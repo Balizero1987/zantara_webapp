@@ -12,7 +12,8 @@ async function syncTeamFromBackend() {
     } else if (isNetlify) {
       apiUrl = '/.netlify/functions/zantara-proxy'; // Netlify function
     } else {
-      apiUrl = 'https://zantara-v520-chatgpt-patch-1064094238013.europe-west1.run.app/call';
+      // Use the public ZANTARA API endpoint
+      apiUrl = 'https://zantara-v520-chatgpt-patch-himaadsxua-ew.a.run.app/call';
     }
 
     console.log('Syncing team from:', apiUrl);
