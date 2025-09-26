@@ -1,0 +1,26 @@
+{
+  "name": "zantara-webapp",
+  "version": "1.0.0",
+  "description": "ZANTARA Web Interface - Bali Zero AI Assistant",
+  "main": "index.html",
+  "scripts": {
+    "dev": "node proxy-server.cjs",
+    "serve": "npx serve .",
+    "deploy": "netlify deploy --prod"
+  },
+  "keywords": [
+    "zantara",
+    "bali-zero",
+    "ai-assistant",
+    "team-management"
+  ],
+  "author": "Bali Zero",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Balizero1987/zantara_webapp.git"
+  },
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}

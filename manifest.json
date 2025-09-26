@@ -1,0 +1,90 @@
+{
+  "name": "ZANTARA Team Hub - Bali Zero",
+  "short_name": "ZANTARA Hub",
+  "description": "AI-powered team workspace for Bali Zero. Chat, collaborate, and manage business tools without limits.",
+  "start_url": "/login.html",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#10b981",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["business", "productivity", "collaboration"],
+  "shortcuts": [
+    {
+      "name": "Team Chat",
+      "short_name": "Chat",
+      "description": "Open team chat interface",
+      "url": "/index.html",
+      "icons": [
+        {
+          "src": "zantara_logo_transparent.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Business Tools",
+      "short_name": "Tools",
+      "description": "Access business tools and pricing",
+      "url": "/index.html#tools",
+      "icons": [
+        {
+          "src": "logo-balizero.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "icons": [
+    {
+      "src": "zantara_logo_transparent.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "density": "1.5"
+    },
+    {
+      "src": "zantara_logo_transparent.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "density": "2.0"
+    },
+    {
+      "src": "zantara_logo_transparent.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "density": "3.0"
+    },
+    {
+      "src": "zantara_logo_transparent.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "density": "4.0"
+    },
+    {
+      "src": "logo-balizero.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "zantara_logo_transparent.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "ZANTARA Team Hub main interface"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  }
+}

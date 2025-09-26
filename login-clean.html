@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZANTARA - Team Access</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="zantara_logo_transparent.png">
+    <meta name="theme-color" content="#6366f1">
+
+    <!-- Geist Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', Helvetica, Arial, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Video Background */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            /* Beautiful gradient background that shows after video fades */
+            background: linear-gradient(135deg, #1a0033 0%, #2D1B69 50%, #6B46C1 100%);
+        }
+
+        .video-background video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: opacity 2s ease-out;
+        }
+
+        .video-background.fade-out video {
+            opacity: 0;
+        }
+
+        /* Overlay - Much lighter to preserve video colors */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2); /* Much lighter overlay */
+            z-index: -1;
+        }
+
+        /* Main Container */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Logo */
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo img {
+            height: 64px;
+            margin-bottom: 16px;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .logo p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 400;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Login Button */
+        .login-btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+        }
+
+        .loading.active {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .footer p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            color: #fca5a5;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Success Message */
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            color: #6ee7b7;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 32px 24px;
+                border-radius: 20px;
+                margin: 12px;
+            }
+
+            .logo h1 {
+                font-size: 24px;
+            }
+        }
+
+        /* Skip Video Button */
+        .skip-video {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .skip-video:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Audio Toggle Button */
+        .audio-toggle {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .audio-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .audio-toggle.playing {
+            animation: none;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Video Background -->
+    <div class="video-background">
+        <video autoplay muted playsinline>
+            <!-- Try local first, fallback to CDN -->
+            <source src="intro.mov" type="video/quicktime">
+            <!-- Fallback: Cloudinary with auto-optimization -->
+            <source src="https://res.cloudinary.com/damguiffu/video/upload/q_auto,f_mp4,vc_h264,w_1280/v1758868677/introzan_wqh6am.mov" type="video/mp4">
+            <!-- Final fallback: Elegant gradient -->
+        </video>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay"></div>
+
+    <!-- Skip Video Button -->
+    <button class="skip-video" onclick="skipToLogin()">Skip Intro</button>
+
+    <!-- Audio Control Button -->
+    <button class="audio-toggle" id="audioToggle" onclick="toggleAudio()" title="Click to unmute">
+        🔇
+    </button>
+
+    <!-- Main Container -->
+    <div class="login-container" id="loginContainer" style="opacity: 0;">
+        <div class="login-card">
+            <!-- Logo -->
+            <div class="logo">
+                <img src="zantara_logo_transparent.png" alt="ZANTARA">
+                <h1>ZANTARA</h1>
+                <p>BALI ZERO AI Chat</p>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage"></div>
+
+            <!-- Success Message -->
+            <div class="success-message" id="successMessage"></div>
+
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="email">Team Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        class="form-input"
+                        placeholder="your.name@balizero.com"
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        class="form-input"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                    >
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span class="btn-text">THE GATE OPENS</span>
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>Opening...</span>
+                    </div>
+                </button>
+            </form>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>Secure access for Bali Zero team members</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let introPlayed = false;
+
+        // Show login after video intro or immediately if video fails
+        window.addEventListener('load', () => {
+            const video = document.querySelector('video');
+            const loginContainer = document.getElementById('loginContainer');
+
+            // Show login after 3 seconds or when video ends
+            const showLogin = () => {
+                if (!introPlayed) {
+                    introPlayed = true;
+                    loginContainer.style.transition = 'opacity 0.8s ease';
+                    loginContainer.style.opacity = '1';
+                }
+            };
+
+            // Auto show after 4 seconds (video duration estimate)
+            setTimeout(showLogin, 4000);
+
+            // Handle video events
+            if (video) {
+                // Show login on error
+                video.addEventListener('error', showLogin);
+
+                // Fade out video when it ends
+                video.addEventListener('ended', () => {
+                    const videoBg = document.querySelector('.video-background');
+                    videoBg.classList.add('fade-out');
+                    showLogin();
+                });
+            }
+        });
+
+        // Skip to login immediately
+        function skipToLogin() {
+            const loginContainer = document.getElementById('loginContainer');
+            const skipBtn = document.querySelector('.skip-video');
+            const videoBg = document.querySelector('.video-background');
+
+            // Fade out video
+            videoBg.classList.add('fade-out');
+
+            loginContainer.style.transition = 'opacity 0.4s ease';
+            loginContainer.style.opacity = '1';
+            skipBtn.style.display = 'none';
+            introPlayed = true;
+        }
+
+        // Form handling
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const btnText = loginBtn.querySelector('.btn-text');
+            const loading = loginBtn.querySelector('.loading');
+
+            // Validate email format
+            if (!email.includes('@')) {
+                showError('Please enter a valid email address');
+                return;
+            }
+
+            // Start loading
+            setLoading(true);
+
+            try {
+                // Simulate authentication (in production, this would call your auth API)
+                await authenticate(email, password);
+
+                // Success
+                showSuccess('The Gate is Opening...');
+
+                // Save credentials and redirect
+                localStorage.setItem('zantara-user-email', email);
+
+                setTimeout(() => {
+                    window.location.href = 'chat.html';
+                }, 1500);
+
+            } catch (error) {
+                showError(error.message);
+                setLoading(false);
+            }
+        });
+
+        // Authentication function
+        async function authenticate(email, password) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    // Accept Bali Zero team emails or demo accounts
+                    const validEmails = [
+                        // Demo accounts
+                        'demo@zantara.com',
+                        'test@balizero.com',
+                        // Real team emails
+                        'zero@balizero.com',
+                        'adit@balizero.com',
+                        'anton@balizero.com',
+                        'angel@balizero.com',
+                        'veronika@balizero.com',
+                        'nina@balizero.com',
+                        'boss@balizero.com'
+                    ];
+
+                    if (email.includes('@balizero.com') || validEmails.includes(email)) {
+                        resolve({ success: true, user: email });
+                    } else {
+                        reject(new Error('Access denied. Please use your @balizero.com email or demo account.'));
+                    }
+                }, 1200);
+            });
+        }
+
+        // UI Helper Functions
+        function setLoading(loading) {
+            const loginBtn = document.getElementById('loginBtn');
+            const btnText = loginBtn.querySelector('.btn-text');
+            const loadingEl = loginBtn.querySelector('.loading');
+
+            if (loading) {
+                btnText.style.display = 'none';
+                loadingEl.classList.add('active');
+                loginBtn.disabled = true;
+            } else {
+                btnText.style.display = 'inline';
+                loadingEl.classList.remove('active');
+                loginBtn.disabled = false;
+            }
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+
+            // Hide after 5 seconds
+            setTimeout(() => {
+                errorEl.classList.remove('show');
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successEl = document.getElementById('successMessage');
+            successEl.textContent = message;
+            successEl.classList.add('show');
+        }
+
+        // Auto-fill demo credentials on development
+        if (window.location.hostname === 'localhost') {
+            // Rotate through different team members for demo
+            const demoEmails = ['adit@balizero.com', 'zero@balizero.com', 'angel@balizero.com', 'demo@zantara.com'];
+            const randomEmail = demoEmails[Math.floor(Math.random() * demoEmails.length)];
+
+            document.getElementById('email').value = randomEmail;
+            document.getElementById('password').value = 'demo';
+
+            // Show hint for testing
+            console.log('🎭 Demo mode active! Try these emails:', demoEmails.join(', '));
+        }
+
+        // Audio Toggle Function
+        function toggleAudio() {
+            const video = document.querySelector('video');
+            const audioToggle = document.getElementById('audioToggle');
+
+            if (video) {
+                if (video.muted) {
+                    video.muted = false;
+                    audioToggle.textContent = '🔊';
+                    audioToggle.classList.add('playing');
+                    audioToggle.title = 'Click to mute';
+                } else {
+                    video.muted = true;
+                    audioToggle.textContent = '🔇';
+                    audioToggle.classList.remove('playing');
+                    audioToggle.title = 'Click to unmute';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

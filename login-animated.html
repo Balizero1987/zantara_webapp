@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZANTARA - Team Access</title>
+    <link rel="icon" type="image/png" href="zantara_logo_transparent.png">
+    <meta name="theme-color" content="#6366f1">
+
+    <!-- Geist Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Animated Background (instead of video) */
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a0033 0%, #2D1B69 50%, #6B46C1 100%);
+            z-index: -2;
+        }
+
+        .animated-background::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(circle at 20% 80%, rgba(147, 51, 234, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(167, 139, 250, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(139, 92, 246, 0.2) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Intro Animation */
+        .intro-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeOut 1s ease 3s forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                pointer-events: none;
+            }
+        }
+
+        .intro-logo {
+            width: 120px;
+            height: 120px;
+            background: white;
+            clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulseScale 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseScale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .intro-logo img {
+            width: 80px;
+            height: 80px;
+            opacity: 0;
+            animation: fadeIn 1s ease 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .intro-text {
+            position: absolute;
+            bottom: 100px;
+            text-align: center;
+            opacity: 0;
+            animation: slideUp 1s ease 1.5s forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .intro-text h2 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .intro-text p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(2px);
+            z-index: -1;
+        }
+
+        /* Main Container */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 3.5s forwards;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Logo */
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo img {
+            height: 64px;
+            margin-bottom: 16px;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .logo p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 400;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Login Button */
+        .login-btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+        }
+
+        .loading.active {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Messages */
+        .error-message, .success-message {
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+
+        .error-message.show, .success-message.show {
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .footer p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Intro (instead of video) -->
+    <div class="intro-animation" id="introAnimation">
+        <div class="intro-logo">
+            <img src="zantara_logo_transparent.png" alt="ZANTARA">
+        </div>
+        <div class="intro-text">
+            <h2>ZANTARA</h2>
+            <p>The Gate Opens</p>
+        </div>
+    </div>
+
+    <!-- Animated Background -->
+    <div class="animated-background"></div>
+
+    <!-- Overlay -->
+    <div class="overlay"></div>
+
+    <!-- Main Container -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-card">
+            <!-- Logo -->
+            <div class="logo">
+                <img src="zantara_logo_transparent.png" alt="ZANTARA">
+                <h1>ZANTARA</h1>
+                <p>BALI ZERO AI Chat</p>
+            </div>
+
+            <!-- Messages -->
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="email">Team Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        class="form-input"
+                        placeholder="your.name@balizero.com"
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        class="form-input"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                    >
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span class="btn-text">THE GATE OPENS</span>
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>Opening...</span>
+                    </div>
+                </button>
+            </form>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>Secure access for Bali Zero team members</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Remove intro animation after 4 seconds
+        setTimeout(() => {
+            const intro = document.getElementById('introAnimation');
+            if (intro) {
+                intro.style.display = 'none';
+            }
+        }, 4000);
+
+        // Form handling
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const btnText = loginBtn.querySelector('.btn-text');
+            const loading = loginBtn.querySelector('.loading');
+
+            // Validate email
+            if (!email.includes('@')) {
+                showError('Please enter a valid email address');
+                return;
+            }
+
+            // Start loading
+            setLoading(true);
+
+            try {
+                // Simulate authentication
+                await authenticate(email, password);
+
+                // Success
+                showSuccess('The Gate is Opening...');
+
+                // Save and redirect
+                localStorage.setItem('zantara-user-email', email);
+
+                setTimeout(() => {
+                    window.location.href = 'chat.html';
+                }, 1500);
+
+            } catch (error) {
+                showError(error.message);
+                setLoading(false);
+            }
+        });
+
+        // Authentication function
+        async function authenticate(email, password) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    // Accept Bali Zero emails or demo
+                    if (email.includes('@balizero.com') || email === 'demo@zantara.com') {
+                        resolve({ success: true, user: email });
+                    } else {
+                        reject(new Error('Access denied. Please use your @balizero.com email.'));
+                    }
+                }, 1200);
+            });
+        }
+
+        // UI Helper Functions
+        function setLoading(loading) {
+            const loginBtn = document.getElementById('loginBtn');
+            const btnText = loginBtn.querySelector('.btn-text');
+            const loadingEl = loginBtn.querySelector('.loading');
+
+            if (loading) {
+                btnText.style.display = 'none';
+                loadingEl.classList.add('active');
+                loginBtn.disabled = true;
+            } else {
+                btnText.style.display = 'inline';
+                loadingEl.classList.remove('active');
+                loginBtn.disabled = false;
+            }
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+            setTimeout(() => {
+                errorEl.classList.remove('show');
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successEl = document.getElementById('successMessage');
+            successEl.textContent = message;
+            successEl.classList.add('show');
+        }
+
+        // Auto-fill demo credentials on localhost
+        if (window.location.hostname === 'localhost') {
+            const demoEmails = ['adit@balizero.com', 'zero@balizero.com', 'angel@balizero.com'];
+            const randomEmail = demoEmails[Math.floor(Math.random() * demoEmails.length)];
+            document.getElementById('email').value = randomEmail;
+            document.getElementById('password').value = 'demo';
+        }
+    </script>
+</body>
+</html>
