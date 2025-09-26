@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZANTARA API Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #0a0a0a;
+            color: #0f0;
+            padding: 20px;
+        }
+        button {
+            background: #0f0;
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+        #output {
+            background: #111;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #0f0;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error { color: #f00; }
+        .success { color: #0f0; }
+    </style>
+</head>
+<body>
+    <h1>🚀 ZANTARA API Test Console</h1>
+
+    <div>
+        <button onclick="testHealth()">Test Health</button>
+        <button onclick="testTeamList()">Test Team List</button>
+        <button onclick="testContactInfo()">Test Contact Info</button>
+        <button onclick="testAIChat()">Test AI Chat</button>
+    </div>
+
+    <div id="output"></div>
+
+    <script>
+        const API_BASE = 'https://zantara-v520-chatgpt-patch-himaadsxua-ew.a.run.app';
+        const API_KEY = 'zantara-internal-dev-key-2025';
+
+        function log(message, type = '') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toISOString();
+            output.innerHTML += `<span class="${type}">[${timestamp}] ${message}</span>\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        async function testHealth() {
+            log('Testing /health endpoint...');
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                log('✅ Health: ' + JSON.stringify(data, null, 2), 'success');
+            } catch (error) {
+                log('❌ Health error: ' + error.message, 'error');
+            }
+        }
+
+        async function testTeamList() {
+            log('Testing team.list handler...');
+            try {
+                const response = await fetch(`${API_BASE}/call`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        key: 'team.list',
+                        params: {}
+                    })
+                });
+                const data = await response.json();
+                log('✅ Team list: ' + JSON.stringify(data, null, 2), 'success');
+            } catch (error) {
+                log('❌ Team list error: ' + error.message, 'error');
+            }
+        }
+
+        async function testContactInfo() {
+            log('Testing contact.info handler...');
+            try {
+                const response = await fetch(`${API_BASE}/call`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        key: 'contact.info',
+                        params: {}
+                    })
+                });
+                const data = await response.json();
+                log('✅ Contact info: ' + JSON.stringify(data, null, 2), 'success');
+            } catch (error) {
+                log('❌ Contact info error: ' + error.message, 'error');
+            }
+        }
+
+        async function testAIChat() {
+            log('Testing AI chat endpoint...');
+            try {
+                const response = await fetch(`${API_BASE}/ai.chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        prompt: 'Hello, test from ZANTARA console'
+                    })
+                });
+                const data = await response.json();
+                log('✅ AI response: ' + JSON.stringify(data, null, 2), 'success');
+            } catch (error) {
+                log('❌ AI chat error: ' + error.message, 'error');
+            }
+        }
+
+        // Auto-test health on load
+        window.onload = () => {
+            log('ZANTARA API Test Console Ready', 'success');
+            log('API: ' + API_BASE);
+            log('Key: ' + API_KEY.substring(0, 10) + '...');
+            testHealth();
+        };
+    </script>
+</body>
+</html>
