@@ -24,7 +24,7 @@ const API_CONFIG = {
   },
 
   // API Key (should be in environment variable in production)
-  apiKey: 'deabf88e8aefda722fbdb8e899d1e1717c8faf66bf56fb82be495c2f3458d30c',
+  apiKey: 'zantara-internal-dev-key-2025',
 
   // Default headers
   headers: {

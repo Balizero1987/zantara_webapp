@@ -23,7 +23,7 @@ async function syncTeamFromBackend() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': 'deabf88e8aefda722fbdb8e899d1e1717c8faf66bf56fb82be495c2f3458d30c'
+        'x-api-key': 'zantara-internal-dev-key-2025'
       },
       body: JSON.stringify({
         key: 'team.list',
