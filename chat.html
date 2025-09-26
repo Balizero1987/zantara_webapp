@@ -1007,21 +1007,64 @@
         function detectBestHandler(message) {
             const lower = message.toLowerCase();
 
+            // Identity and team related
+            if (lower.includes('chi sono') || lower.includes('who am i') ||
+                lower.includes('mi conosci') || lower.includes('know me') ||
+                lower.includes('il mio profilo') || lower.includes('my profile')) {
+                return 'identity.resolve';
+            }
+
+            // Team information
+            if (lower.includes('team') || lower.includes('collaborator') ||
+                lower.includes('membri') || lower.includes('chi lavora') ||
+                lower.includes('staff') || lower.includes('dipendenti')) {
+                return 'team.list';
+            }
+
             // Price/quote related
             if (lower.includes('price') || lower.includes('quote') ||
                 lower.includes('harga') || lower.includes('biaya') ||
-                lower.includes('berapa') || lower.includes('cost')) {
+                lower.includes('berapa') || lower.includes('cost') ||
+                lower.includes('prezz') || lower.includes('quanto costa')) {
                 return 'bali.zero.pricing';
             }
 
+            // Company/contact info
+            if (lower.includes('contact') || lower.includes('info bali zero') ||
+                lower.includes('ufficio') || lower.includes('sede') ||
+                lower.includes('telefono') || lower.includes('email')) {
+                return 'contact.info';
+            }
+
+            // Memory related
+            if (lower.includes('ricorda') || lower.includes('save') ||
+                lower.includes('memorizza') || lower.includes('remember')) {
+                return 'memory.save';
+            }
+
             // Lead saving
-            if (lower.includes('save lead') || lower.includes('client lead')) {
+            if (lower.includes('save lead') || lower.includes('client lead') ||
+                lower.includes('nuovo cliente') || lower.includes('prospect')) {
                 return 'lead.save';
             }
 
-            // Company info
-            if (lower.includes('contact') || lower.includes('info bali zero')) {
-                return 'contact.info';
+            // Calendar/events
+            if (lower.includes('calendario') || lower.includes('appointment') ||
+                lower.includes('meeting') || lower.includes('evento')) {
+                return 'calendar.create';
+            }
+
+            // Document related
+            if (lower.includes('document') || lower.includes('file') ||
+                lower.includes('pdf') || lower.includes('download')) {
+                return 'document.prepare';
+            }
+
+            // For greetings and casual conversation, but WITH context
+            if (lower.includes('ciao') || lower.includes('hello') ||
+                lower.includes('hi') || lower.includes('come stai') ||
+                lower.includes('how are you') || lower.includes('buongiorno')) {
+                return 'ai.chat';
             }
 
             // Default to AI chat
@@ -1038,43 +1081,68 @@
                     let userContext = currentUser ?
                         `I am ${currentUser.name} (${currentUser.email}), ${currentUser.role} at Bali Zero. ` : '';
 
-                    // Add team info if asking about collaborators
-                    if (lower.includes('collaborator') || lower.includes('team') ||
-                        lower.includes('chi lavora') || lower.includes('membri')) {
-                        const teamList = Object.values(TEAM_MEMBERS).map(m =>
-                            `- ${m.name}: ${m.role}`
-                        ).slice(0, 10).join('\n');
-
-                        userContext += `\nBali Zero team includes:\n${teamList}\n\nQuestion: `;
-                    }
-
-                    // Add pricing info if asking about prices
-                    if (lower.includes('prezz') || lower.includes('price') || lower.includes('cost')) {
-                        userContext += `\nBali Zero Services & Prices:
-- B211A Visa (6 months): $650
-- B211B Business Visa (6 months): $850
-- KITAS Work Permit (1 year): $2,500
-- PT Company Setup: $2,800
-- Virtual Office: $150/month
-- Tax Services: From $200/month\n\nQuestion: `;
-                    }
-
                     return {
                         prompt: userContext + message,
                         context: `User: ${currentUser?.name || 'Team Member'}`,
                         userRole: currentUser?.role || 'Team Member',
                         department: currentUser?.department || 'general'
                     };
+
+                case 'identity.resolve':
+                    return {
+                        email: currentUser?.email || 'demo@zantara.com',
+                        identity_hint: currentUser?.email || message
+                    };
+
+                case 'team.list':
+                    return {
+                        department: currentUser?.department,
+                        include_details: true
+                    };
+
+                case 'contact.info':
+                    return {};
+
                 case 'bali.zero.pricing':
                     return { service: extractService(message) };
+
+                case 'memory.save':
+                    return {
+                        userId: currentUser?.email || 'demo',
+                        key: `note_${Date.now()}`,
+                        content: message,
+                        metadata: {
+                            source: 'chat',
+                            timestamp: new Date().toISOString()
+                        }
+                    };
+
                 case 'lead.save':
                     return {
                         details: message,
                         source: 'ZANTARA Chat',
                         handled_by: currentUser?.name || 'Team Member'
                     };
+
+                case 'calendar.create':
+                    return {
+                        title: 'Meeting request',
+                        description: message,
+                        organizer: currentUser?.email || 'demo@zantara.com'
+                    };
+
+                case 'document.prepare':
+                    return {
+                        type: 'general',
+                        content: message,
+                        user: currentUser?.name || 'Team Member'
+                    };
+
                 default:
-                    return { query: message };
+                    return {
+                        query: message,
+                        user: currentUser?.email || 'demo@zantara.com'
+                    };
             }
         }
 
