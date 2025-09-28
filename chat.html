@@ -6,7 +6,7 @@
     <title>ZANTARA Chat - AI Assistant</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="zantara_logo_transparent.png">
+    <link rel="icon" type="image/png" href="assets/logozantara.jpeg">
     <meta name="theme-color" content="#6366f1">
 
     <!-- Geist Font -->
@@ -413,7 +413,7 @@
         <div class="chat-header">
             <div class="header-left">
                 <div class="assistant-avatar">
-                    <img src="zantara_logo_transparent.png" alt="ZANTARA" style="width: 24px; height: 24px;">
+                    <img src="assets/logobianco.jpeg" alt="ZANTARA" style="width: 24px; height: 24px;">
                 </div>
                 <div class="assistant-info">
                     <h2>ZANTARA</h2>
@@ -431,7 +431,7 @@
             <!-- Welcome Message -->
             <div class="welcome-message">
                 <div class="welcome-icon">
-                    <img src="zantara_logo_transparent.png" alt="ZANTARA" style="width: 48px; height: 48px; opacity: 0.8;">
+                <img src="assets/logobianco.jpeg" alt="ZANTARA" style="width: 48px; height: 48px; opacity: 0.8;">
                 </div>
                 <h3>ZANTARA Awaits</h3>
                 <p>Visas, business, clarity — one channel.</p>
@@ -444,7 +444,7 @@
         <!-- Typing Indicator -->
         <div class="typing-indicator" id="typingIndicator">
             <div class="message-avatar" style="background: white; clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);">
-                <img src="zantara_logo_transparent.png" alt="ZANTARA" style="width: 20px; height: 20px;">
+                <img src="assets/logobianco.jpeg" alt="ZANTARA" style="width: 20px; height: 20px;">
             </div>
             <div class="typing-content">
                 <div class="typing-dots">
@@ -853,7 +853,7 @@
             messageDiv.className = `message ${role}`;
 
             const timeStr = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const avatar = role === 'user' ? '👤' : '<img src="zantara_logo_transparent.png" alt="Z" style="width: 20px; height: 20px;">';
+            const avatar = role === 'user' ? '👤' : '<img src="assets/logobianco.jpeg" alt="Z" style="width: 20px; height: 20px;">';
 
             messageDiv.innerHTML = `
                 <div class="message-avatar">${avatar}</div>

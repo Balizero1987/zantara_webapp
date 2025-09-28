@@ -74,7 +74,7 @@ class ZantaraApp {
     const div = document.createElement('div'); div.className = `message ${sender}`;
     const content = opts.html ? String(text) : this.escape(text);
     if (sender === 'assistant') {
-      div.innerHTML = `<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`;
+      div.innerHTML = `<div class="message-avatar"><img src="assets/logobianco.jpeg" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`;
     } else {
       div.innerHTML = `<div class="message-bubble">${content}</div>`;
     }
@@ -84,7 +84,7 @@ class ZantaraApp {
     return div;
   }
 
-  showTypingIndicator() { const c = document.querySelector('.messages-container'); if (!c) return; const d = document.createElement('div'); d.className = 'message assistant typing-message'; d.innerHTML = `<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA" class="thinking"></div><div class="message-bubble"><div class="typing-indicator"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div></div>`; c.appendChild(d); c.scrollTop = c.scrollHeight; }
+  showTypingIndicator() { const c = document.querySelector('.messages-container'); if (!c) return; const d = document.createElement('div'); d.className = 'message assistant typing-message'; d.innerHTML = `<div class="message-avatar"><img src="assets/logobianco.jpeg" alt="ZANTARA" class="thinking"></div><div class="message-bubble"><div class="typing-indicator"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div></div>`; c.appendChild(d); c.scrollTop = c.scrollHeight; }
   hideTypingIndicator() { document.querySelector('.typing-message')?.remove(); }
 
   async processWithZantara(text) {
@@ -163,7 +163,7 @@ class ZantaraApp {
     for (const m of visible) {
       const div = document.createElement('div'); div.className = `message ${m.sender}`;
       const content = m.html ? String(m.text) : this.escape(m.text);
-      if (m.sender === 'assistant') div.innerHTML = `<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`;
+      if (m.sender === 'assistant') div.innerHTML = `<div class="message-avatar"><img src="assets/logobianco.jpeg" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`;
       else div.innerHTML = `<div class="message-bubble">${content}</div>`;
       container.appendChild(div);
     }
@@ -180,4 +180,3 @@ class ZantaraApp {
 }
 
 document.addEventListener('DOMContentLoaded', () => { window.zantaraApp = new ZantaraApp(); });
-
