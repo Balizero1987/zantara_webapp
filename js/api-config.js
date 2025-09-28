@@ -7,7 +7,8 @@ const API_CONFIG = {
   // Proxy/BFF endpoints (server-side adds x-api-key, client sends x-user-id)
   proxy: {
     production: {
-      base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || '',
+      // Default to the provided Cloud Run proxy; still overridable via window/localStorage
+      base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://zantara-web-proxy-himaadsxua-ew.a.run.app/api/zantara',
       call: '/call',
       ai: '/ai.chat',
       aiStream: '/ai.chat.stream',
