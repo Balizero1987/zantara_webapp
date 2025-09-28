@@ -2,40 +2,19 @@
 
 async function syncTeamFromBackend() {
   try {
-    // Determine API endpoint based on environment
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const isNetlify = window.location.hostname.includes('netlify');
-
-    let apiUrl;
-    if (isLocalhost) {
-      apiUrl = 'http://localhost:3003/call'; // Local proxy
-    } else if (isNetlify) {
-      apiUrl = '/.netlify/functions/zantara-proxy'; // Netlify function
-    } else {
-      // Use the public ZANTARA API endpoint
-      apiUrl = 'https://zantara-v520-chatgpt-patch-himaadsxua-ew.a.run.app/call';
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      console.log('Sync skipped: offline');
+      return null;
+    }
+    // Use centralized API helper (handles GitHub Pages CORS via proxy)
+    if (!window.ZANTARA_API || typeof window.ZANTARA_API.call !== 'function') {
+      throw new Error('API helper not available');
     }
 
-    console.log('Syncing team from:', apiUrl);
-
-    // Fetch team data from ZANTARA
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': 'zantara-internal-dev-key-2025'
-      },
-      body: JSON.stringify({
-        key: 'team.list',
-        params: {}
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const result = await response.json();
+    const result = await window.ZANTARA_API.call('/call', {
+      key: 'team.list',
+      params: {}
+    }, true);
 
     if (result.ok && result.data && result.data.members) {
       // Transform backend data to match frontend format
@@ -114,17 +93,46 @@ function getDashboardWidgets(department) {
   return widgets[department] || ['general_dashboard'];
 }
 
-// Auto-sync on load
+// Auto-sync on load with visibility-aware scheduling
 if (typeof window !== 'undefined') {
   window.syncTeamFromBackend = syncTeamFromBackend;
 
   // Sync team data when DOM is ready
+  const start = () => {
+    try { syncTeamFromBackend(); } catch (_) {}
+    scheduleNextSync();
+  };
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', syncTeamFromBackend);
+    document.addEventListener('DOMContentLoaded', start);
   } else {
-    syncTeamFromBackend();
+    start();
   }
 
-  // Sync every 5 minutes
-  setInterval(syncTeamFromBackend, 5 * 60 * 1000);
+  let syncTimer = null;
+  let backoff = 1; // exponential backoff factor
+  const VISIBLE_MS = 5 * 60 * 1000;   // 5 minutes when tab visible
+  const HIDDEN_MS  = 30 * 60 * 1000;  // 30 minutes when tab hidden
+
+  function scheduleNextSync() {
+    if (syncTimer) clearTimeout(syncTimer);
+    const base = document.hidden ? HIDDEN_MS : VISIBLE_MS;
+    const delay = base * backoff;
+    syncTimer = setTimeout(async () => {
+      try {
+        const res = await syncTeamFromBackend();
+        // If we got data, reset backoff; otherwise increase up to x8
+        if (res) backoff = 1; else backoff = Math.min(backoff * 2, 8);
+      } catch (_) {
+        backoff = Math.min(backoff * 2, 8);
+      }
+      scheduleNextSync();
+    }, delay);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    scheduleNextSync();
+  });
+
+  window.addEventListener('online', scheduleNextSync);
+  window.addEventListener('offline', scheduleNextSync);
 }

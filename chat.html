@@ -12,6 +12,14 @@
     <!-- Geist Font -->
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Design System -->
+    <link rel="stylesheet" href="styles/design-system.css">
+    <link rel="stylesheet" href="styles/streaming-toggle.css">
+    <link rel="stylesheet" href="styles/virtualization-config.css">
+    <link rel="stylesheet" href="styles/test-console.css">
+    <link rel="stylesheet" href="styles/onboarding-system.css">
+    <link rel="stylesheet" href="styles/feature-discovery.css">
+
     <!-- API Configuration -->
     <script src="js/api-config.js"></script>
 
@@ -1330,6 +1338,21 @@
         function showError(message) {
             addMessage('assistant', `❌ ${message}`);
         }
+
+        // Initialize all enhancement systems
+        const enhancementScripts = [
+            'js/streaming-toggle.js',
+            'js/message-virtualization.js',
+            'js/test-console.js',
+            'js/onboarding-system.js',
+            'js/feature-discovery.js'
+        ];
+
+        enhancementScripts.forEach(src => {
+            const script = document.createElement('script');
+            script.src = src;
+            document.head.appendChild(script);
+        });
     </script>
 </body>
 </html>
