@@ -44,6 +44,14 @@
         <button onclick="printTelemetry()" title="Show telemetry summary">Telemetry Summary</button>
     </div>
 
+    <div style="margin-top:12px;">
+        <input id="baseOverride" placeholder="Set API Base (e.g., https://zantara-v520-production-XXXX-ew.a.run.app)" style="width:100%;padding:8px;background:#111;border:1px solid #0f0;color:#0f0;" />
+        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="setBaseFromInput()">Set Base</button>
+            <button onclick="showCurrentBase()">Show Current Base</button>
+        </div>
+    </div>
+
     <h3 style="margin-top:16px;">Training + Integration Runner</h3>
     <div>
         <input id="testUserEmail" placeholder="test user email (default: localStorage or demo@zantara.com)" style="width:100%;padding:8px;background:#111;border:1px solid #0f0;color:#0f0;" />
@@ -94,6 +102,26 @@
             } catch (error) {
                 log('❌ Health error: ' + error.message, 'error');
             }
+        }
+
+        function setBaseFromInput() {
+            const input = document.getElementById('baseOverride');
+            const val = (input && input.value || '').trim();
+            if (!val) return log('⚠️ Missing base URL', 'error');
+            if (!/^https?:\/\//i.test(val)) return log('❌ Invalid URL', 'error');
+            try {
+                window.ZANTARA_API.setBase(val);
+                localStorage.setItem('zantara-api-base', val);
+                log('🔧 Base set to: ' + val, 'success');
+            } catch(e) {
+                log('❌ Failed to set base: ' + e.message, 'error');
+            }
+        }
+
+        function showCurrentBase() {
+            const viaHelper = !!(window.ZANTARA_API && window.ZANTARA_API.call);
+            const helperBase = viaHelper ? (window.ZANTARA_API.config?.production?.base || 'unknown') : 'n/a';
+            log('ℹ️ Current Base: ' + helperBase);
         }
 
         function printTelemetry() {

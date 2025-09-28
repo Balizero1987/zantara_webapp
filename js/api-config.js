@@ -4,8 +4,8 @@
 const API_CONFIG = {
   // Production ZANTARA endpoints
   production: {
-    // Unified Cloud Run endpoint with CORS enabled
-    base: 'https://zantara-v520-chatgpt-patch-himaadsxua-ew.a.run.app',
+    // Unified Cloud Run endpoint with CORS enabled (production)
+    base: 'https://zantara-v520-production-himaadsxua-ew.a.run.app',
     call: '/call',
     health: '/health'
   },

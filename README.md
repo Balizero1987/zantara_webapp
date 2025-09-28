@@ -13,7 +13,7 @@ Web interface for ZANTARA V2 – Bali Zero AI Assistant
 ## 📦 Setup
 1. Clone repository
 2. Push to GitHub and enable GitHub Pages (branch main, folder root)
-3. Backend: enable CORS on Cloud Run for Origin https://balizero1987.github.io
+3. Backend: enable CORS on Cloud Run for Origins https://balizero1987.github.io and https://zantara.balizero.com
 4. Optional: override API base via localStorage key `zantara-api-base`
 
 Please, before doing anything:
@@ -58,6 +58,18 @@ Quick Links
 Notes
 - The client never needs public CORS proxies: backend exposes proper CORS.
 - For local development, a small dev proxy runs on port 3003 (`npm run dev`).
+
+## 🔌 Production Base (Cloud Run)
+
+- Service: `zantara-v520-production` (region: `europe-west1`)
+- Set base at runtime (DevTools console):
+  ```js
+  window.ZANTARA_API.setBase('https://<your-cloud-run-service-url>');
+  ```
+- Or from the Test Console UI (`test-api.html`): field "Set API Base" → Set Base
+- Persist locally: saved in `localStorage['zantara-api-base']`
+
+Verify connectivity from CLI or Test Console (Contact Info, Team List, AI Chat should be 200).
 
 ## 📝 License
 © 2025 Bali Zero. All rights reserved.
