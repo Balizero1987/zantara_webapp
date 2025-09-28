@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZANTARA Chat - AI Assistant</title>
+    <title>ZANTARA Chat (redirecting…)</title>
+    <meta http-equiv="refresh" content="0; url=syncra.html">
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="assets/logozantara.jpeg">
@@ -20,6 +21,10 @@
     <link rel="stylesheet" href="styles/onboarding-system.css">
     <link rel="stylesheet" href="styles/feature-discovery.css">
 
+    <!-- Redirect Classic UI to Syncra -->
+    <script>
+      (function(){ try { if (!/force=true/.test(location.search)) { location.replace('syncra.html'); } } catch(_) { location.href = 'syncra.html'; } })();
+    </script>
     <!-- API Configuration -->
     <script src="js/api-config.js"></script>
 
