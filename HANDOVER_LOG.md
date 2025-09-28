@@ -1,6 +1,6 @@
 # HANDOVER LOG – ZANTARA WEBAPP
 
-2025-09-27 – Session Summary
+2025-09-28 – Session Summary
 - CORS: enabled on Cloud Run for Pages origin
 - Endpoint: unified to Cloud Run canonical; proxies removed
 - Persona V2: loaded from `persona/instructions.md` (override via localStorage)
@@ -16,12 +16,14 @@
 - **Message Virtualization**: configurable MAX_RENDER_MESSAGES (5-200), device presets, auto-detection
 - **Enhanced Test Console**: 8 automated test scenarios, performance metrics, mock server, keyboard shortcut (Ctrl+Shift+T)
 - **Complete Onboarding System**: Welcome flow (6 steps), smart feature discovery, help center, keyboard shortcuts (F1/?)
+- **PERSONA FIX**: Simplified persona/instructions.md from 139 lines of complex Italian/Indonesian cultural references to 33 lines of clear professional instructions
 
 Open Items / Next Steps
 - Optional SSE endpoint adoption when backend exposes real streaming
 - Expand Quick Actions palette (e.g., Relationship Intelligence)
-- Toggle UI for streaming on/off (currently auto)
-- Workspace tests: finalize OAuth2/Impersonation config on backend
+- Basic telemetry implementation (P3)
+- GIFs/screenshots for onboarding (P4)
+- Backend coordination: SSE integration plan, model routing, V2 handler contract (P1)
 
 Policy
 - LAW: Structural code changes must be proposed/approved for the Mother Project before merging here.
