@@ -5,21 +5,23 @@ class ZantaraApp {
     this.currentView = 'welcome';
     this.messages = [];
     this.recognition = null;
-    this.extraLoaded = 0; // for "Load earlier"
+    this.extraLoaded = 0; // for "Load earlier" control
     this.init();
   }
 
   init() {
+    // Hide splash after a short delay
     setTimeout(() => {
       const splash = document.getElementById('splash-screen');
       if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 500); }
-    }, 2000);
+    }, 1200);
 
     this.initEventListeners();
     this.initVoiceRecognition();
 
     if (localStorage.getItem('zantara_user')) this.showChatInterface();
 
+    // Non-blocking identity check
     try {
       const api = window.ZANTARA_API;
       const email = localStorage.getItem('zantara-user-email') || '';
@@ -52,8 +54,14 @@ class ZantaraApp {
     }
   }
 
-  startVoiceRecording() { const o = document.getElementById('voice-overlay'); if (o) o.style.display = 'flex'; if (this.recognition) { this.recognition.start(); this.isListening = true; const t = document.querySelector('.listening-text'); if (t) t.textContent = 'Listening...'; } }
-  stopVoiceRecording() { const o = document.getElementById('voice-overlay'); if (o) o.style.display = 'none'; if (this.recognition && this.isListening) { this.recognition.stop(); this.isListening = false; } }
+  startVoiceRecording() {
+    const o = document.getElementById('voice-overlay'); if (o) o.style.display = 'flex';
+    if (this.recognition) { this.recognition.start(); this.isListening = true; const t = document.querySelector('.listening-text'); if (t) t.textContent = 'Listening...'; }
+  }
+  stopVoiceRecording() {
+    const o = document.getElementById('voice-overlay'); if (o) o.style.display = 'none';
+    if (this.recognition && this.isListening) { this.recognition.stop(); this.isListening = false; }
+  }
 
   processVoiceCommand(transcript) { this.stopVoiceRecording(); this.showChatInterface(); this.addMessage('user', transcript); this.processWithZantara(transcript); }
 
@@ -63,6 +71,11 @@ class ZantaraApp {
     const command = map[action] || `Help me with ${action}`;
     this.addMessage('user', command);
     this.runQuickAction(action, command);
+  }
+
+  async runQuickAction(action, command) {
+    // For now we reuse the main processor; pricing policies are handled there
+    return this.processWithZantara(command);
   }
 
   showChatInterface() { const w = document.getElementById('welcome-screen'); const c = document.getElementById('chat-interface'); if (w) w.style.display = 'none'; if (c) c.style.display = 'flex'; localStorage.setItem('zantara_user', 'true'); }
@@ -84,46 +97,77 @@ class ZantaraApp {
     return div;
   }
 
-  showTypingIndicator() { const c = document.querySelector('.messages-container'); if (!c) return; const d = document.createElement('div'); d.className = 'message assistant typing-message'; d.innerHTML = `<div class="message-avatar"><img src="assets/logobianco.jpeg" alt="ZANTARA" class="thinking"></div><div class="message-bubble"><div class="typing-indicator"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div></div>`; c.appendChild(d); c.scrollTop = c.scrollHeight; }
-  hideTypingIndicator() { document.querySelector('.typing-message')?.remove(); }
+  // Typing indicator bubble for assistant
+  showTypingIndicator() {
+    const c = document.querySelector('.messages-container'); if (!c) return;
+    this.hideTypingIndicator();
+    const d = document.createElement('div');
+    d.className = 'message assistant typing-message';
+    d.innerHTML = `
+      <div class="message-avatar"><img src="assets/logobianco.jpeg" alt="ZANTARA"></div>
+      <div class="message-bubble">
+        <div class="typing-indicator">
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+        </div>
+      </div>
+    `;
+    c.appendChild(d);
+    c.scrollTop = c.scrollHeight;
+  }
+  hideTypingIndicator() { const t = document.querySelector('.typing-message'); if (t) t.remove(); }
 
   async processWithZantara(text) {
-    this.showTypingIndicator(); const api = window.ZANTARA_API;
     try {
-      if (api?.call) {
-        const res = await api.call('/call', { key: 'ai.chat', params: { prompt: text } }, true);
-        const reply = this.extractReply(res); this.hideTypingIndicator(); this.renderAssistantReply(reply || 'OK.');
-      } else {
-        setTimeout(() => { this.hideTypingIndicator(); this.renderAssistantReply(`I understand you want to: "${text}". Let me help you with that.`); }, 1000);
+      this.showTypingIndicator();
+      const api = window.ZANTARA_API;
+      if (!api || !api.call) { this.hideTypingIndicator(); return this.renderAssistantReply('API not available.'); }
+
+      const wantsPricing = /\b(price|pricing|cost|fee|fees|prezzo|prezzi|costo|costi)\b/i.test(text || '');
+      const codeMatch = /\bD\d{2}\b/i.exec(text || '');
+
+      if (wantsPricing || codeMatch) {
+        // Official pricing only (policy)
+        const key = codeMatch ? 'price.lookup' : 'pricing.official';
+        const params = codeMatch ? { service: codeMatch[0].toUpperCase() } : { service_type: 'all', include_details: true };
+        const res = await api.call('/call', { key, params }, true);
+        this.hideTypingIndicator();
+        const blob = JSON.stringify(res || {});
+        if (/PREZZI UFFICIALI 2025/i.test(blob)) {
+          this.addMessage('assistant', 'Redirecting to official prices…');
+          const retry = await api.call('/call', { key: 'pricing.official', params: { service_type: 'all', include_details: true } }, true);
+          return this.renderAssistantReply(this.formatPricing(retry));
+        }
+        return this.renderAssistantReply(this.formatPricing(res));
       }
-    } catch (e) { this.hideTypingIndicator(); this.renderAssistantReply(`There was a problem contacting ZANTARA. (${e.message})`); }
+
+      // Default to ai.chat
+      const res = await api.call('/call', { key: 'ai.chat', params: { prompt: text } }, true);
+      this.hideTypingIndicator();
+      return this.renderAssistantReply(this.extractReply(res) || 'OK.');
+
+    } catch (err) {
+      this.hideTypingIndicator();
+      console.error(err);
+      return this.addMessage('assistant', 'Request failed. Please try again.');
+    }
   }
 
-  extractReply(res) { if (!res) return ''; if (typeof res === 'string') return res; return (res.reply || res.message || res.text || res?.data?.reply || res?.choices?.[0]?.message?.content || JSON.stringify(res)); }
-
-  processToolCommand(text) {
-    const card = `<div class="tool-card"><div class="tool-header"><img src="zantara_logo_transparent.png" class="lotus-mini" alt=""><span>Processing your request...</span></div><div class="tool-progress"><div class="tool-progress-bar" style="width: 0%"></div></div></div>`;
-    this.addMessage('assistant', `I'm working on that for you. ${card}`, { html: true });
-    setTimeout(() => { const bars = document.querySelectorAll('.tool-progress-bar'); const bar = bars[bars.length - 1]; if (bar) bar.style.width = '100%'; }, 100);
+  extractReply(res) {
+    if (!res) return '';
+    if (typeof res.reply === 'string') return res.reply;
+    if (typeof res.message === 'string') return res.message;
+    if (typeof res.text === 'string') return res.text;
+    try { if (Array.isArray(res.choices) && res.choices[0]?.message?.content) return res.choices[0].message.content; } catch(_){}
+    try { if (res.data && typeof res.data.reply === 'string') return res.data.reply; } catch(_){}
+    return JSON.stringify(res, null, 2);
   }
 
-  async runQuickAction(action, originalText) {
-    const api = window.ZANTARA_API;
-    const showCard = () => { const html = `<div class="tool-card"><div class="tool-header"><img src="zantara_logo_transparent.png" class="lotus-mini" alt=""><span>Processing your request...</span></div><div class="tool-progress"><div class="tool-progress-bar" style="width: 0%"></div></div></div>`; this.addMessage('assistant', html, { html: true }); const bars = document.querySelectorAll('.tool-progress-bar'); return bars[bars.length - 1] || null; };
-    const bar = showCard(); const setBar = (p) => { if (bar) bar.style.width = `${p}%`; }; setBar(20);
-    if (!api?.call) { setBar(100); this.addMessage('assistant', `No backend available. I’ll handle "${originalText}" for you.`); return; }
-    const now = new Date(); const in1h = new Date(Date.now() + 3600e3); const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
-    const variantsByAction = {
-      generate: [ { key: 'zantara.create.content', params: { topic: originalText || 'general', format: 'short' } }, { key: 'ai.chat', params: { prompt: `[Quick Action: Generate] ${originalText || 'Generate content for me.'}` } } ],
-      document: [ { key: 'zantara.create.document', params: { title: `ZANTARA Doc - ${now.toISOString().slice(0, 10)}`, content: originalText || 'New document from quick action.' } }, { key: 'docs.create', params: { title: `ZANTARA Doc - ${now.toISOString().slice(0, 10)}`, body: { content: [ { paragraph: { elements: [ { textRun: { content: (originalText || 'New document') + '\n', textStyle: { bold: true } } } ] } } ] } } }, { key: 'ai.chat', params: { prompt: `[Quick Action: Document] ${originalText || 'Create a document.'}` } } ],
-      schedule: [ { key: 'zantara.calendar.event', params: { summary: 'Quick Meeting', description: originalText || 'Scheduled via Quick Action', startTime: now.toISOString(), endTime: in1h.toISOString(), timeZone: tz } }, { key: 'calendar.create', params: { event: { summary: 'ZANTARA Quick Meeting', description: originalText || 'Created by ZANTARA', start: { dateTime: now.toISOString(), timeZone: tz }, end: { dateTime: in1h.toISOString(), timeZone: tz }, attendees: [] } } }, { key: 'ai.chat', params: { prompt: `[Quick Action: Schedule] ${originalText || 'Schedule a meeting.'}` } } ],
-      note: [ { key: 'zantara.create.note', params: { content: originalText || 'Quick note', tags: ['quick-action'] } }, { key: 'ai.chat', params: { prompt: `[Quick Action: Note] ${originalText || 'Create a note.'}` } } ],
-    };
-    const variants = variantsByAction[action] || [ { key: 'ai.chat', params: { prompt: originalText || `Help me with ${action}` } } ];
-    const call = async (key, params) => api.call('/call', { key, params }, true);
-    let response = null; let usedKey = '';
-    for (let i = 0; i < variants.length; i++) { const v = variants[i]; try { setBar(20 + Math.round(((i + 1) / variants.length) * 60)); const res = await call(v.key, v.params); if (res && (res.ok || res.status === 200 || res.result || res.reply || res.message)) { response = res; usedKey = v.key; break; } } catch (_) { continue; } }
-    setBar(100); const reply = this.extractReply(response) || `Done via ${usedKey || 'fallback'}.`; this.renderAssistantReply(reply);
+  formatPricing(res) {
+    if (!res) return 'No pricing data available.';
+    const obj = (res.data && res.data.pricing) ? res.data.pricing : res.pricing || res.data || res;
+    try { return 'Official pricing:\n' + JSON.stringify(obj, null, 2); } catch(_) { return 'Official pricing available.'; }
   }
 
   switchView(view) { console.log('Switching to view:', view); }
@@ -179,4 +223,5 @@ class ZantaraApp {
   updateLoadEarlierChip(count) { const container = document.querySelector('.messages-container'); if (!container) return; let chip = document.getElementById('load-earlier-chip'); if (count > 0) { if (!chip) { chip = this.createLoadEarlierChip(count); container.insertBefore(chip, container.firstChild); } else { chip.textContent = `Load earlier (${count})`; chip.setAttribute('aria-label', `Load earlier messages (${count})`); } } else if (chip) { chip.remove(); } }
 }
 
+// Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => { window.zantaraApp = new ZantaraApp(); });
