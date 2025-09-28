@@ -41,6 +41,7 @@
         <button onclick="testTeamList()">Test Team List</button>
         <button onclick="testContactInfo()">Test Contact Info</button>
         <button onclick="testAIChat()">Test AI Chat</button>
+        <button onclick="printTelemetry()" title="Show telemetry summary">Telemetry Summary</button>
     </div>
 
     <h3 style="margin-top:16px;">Training + Integration Runner</h3>
@@ -92,6 +93,18 @@
                 log('✅ Health: ' + JSON.stringify(data, null, 2), 'success');
             } catch (error) {
                 log('❌ Health error: ' + error.message, 'error');
+            }
+        }
+
+        function printTelemetry() {
+            try {
+                const t = (window.ZANTARA_TELEMETRY && window.ZANTARA_TELEMETRY.getSummary) ? window.ZANTARA_TELEMETRY.getSummary() : null;
+                if (!t) return log('❌ Telemetry not available', 'error');
+                log('📊 Telemetry Totals: ' + JSON.stringify(t.totals));
+                const top = Object.entries(t.perKey).sort((a,b)=>b[1].count - a[1].count).slice(0,8);
+                log('📈 Top Keys:\n' + JSON.stringify(Object.fromEntries(top), null, 2));
+            } catch (e) {
+                log('❌ Telemetry error: ' + e.message, 'error');
             }
         }
 
@@ -232,6 +245,8 @@
                 } catch (e) { err++; log(`❌ ${t.name}: ${e.message}`, 'error'); }
             }
             log(`🏁 Integration tests completed: OK=${ok}, ERR=${err}`, err ? 'error' : 'success');
+            // Print telemetry summary after integration
+            printTelemetry();
         }
 
         async function runAll() {

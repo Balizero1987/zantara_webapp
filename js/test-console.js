@@ -474,8 +474,12 @@ class TestConsole {
 
     // Helper Methods
     async simulateSendMessage(data) {
-        const input = document.getElementById('messageInput');
-        const sendBtn = document.getElementById('sendBtn');
+        const input = document.getElementById('messageInput') ||
+                      document.getElementById('message-input') ||
+                      document.querySelector('#message-input, #messageInput, .message-input');
+        const sendBtn = document.getElementById('sendBtn') ||
+                        document.getElementById('send-button') ||
+                        document.querySelector('#send-button, #sendBtn, .send-button');
 
         if (input && sendBtn) {
             input.value = data.text;
