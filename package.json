@@ -5,8 +5,7 @@
   "main": "index.html",
   "scripts": {
     "dev": "node proxy-server.cjs",
-    "serve": "npx serve .",
-    "deploy": "netlify deploy --prod"
+    "serve": "npx serve ."
   },
   "keywords": [
     "zantara",

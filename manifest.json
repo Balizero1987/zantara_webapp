@@ -2,12 +2,12 @@
   "name": "ZANTARA Team Hub - Bali Zero",
   "short_name": "ZANTARA Hub",
   "description": "AI-powered team workspace for Bali Zero. Chat, collaborate, and manage business tools without limits.",
-  "start_url": "/login.html",
+  "start_url": "login-clean.html",
   "display": "standalone",
   "background_color": "#1a1a1a",
   "theme_color": "#10b981",
   "orientation": "portrait-primary",
-  "scope": "/",
+  "scope": "/zantara_webapp/",
   "lang": "en",
   "categories": ["business", "productivity", "collaboration"],
   "shortcuts": [
@@ -31,7 +31,7 @@
       "url": "/index.html#tools",
       "icons": [
         {
-          "src": "logo-balizero.png",
+          "src": "zantara_logo_transparent.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -64,7 +64,7 @@
       "density": "4.0"
     },
     {
-      "src": "logo-balizero.png",
+      "src": "zantara_logo_transparent.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

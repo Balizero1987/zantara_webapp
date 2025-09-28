@@ -9,6 +9,25 @@
   --z-secondary: #a855f7;
   --z-accent: #10b981;
 
+  /* Neutrals */
+  --z-neutral-0: #0a0a0a;
+  --z-neutral-50: #0f0f0f;
+  --z-neutral-100: #151515;
+  --z-neutral-200: #1f1f1f;
+  --z-neutral-300: #2a2a2a;
+  --z-neutral-400: #3a3a3a;
+  --z-neutral-500: #525252;
+  --z-neutral-600: #737373;
+  --z-neutral-700: #a3a3a3;
+  --z-neutral-800: #d4d4d4;
+  --z-neutral-900: #fafafa;
+
+  /* Semantic */
+  --z-success: #10b981;
+  --z-warning: #f59e0b;
+  --z-danger: #ef4444;
+  --z-info: #22d3ee;
+
   /* Gradients */
   --z-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --z-gradient-dark: linear-gradient(135deg, #1a0033 0%, #2D1B69 50%, #6B46C1 100%);
@@ -21,6 +40,9 @@
   --z-bg-elevated: #151515;
   --z-bg-card: rgba(255, 255, 255, 0.03);
   --z-bg-hover: rgba(255, 255, 255, 0.05);
+
+  /* Focus ring */
+  --z-focus: 0 0 0 3px rgba(99, 102, 241, 0.35);
 
   /* Text */
   --z-text-primary: #ffffff;
@@ -39,6 +61,7 @@
   --z-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
   --z-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
   --z-shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
+  --z-shadow-soft: 0 8px 32px rgba(0,0,0,0.35);
 
   /* Blur */
   --z-blur-sm: blur(4px);
@@ -198,6 +221,34 @@
 .btn-modern:hover::before {
   left: 100%;
 }
+
+/* Chips / Pills */
+.z-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--z-border-subtle);
+  color: var(--z-text-primary);
+  font-size: 12px;
+  line-height: 1;
+}
+.z-chip--action { cursor: pointer; transition: all var(--z-transition-fast); }
+.z-chip--action:hover { background: rgba(255,255,255,0.12); border-color: var(--z-border-default); }
+.z-chip:focus-visible { outline: none; box-shadow: var(--z-focus); }
+
+/* Icon button */
+.z-icon-btn {
+  width: 28px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 8px; border: 1px solid var(--z-border-subtle);
+  background: rgba(255,255,255,0.06);
+  color: var(--z-text-primary); font-size: 12px; cursor: pointer;
+}
+.z-icon-btn:hover { background: rgba(255,255,255,0.12); }
+.z-icon-btn:focus-visible { outline: none; box-shadow: var(--z-focus); }
 
 .btn-modern:hover {
   transform: translateY(-2px);

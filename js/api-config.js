@@ -4,24 +4,13 @@
 const API_CONFIG = {
   // Production ZANTARA endpoints
   production: {
+    // Unified Cloud Run endpoint with CORS enabled
     base: 'https://zantara-v520-chatgpt-patch-himaadsxua-ew.a.run.app',
     call: '/call',
     health: '/health'
   },
 
-  // CORS proxy options (for GitHub Pages)
-  corsProxy: {
-    // Option 1: Use a public CORS proxy
-    enabled: true,
-    service: 'https://corsproxy.io/?',
-
-    // Option 2: Alternative proxies
-    alternatives: [
-      'https://api.allorigins.win/raw?url=',
-      'https://cors-anywhere.herokuapp.com/',
-      'https://cors.bridged.cc/'
-    ]
-  },
+  // No public CORS proxies needed (Cloud Run CORS enabled)
 
   // API Key (should be in environment variable in production)
   apiKey: 'zantara-internal-dev-key-2025',
@@ -40,12 +29,6 @@ async function callZantaraAPI(endpoint, data, useProxy = true) {
 
     let apiUrl = API_CONFIG.production.base + endpoint;
 
-    // Use CORS proxy for GitHub Pages
-    if (isGitHubPages && useProxy && API_CONFIG.corsProxy.enabled) {
-      apiUrl = API_CONFIG.corsProxy.service + encodeURIComponent(apiUrl);
-      console.log('Using CORS proxy for GitHub Pages');
-    }
-
     // For development, use local proxy
     if (isDevelopment) {
       apiUrl = 'http://localhost:3003' + endpoint;
@@ -56,7 +39,10 @@ async function callZantaraAPI(endpoint, data, useProxy = true) {
       method: 'POST',
       headers: {
         ...API_CONFIG.headers,
-        'x-api-key': API_CONFIG.apiKey
+        'x-api-key': API_CONFIG.apiKey,
+        ...(typeof window !== 'undefined' && window.ZANTARA_SESSION_ID
+          ? { 'x-session-id': window.ZANTARA_SESSION_ID }
+          : {})
       },
       body: JSON.stringify(data)
     });
@@ -69,15 +55,6 @@ async function callZantaraAPI(endpoint, data, useProxy = true) {
 
   } catch (error) {
     console.error('API call failed:', error);
-
-    // Try alternative CORS proxies if the first one fails
-    if (API_CONFIG.corsProxy.alternatives.length > 0 && useProxy) {
-      console.log('Trying alternative CORS proxy...');
-      const altProxy = API_CONFIG.corsProxy.alternatives[0];
-      API_CONFIG.corsProxy.service = altProxy;
-      API_CONFIG.corsProxy.alternatives.shift();
-      return callZantaraAPI(endpoint, data, true);
-    }
 
     throw error;
   }
@@ -108,10 +85,19 @@ async function checkAPIHealth() {
 
 // Export for use in other scripts
 if (typeof window !== 'undefined') {
+  // Allow base override via global or localStorage for flexibility
+  try {
+    const overrideBase = window.ZANTARA_API_BASE || localStorage.getItem('zantara-api-base');
+    if (overrideBase && typeof overrideBase === 'string') {
+      API_CONFIG.production.base = overrideBase;
+    }
+  } catch (_) {}
+
   window.ZANTARA_API = {
     config: API_CONFIG,
     call: callZantaraAPI,
-    checkHealth: checkAPIHealth
+    checkHealth: checkAPIHealth,
+    setBase: (base) => { if (typeof base === 'string' && base.startsWith('http')) API_CONFIG.production.base = base; }
   };
 }
 
