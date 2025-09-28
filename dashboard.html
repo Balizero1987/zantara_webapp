@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZANTARA Dashboard - Command Center</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="zantara_logo_transparent.png">
+    <meta name="theme-color" content="#6366f1">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Design System -->
+    <link rel="stylesheet" href="styles/design-system.css">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/phosphor-icons/2.0.0/bold/style.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--z-font-primary);
+            background: var(--z-bg-primary);
+            color: var(--z-text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: var(--z-gradient-dark);
+            overflow: hidden;
+        }
+
+        .background-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: var(--z-gradient-glow);
+            animation: rotate 30s linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .orb1 {
+            width: 600px;
+            height: 600px;
+            background: #6366f1;
+            top: -200px;
+            left: -200px;
+            animation-duration: 25s;
+        }
+
+        .orb2 {
+            width: 400px;
+            height: 400px;
+            background: #a855f7;
+            bottom: -100px;
+            right: -100px;
+            animation-duration: 30s;
+            animation-delay: -5s;
+        }
+
+        .orb3 {
+            width: 300px;
+            height: 300px;
+            background: #10b981;
+            top: 50%;
+            left: 50%;
+            animation-duration: 35s;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(100px, -100px) scale(1.1); }
+            50% { transform: translate(-100px, 50px) scale(0.9); }
+            75% { transform: translate(50px, 100px) scale(1.05); }
+        }
+
+        /* Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--z-border-subtle);
+            display: flex;
+            flex-direction: column;
+            transition: all var(--z-transition-base);
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--z-border-subtle);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--z-gradient-primary);
+            border-radius: var(--z-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            box-shadow: var(--z-shadow-glow);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: var(--z-gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: var(--z-radius-md);
+            color: var(--z-text-secondary);
+            text-decoration: none;
+            transition: all var(--z-transition-fast);
+            margin-bottom: 4px;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: var(--z-bg-hover);
+            color: var(--z-text-primary);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--z-primary-light);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            background: var(--z-primary);
+            border-radius: 0 3px 3px 0;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .topbar {
+            height: 70px;
+            padding: 0 32px;
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--z-border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--z-border-subtle);
+            border-radius: var(--z-radius-lg);
+            padding: 10px 16px;
+            width: 400px;
+            transition: all var(--z-transition-base);
+        }
+
+        .search-box:focus-within {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--z-primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--z-text-primary);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--z-text-muted);
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .icon-button {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--z-radius-md);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--z-border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--z-transition-fast);
+            position: relative;
+        }
+
+        .icon-button:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid var(--z-bg-primary);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--z-radius-lg);
+            cursor: pointer;
+            transition: all var(--z-transition-fast);
+        }
+
+        .user-menu:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        .dashboard-header {
+            margin-bottom: 32px;
+        }
+
+        .dashboard-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ffffff 0%, #a8a8a8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard-subtitle {
+            font-size: 16px;
+            color: var(--z-text-secondary);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--z-bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--z-border-subtle);
+            border-radius: var(--z-radius-xl);
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--z-transition-base);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--z-border-default);
+            box-shadow: var(--z-shadow-xl);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--z-gradient-primary);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: var(--z-text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--z-radius-md);
+            background: rgba(99, 102, 241, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--z-primary-light);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+        }
+
+        .stat-change.positive {
+            color: var(--z-accent);
+        }
+
+        .stat-change.negative {
+            color: #ef4444;
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .chart-card {
+            background: var(--z-bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--z-border-subtle);
+            border-radius: var(--z-radius-xl);
+            padding: 24px;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--z-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--z-text-muted);
+        }
+
+        /* Activity Feed */
+        .activity-feed {
+            background: var(--z-bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--z-border-subtle);
+            border-radius: var(--z-radius-xl);
+            padding: 24px;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--z-border-subtle);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--z-radius-md);
+            background: var(--z-gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-size: 14px;
+            color: var(--z-text-primary);
+            margin-bottom: 4px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: var(--z-text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                left: -260px;
+                height: 100vh;
+                z-index: 1000;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-box {
+                width: auto;
+                flex: 1;
+            }
+
+            .dashboard-content {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="background-animation">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo">Z</div>
+                    <div class="logo-text">ZANTARA</div>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <i class="ph-bold ph-house nav-icon"></i>
+                    <span class="nav-label">Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="ph-bold ph-users nav-icon"></i>
+                    <span class="nav-label">Team</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="ph-bold ph-briefcase nav-icon"></i>
+                    <span class="nav-label">Applications</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="ph-bold ph-chart-line nav-icon"></i>
+                    <span class="nav-label">Analytics</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="ph-bold ph-robot nav-icon"></i>
+                    <span class="nav-label">AI Assistant</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="ph-bold ph-gear nav-icon"></i>
+                    <span class="nav-label">Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="topbar">
+                <div class="search-box">
+                    <i class="ph-bold ph-magnifying-glass"></i>
+                    <input type="text" class="search-input" placeholder="Search anything...">
+                </div>
+
+                <div class="topbar-actions">
+                    <button class="icon-button">
+                        <i class="ph-bold ph-bell"></i>
+                        <span class="notification-badge"></span>
+                    </button>
+
+                    <button class="icon-button">
+                        <i class="ph-bold ph-moon"></i>
+                    </button>
+
+                    <div class="user-menu">
+                        <div class="avatar avatar-octagon">Z</div>
+                        <div>
+                            <div style="font-size: 14px; font-weight: 600;">Zero Master</div>
+                            <div style="font-size: 12px; color: var(--z-text-muted);">CEO</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <div class="dashboard-header">
+                    <h1 class="dashboard-title">Welcome back, Zero!</h1>
+                    <p class="dashboard-subtitle">Here's what's happening with Bali Zero today.</p>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Active Applications</div>
+                            <div class="stat-icon">
+                                <i class="ph-bold ph-file-text"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">247</div>
+                        <div class="stat-change positive">
+                            <i class="ph-bold ph-arrow-up"></i>
+                            <span>12% from last week</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Team Members</div>
+                            <div class="stat-icon">
+                                <i class="ph-bold ph-users-three"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">23</div>
+                        <div class="stat-change positive">
+                            <i class="ph-bold ph-arrow-up"></i>
+                            <span>2 new this month</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">AI Interactions</div>
+                            <div class="stat-icon">
+                                <i class="ph-bold ph-robot"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">1,842</div>
+                        <div class="stat-change positive">
+                            <i class="ph-bold ph-arrow-up"></i>
+                            <span>28% from yesterday</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Success Rate</div>
+                            <div class="stat-icon">
+                                <i class="ph-bold ph-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">98.7%</div>
+                        <div class="stat-change positive">
+                            <i class="ph-bold ph-arrow-up"></i>
+                            <span>0.3% improvement</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Performance Overview</h3>
+                            <select class="input-modern" style="width: 120px; padding: 8px 12px;">
+                                <option>This Week</option>
+                                <option>This Month</option>
+                                <option>This Year</option>
+                            </select>
+                        </div>
+                        <div class="chart-placeholder">
+                            <span>Chart will be rendered here</span>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Team Activity</h3>
+                        </div>
+                        <div class="activity-feed">
+                            <div class="activity-item">
+                                <div class="activity-avatar">AD</div>
+                                <div class="activity-content">
+                                    <div class="activity-text"><strong>ADIT</strong> processed visa application #1847</div>
+                                    <div class="activity-time">2 minutes ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-avatar">AM</div>
+                                <div class="activity-content">
+                                    <div class="activity-text"><strong>AMANDA</strong> updated client documentation</div>
+                                    <div class="activity-time">15 minutes ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-avatar">AN</div>
+                                <div class="activity-content">
+                                    <div class="activity-text"><strong>ANGEL</strong> completed tax review for PT XYZ</div>
+                                    <div class="activity-time">1 hour ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-avatar">NI</div>
+                                <div class="activity-content">
+                                    <div class="activity-text"><strong>NINA</strong> published new marketing content</div>
+                                    <div class="activity-time">2 hours ago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Add interactivity
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate stats on scroll
+            const observeElements = () => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.animation = 'fadeInUp 0.6s ease-out';
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.stat-card').forEach(card => {
+                    observer.observe(card);
+                });
+            };
+
+            // Add fadeInUp animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            observeElements();
+        });
+    </script>
+</body>
+</html>
