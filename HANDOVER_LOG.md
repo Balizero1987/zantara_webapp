@@ -13,6 +13,15 @@
 - CORS: guidance added; ensure Cloud Run has `CORS_ORIGINS=https://zantara.balizero.com,https://balizero1987.github.io,...`.
 - GitHub Pages: aligned `gh-pages` with main to avoid stale builds; index uses cache‑busting.
 
+2025-09-29 – Login Cleanup + Proxy Worker
+- Login pages simplified: removed legacy video intro, kept minimal EN sign-in (`login-clean.html`).
+- Root now redirects to `login-clean.html` (cache-busted). `portal.html` redirects to login.
+- Favicon unified to `assets/logozantara.jpeg` across pages.
+- Limited Mode banner gated to dev only (use `?dev=true` to display).
+- Syncra app now routes pricing flows via official endpoints (`pricing.official` / `price.lookup`) with redirect handling (“PREZZI UFFICIALI 2025”).
+- Added Cloudflare Worker proxy (`proxy-worker/`) with CORS, secrets, SSE piping, and GitHub Action.
+- Client remains in proxy mode by default; set `window.ZANTARA_PROXY_BASE` or `localStorage['zantara-proxy-base']` to Worker URL (e.g., `https://<worker>.workers.dev/api/zantara`).
+
 Open Items / Next Steps
 - SSE real streaming: draft and align contract (keys/chunks/heartbeats), client flag/fallback plan.
 - Observability: optional UI badge (Syncra header) and expanded metrics (p95 per handler), server‑side logs.
