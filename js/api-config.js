@@ -5,7 +5,7 @@ const API_CONFIG = {
   // Production ZANTARA endpoints
   production: {
     // Unified Cloud Run endpoint with CORS enabled (production)
-    base: 'https://zantara-v520-production-himaadsxua-ew.a.run.app',
+    base: 'https://zantara-v520-production-1064094238013.europe-west1.run.app',
     call: '/call',
     health: '/health'
   },
