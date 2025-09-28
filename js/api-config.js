@@ -180,15 +180,21 @@ async function callZantaraAPI(endpoint, data, useProxy = true) {
   }
 }
 
-// Function to check API health (always attempts direct fetch)
+// Function to check API health (tries proxy then backend)
 async function checkAPIHealth() {
   try {
-    const viaProxy = API_CONFIG.mode === 'proxy' && (API_CONFIG.proxy.production.base || window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'));
-    const healthUrl = (viaProxy ? (API_CONFIG.proxy.production.base || window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base')) : API_CONFIG.production.base) + '/health';
-    const resp = await fetch(healthUrl, { method: 'GET' });
-    if (resp.ok) {
-      try { const data = await resp.json(); console.log('✅ ZANTARA API is healthy:', data); } catch (_) {}
-      return true;
+    const proxyBase = (API_CONFIG.proxy.production.base || (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base')))) || '';
+    const directBase = API_CONFIG.production.base;
+
+    if (proxyBase) {
+      try {
+        const r = await fetch(proxyBase + '/health', { method: 'GET' });
+        if (r.ok) { try { console.log('✅ ZANTARA API (proxy) healthy:', await r.clone().json()); } catch(_){}; return true; }
+      } catch (_) {}
+    }
+    if (directBase) {
+      const r2 = await fetch(directBase + '/health', { method: 'GET' });
+      if (r2.ok) { try { console.log('✅ ZANTARA API (backend) healthy:', await r2.clone().json()); } catch(_){}; return true; }
     }
     return false;
   } catch (error) {
