@@ -4,18 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZANTARA - Team Access</title>
-
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="zantara_logo_transparent.png">
     <meta name="theme-color" content="#6366f1">
 
     <!-- Geist Font -->
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- API Configuration -->
-    <script src="js/api-config.js"></script>
-    <script src="team-config.js"></script>
-    <script src="sync-team.js"></script>
 
     <style>
         * {
@@ -25,45 +18,133 @@
         }
 
         body {
-            font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', Helvetica, Arial, sans-serif;
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #0a0a0a;
             color: #ffffff;
             min-height: 100vh;
             overflow: hidden;
         }
 
-        /* Video Background */
-        .video-background {
+        /* Animated Background (instead of video) */
+        .animated-background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -2;
-            /* Beautiful gradient background that shows after video fades */
             background: linear-gradient(135deg, #1a0033 0%, #2D1B69 50%, #6B46C1 100%);
+            z-index: -2;
         }
 
-        .video-background video {
+        .animated-background::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(circle at 20% 80%, rgba(147, 51, 234, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(167, 139, 250, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(139, 92, 246, 0.2) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Intro Animation */
+        .intro-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: opacity 2s ease-out;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeOut 1s ease 3s forwards;
         }
 
-        .video-background.fade-out video {
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                pointer-events: none;
+            }
+        }
+
+        .intro-logo {
+            width: 120px;
+            height: 120px;
+            background: white;
+            clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulseScale 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseScale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .intro-logo img {
+            width: 80px;
+            height: 80px;
             opacity: 0;
+            animation: fadeIn 1s ease 0.5s forwards;
         }
 
-        /* Overlay - Much lighter to preserve video colors */
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .intro-text {
+            position: absolute;
+            bottom: 100px;
+            text-align: center;
+            opacity: 0;
+            animation: slideUp 1s ease 1.5s forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .intro-text h2 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .intro-text p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+        }
+
+        /* Overlay */
         .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.2); /* Much lighter overlay */
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(2px);
             z-index: -1;
         }
 
@@ -74,6 +155,8 @@
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 3.5s forwards;
         }
 
         .login-card {
@@ -172,17 +255,12 @@
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
-        .login-btn:active {
-            transform: translateY(0);
-        }
-
         .login-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-            transform: none;
         }
 
-        /* Loading State */
+        /* Loading */
         .loading {
             display: none;
         }
@@ -207,6 +285,32 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Messages */
+        .error-message, .success-message {
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+
+        .error-message.show, .success-message.show {
+            display: block;
+        }
+
         /* Footer */
         .footer {
             text-align: center;
@@ -217,149 +321,28 @@
             color: rgba(255, 255, 255, 0.4);
             font-size: 14px;
         }
-
-        .footer a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Error Message */
-        .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 24px;
-            color: #fca5a5;
-            font-size: 14px;
-            text-align: center;
-            display: none;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
-        /* Success Message */
-        .success-message {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 24px;
-            color: #6ee7b7;
-            font-size: 14px;
-            text-align: center;
-            display: none;
-        }
-
-        .success-message.show {
-            display: block;
-        }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            .login-card {
-                padding: 32px 24px;
-                border-radius: 20px;
-                margin: 12px;
-            }
-
-            .logo h1 {
-                font-size: 24px;
-            }
-        }
-
-        /* Skip Video Button */
-        .skip-video {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 8px 16px;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
-
-        .skip-video:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        /* Audio Toggle Button */
-        .audio-toggle {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: pulse 2s infinite;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .audio-toggle:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-        }
-
-        .audio-toggle.playing {
-            animation: none;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
     </style>
 </head>
 <body>
-    <!-- Video Background -->
-    <div class="video-background">
-        <video autoplay muted playsinline>
-            <!-- Try local first, fallback to CDN -->
-            <source src="intro.mov" type="video/quicktime">
-            <!-- Fallback: Cloudinary with auto-optimization -->
-            <source src="https://res.cloudinary.com/damguiffu/video/upload/q_auto,f_mp4,vc_h264,w_1280/v1758868677/introzan_wqh6am.mov" type="video/mp4">
-            <!-- Final fallback: Elegant gradient -->
-        </video>
+    <!-- Animated Intro (instead of video) -->
+    <div class="intro-animation" id="introAnimation">
+        <div class="intro-logo">
+            <img src="zantara_logo_transparent.png" alt="ZANTARA">
+        </div>
+        <div class="intro-text">
+            <h2>ZANTARA</h2>
+            <p>The Gate Opens</p>
+        </div>
     </div>
+
+    <!-- Animated Background -->
+    <div class="animated-background"></div>
 
     <!-- Overlay -->
     <div class="overlay"></div>
 
-    <!-- Skip Video Button -->
-    <button class="skip-video" onclick="skipToLogin()">Skip Intro</button>
-
-    <!-- Audio Control Button -->
-    <button class="audio-toggle" id="audioToggle" onclick="toggleAudio()" title="Click to unmute">
-        🔇
-    </button>
-
     <!-- Main Container -->
-    <div class="login-container" id="loginContainer" style="opacity: 0;">
+    <div class="login-container" id="loginContainer">
         <div class="login-card">
             <!-- Logo -->
             <div class="logo">
@@ -368,10 +351,8 @@
                 <p>BALI ZERO AI Chat</p>
             </div>
 
-            <!-- Error Message -->
+            <!-- Messages -->
             <div class="error-message" id="errorMessage"></div>
-
-            <!-- Success Message -->
             <div class="success-message" id="successMessage"></div>
 
             <!-- Login Form -->
@@ -412,66 +393,17 @@
             <div class="footer">
                 <p>Secure access for Bali Zero team members</p>
             </div>
-
-            <div class="footer" aria-label="Preview new UI">
-                <p>
-                    Prefer a fresh look? 
-                    <a href="syncra.html" class="preview-link" title="Try the new Syncra UI (Preview)">
-                        Try New UI (Preview) →
-                    </a>
-                </p>
-            </div>
         </div>
     </div>
 
     <script>
-        let introPlayed = false;
-
-        // Show login after video intro or immediately if video fails
-        window.addEventListener('load', () => {
-            const video = document.querySelector('video');
-            const loginContainer = document.getElementById('loginContainer');
-
-            // Show login after 3 seconds or when video ends
-            const showLogin = () => {
-                if (!introPlayed) {
-                    introPlayed = true;
-                    loginContainer.style.transition = 'opacity 0.8s ease';
-                    loginContainer.style.opacity = '1';
-                }
-            };
-
-            // Auto show after 4 seconds (video duration estimate)
-            setTimeout(showLogin, 4000);
-
-            // Handle video events
-            if (video) {
-                // Show login on error
-                video.addEventListener('error', showLogin);
-
-                // Fade out video when it ends
-                video.addEventListener('ended', () => {
-                    const videoBg = document.querySelector('.video-background');
-                    videoBg.classList.add('fade-out');
-                    showLogin();
-                });
+        // Remove intro animation after 4 seconds
+        setTimeout(() => {
+            const intro = document.getElementById('introAnimation');
+            if (intro) {
+                intro.style.display = 'none';
             }
-        });
-
-        // Skip to login immediately
-        function skipToLogin() {
-            const loginContainer = document.getElementById('loginContainer');
-            const skipBtn = document.querySelector('.skip-video');
-            const videoBg = document.querySelector('.video-background');
-
-            // Fade out video
-            videoBg.classList.add('fade-out');
-
-            loginContainer.style.transition = 'opacity 0.4s ease';
-            loginContainer.style.opacity = '1';
-            skipBtn.style.display = 'none';
-            introPlayed = true;
-        }
+        }, 4000);
 
         // Form handling
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -483,7 +415,7 @@
             const btnText = loginBtn.querySelector('.btn-text');
             const loading = loginBtn.querySelector('.loading');
 
-            // Validate email format
+            // Validate email
             if (!email.includes('@')) {
                 showError('Please enter a valid email address');
                 return;
@@ -493,13 +425,13 @@
             setLoading(true);
 
             try {
-                // Simulate authentication (in production, this would call your auth API)
+                // Simulate authentication
                 await authenticate(email, password);
 
                 // Success
                 showSuccess('The Gate is Opening...');
 
-                // Save credentials and redirect
+                // Save and redirect
                 localStorage.setItem('zantara-user-email', email);
 
                 setTimeout(() => {
@@ -516,25 +448,11 @@
         async function authenticate(email, password) {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    // Accept Bali Zero team emails or demo accounts
-                    const validEmails = [
-                        // Demo accounts
-                        'demo@zantara.com',
-                        'test@balizero.com',
-                        // Real team emails
-                        'zero@balizero.com',
-                        'adit@balizero.com',
-                        'anton@balizero.com',
-                        'angel@balizero.com',
-                        'veronika@balizero.com',
-                        'nina@balizero.com',
-                        'boss@balizero.com'
-                    ];
-
-                    if (email.includes('@balizero.com') || validEmails.includes(email)) {
+                    // Accept Bali Zero emails or demo
+                    if (email.includes('@balizero.com') || email === 'demo@zantara.com') {
                         resolve({ success: true, user: email });
                     } else {
-                        reject(new Error('Access denied. Please use your @balizero.com email or demo account.'));
+                        reject(new Error('Access denied. Please use your @balizero.com email.'));
                     }
                 }, 1200);
             });
@@ -561,8 +479,6 @@
             const errorEl = document.getElementById('errorMessage');
             errorEl.textContent = message;
             errorEl.classList.add('show');
-
-            // Hide after 5 seconds
             setTimeout(() => {
                 errorEl.classList.remove('show');
             }, 5000);
@@ -574,37 +490,12 @@
             successEl.classList.add('show');
         }
 
-        // Auto-fill demo credentials on development
+        // Auto-fill demo credentials on localhost
         if (window.location.hostname === 'localhost') {
-            // Rotate through different team members for demo
-            const demoEmails = ['adit@balizero.com', 'zero@balizero.com', 'angel@balizero.com', 'demo@zantara.com'];
+            const demoEmails = ['adit@balizero.com', 'zero@balizero.com', 'angel@balizero.com'];
             const randomEmail = demoEmails[Math.floor(Math.random() * demoEmails.length)];
-
             document.getElementById('email').value = randomEmail;
             document.getElementById('password').value = 'demo';
-
-            // Show hint for testing
-            console.log('🎭 Demo mode active! Try these emails:', demoEmails.join(', '));
-        }
-
-        // Audio Toggle Function
-        function toggleAudio() {
-            const video = document.querySelector('video');
-            const audioToggle = document.getElementById('audioToggle');
-
-            if (video) {
-                if (video.muted) {
-                    video.muted = false;
-                    audioToggle.textContent = '🔊';
-                    audioToggle.classList.add('playing');
-                    audioToggle.title = 'Click to mute';
-                } else {
-                    video.muted = true;
-                    audioToggle.textContent = '🔇';
-                    audioToggle.classList.remove('playing');
-                    audioToggle.title = 'Click to unmute';
-                }
-            }
         }
     </script>
 </body>
