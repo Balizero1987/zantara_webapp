@@ -95,8 +95,20 @@
         async function testHealth() {
             log('Testing /health endpoint...');
             try {
-                const response = await fetch(`${API_BASE}/health`);
-                const data = await response.json();
+                let url = `${API_BASE}/health`;
+                let resp = null;
+                if (API_BASE) {
+                  resp = await fetch(url);
+                }
+                if (!resp || !resp.ok) {
+                  const backend = (window.ZANTARA_API && window.ZANTARA_API.config && window.ZANTARA_API.config.production && window.ZANTARA_API.config.production.base) || '';
+                  if (backend) {
+                    url = backend + '/health';
+                    resp = await fetch(url);
+                  }
+                }
+                if (!resp) throw new Error('No health endpoint reachable');
+                const data = await resp.json();
                 log('✅ Health: ' + JSON.stringify(data, null, 2), 'success');
             } catch (error) {
                 log('❌ Health error: ' + error.message, 'error');
