@@ -145,23 +145,15 @@ async function callZantaraAPI(endpoint, data, useProxy = true) {
   }
 }
 
-// Function to check API health
+// Function to check API health (always attempts direct fetch)
 async function checkAPIHealth() {
   try {
-    const isGitHubPages = window.location.hostname.includes('github.io');
-    const isCustomDomain = window.location.hostname === 'zantara.balizero.com';
-    let healthUrl = API_CONFIG.production.base + '/health';
-
-    if (isGitHubPages || isCustomDomain) {
-      // For health check, try direct first (no auth needed)
-      const response = await fetch(healthUrl);
-      if (response.ok) {
-        const data = await response.json();
-        console.log('✅ ZANTARA API is healthy:', data);
-        return true;
-      }
+    const healthUrl = API_CONFIG.production.base + '/health';
+    const resp = await fetch(healthUrl, { method: 'GET' });
+    if (resp.ok) {
+      try { const data = await resp.json(); console.log('✅ ZANTARA API is healthy:', data); } catch (_) {}
+      return true;
     }
-
     return false;
   } catch (error) {
     console.warn('❌ ZANTARA API health check failed:', error);
