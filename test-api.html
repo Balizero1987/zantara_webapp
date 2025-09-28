@@ -83,7 +83,7 @@
     <div id="output"></div>
 
     <script>
-        const API_BASE = (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base') || '');
+        const API_BASE = (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base') || (window.ZANTARA_API && window.ZANTARA_API.config && window.ZANTARA_API.config.proxy && window.ZANTARA_API.config.proxy.production && window.ZANTARA_API.config.proxy.production.base) || '');
 
         function log(message, type = '') {
             const output = document.getElementById('output');
