@@ -211,7 +211,7 @@ class ZantaraApp {
     for (const m of visible) {
       const div = document.createElement('div'); div.className = `message ${m.sender}`;
       const content = m.html ? String(m.text) : this.escape(m.text);
-      if (m.sender === 'assistant') div.innerHTML = `<div class="message-avatar"><img src="assets/logobianco.jpeg" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`;
+      if (m.sender === 'assistant') div.innerHTML = `<div class="message-avatar"><img src="/zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`;
       else div.innerHTML = `<div class="message-bubble">${content}</div>`;
       container.appendChild(div);
     }
