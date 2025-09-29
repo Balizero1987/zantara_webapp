@@ -5,7 +5,8 @@
   "main": "index.html",
   "scripts": {
     "dev": "node proxy-server.cjs",
-    "serve": "npx serve ."
+    "serve": "npx serve .",
+    "kb:import": "node scripts/kb-import.mjs"
   },
   "keywords": [
     "zantara",
@@ -20,6 +21,8 @@
     "url": "git+https://github.com/Balizero1987/zantara_webapp.git"
   },
   "devDependencies": {
-    "serve": "^14.2.0"
+    "serve": "^14.2.0",
+    "pdf-parse": "^1.1.1",
+    "mammoth": "^1.6.0"
   }
 }
