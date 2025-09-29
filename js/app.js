@@ -94,7 +94,8 @@ class ZantaraApp {
     this.initEventListeners();
     this.initVoiceRecognition();
 
-    if (localStorage.getItem('zantara_user')) this.showChatInterface();
+    // Enter chat by default
+    this.showChatInterface();
 
     // Non-blocking identity check
     try {

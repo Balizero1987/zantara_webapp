@@ -63,6 +63,16 @@ class ThemeManager {
     document.body.setAttribute('data-theme', theme);
     document.querySelectorAll('.glass-card, .voice-button, .action-card, .message-bubble, .tool-card, .typing-dot, .input-area, .action-chip')
       .forEach(el => el.setAttribute('data-theme', theme));
+    // Swap lotus asset per theme
+    try {
+      const headerLogo = document.querySelector('.lotus-logo');
+      const splashLogo = document.querySelector('.lotus-splash');
+      const day = 'assets/lotus-day.svg';
+      const night = 'assets/lotus-night.svg';
+      const src = theme === 'day' ? day : night;
+      if (headerLogo) headerLogo.setAttribute('src', src);
+      if (splashLogo) splashLogo.setAttribute('src', src);
+    } catch (_) {}
     // Sync theme on FAB if present
     document.querySelectorAll('.theme-toggle-fab').forEach(el => el.setAttribute('data-theme', theme));
     this.currentTheme = theme;
