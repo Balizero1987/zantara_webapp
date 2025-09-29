@@ -10,6 +10,19 @@ class ZantaraApp {
   }
 
   // --- Persona & System Prompt helpers ---
+  detectLanguage(text) {
+    try {
+      const t = String(text || '').toLowerCase();
+      // very light heuristics
+      if (/(\bciao\b|come\b|sono\b|grazie|perch[eé]|oggi|domani)/.test(t)) return 'it';
+      if (/(\bhalo\b|apa\b|yang\b|bisa\b|terima kasih|kenapa|hari ini)/.test(t)) return 'id';
+      if (/(\bпривіт\b|будь ласка|дякую|як|що|сьогодні|завтра|хто\b|я\s+є)/.test(t)) return 'uk';
+      if (/(\bhello\b|hey\b|how\b|thanks|why|today|tomorrow|who am i)/.test(t)) return 'en';
+      // codes like C1/C2/D12 etc. are neutral; default to Indonesian policy
+      return 'id';
+    } catch (_) { return 'id'; }
+  }
+
   getUserEmail() {
     try { return localStorage.getItem('zantara-user-email') || ''; } catch(_) { return ''; }
   }
@@ -168,6 +181,35 @@ class ZantaraApp {
       const api = window.ZANTARA_API;
       if (!api || !api.call) { this.hideTypingIndicator(); return this.renderAssistantReply('API not available.'); }
 
+      // Capture identity if user provided an email address
+      const emailMatch = String(text || '').match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+      if (emailMatch && emailMatch[0]) {
+        try { localStorage.setItem('zantara-user-email', emailMatch[0]); } catch(_) {}
+        this.hideTypingIndicator();
+        const lang = this.detectLanguage(text);
+        const ack = (
+          lang === 'it' ? `Grazie. Ti ho riconosciuto come ${emailMatch[0]}. Come posso aiutarti?` :
+          lang === 'uk' ? `Дякую. Я впізнала вас як ${emailMatch[0]}. Чим можу допомогти?` :
+          lang === 'en' ? `Thanks. I recognized you as ${emailMatch[0]}. How can I help?` :
+                          `Terima kasih. Saya mengenali Anda sebagai ${emailMatch[0]}. Ada yang bisa saya bantu?`
+        );
+        return this.renderAssistantReply(ack);
+      }
+
+      // If counterpart is unknown, request identification first
+      const profile0 = this.getCounterpartProfile();
+      if (profile0.isUnknown) {
+        this.hideTypingIndicator();
+        const lang = this.detectLanguage(text);
+        const ask = (
+          lang === 'it' ? 'Prima di iniziare, dimmi il tuo nome o email aziendale (es. nome@balizero.com).' :
+          lang === 'uk' ? "Перш ніж почати, напишіть ваше ім'я або корпоративний email (приклад: name@balizero.com)." :
+          lang === 'en' ? 'Before we start, please share your name or company email (e.g., name@balizero.com).' :
+                          'Sebelum mulai, sebutkan nama atau email perusahaan Anda (mis. nama@balizero.com).'
+        );
+        return this.renderAssistantReply(ask);
+      }
+
       // Friendly greeting handler (avoid irrelevant memory mentions)
       const t = String(text || '').trim().toLowerCase();
       const greet = /^(hi|hello|hey|ciao|halo|hai|hola|salve)\b/.test(t);
@@ -181,8 +223,17 @@ class ZantaraApp {
           case 'id': reply = 'Halo! Ada yang bisa saya bantu?'; break;
           default: reply = 'Hello! How can I help you today?';
         }
-        // If counterpart unknown, politely ask identification in Bahasa
-        if (p.isUnknown) reply += ' Boleh tahu nama atau email Anda?';
+        // If counterpart unknown, politely ask identification in the detected language
+        if (p.isUnknown) {
+          const askLang = this.detectLanguage(text);
+          const ask = (
+            askLang === 'it' ? ' Per procedere, qual è il tuo nome o email aziendale?' :
+            askLang === 'uk' ? " Щоб продовжити, напишіть ім'я або корпоративний email." :
+            askLang === 'en' ? ' To proceed, what is your name or company email?' :
+                               ' Untuk lanjut, apa nama atau email perusahaan Anda?'
+          );
+          reply += ask;
+        }
         return this.renderAssistantReply(reply);
       }
 
