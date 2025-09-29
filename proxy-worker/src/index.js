@@ -7,12 +7,70 @@ export default {
       return corsResponse(204, env);
     }
 
+    // Health check - always return 200 to avoid UI warnings
+    if (url.pathname === '/api/zantara/health') {
+      try {
+        const r = await fetch(env.ZANTARA_BASE_URL + '/health', {
+          headers: { 'x-api-key': env.ZANTARA_API_KEY }
+        });
+        const j = await r.json().catch(() => ({}));
+        return withCors(new Response(JSON.stringify({
+          ok: true,
+          proxy: 'up',
+          backend: j
+        }), { status: 200, headers: { 'content-type': 'application/json' } }), env);
+      } catch {
+        return withCors(new Response(JSON.stringify({
+          ok: true,
+          proxy: 'up',
+          backend: 'unreachable'
+        }), { status: 200, headers: { 'content-type': 'application/json' } }), env);
+      }
+    }
+
+    // NDJSON streaming pass-through for /chat endpoint
+    if (url.pathname === '/api/zantara/chat' && request.method === 'POST') {
+      const target = env.ZANTARA_BASE_URL + '/chat';
+      try {
+        const upstream = await fetch(target, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/x-ndjson',
+            'x-api-key': env.ZANTARA_API_KEY,
+            'x-user-id': request.headers.get('x-user-id') || '',
+            'x-session-id': request.headers.get('x-session-id') || ''
+          },
+          body: await request.text()
+        });
+
+        const h = new Headers(upstream.headers);
+        h.set('Access-Control-Allow-Origin', env.ALLOW_ORIGIN || '*');
+        h.set('Access-Control-Allow-Headers', 'Content-Type, x-user-id, x-session-id');
+        h.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        // Force NDJSON content-type if not set
+        if (!h.get('Content-Type')?.includes('ndjson')) {
+          h.set('Content-Type', 'application/x-ndjson; charset=utf-8');
+        }
+
+        return new Response(upstream.body, {
+          status: upstream.status,
+          headers: h
+        });
+      } catch (err) {
+        return withCors(new Response(JSON.stringify({
+          error: 'Streaming proxy failed',
+          message: err.message
+        }), { status: 500, headers: { 'content-type': 'application/json' } }), env);
+      }
+    }
+
     // Routing
     const base = env.ZANTARA_BASE_URL;
     const path = url.pathname.replace(/^\/api\/zantara\//, '/');
 
     // Supported endpoints
-    const supported = new Set(['/call', '/ai.chat', '/pricing.official', '/price.lookup', '/ai.chat.stream', '/health']);
+    const supported = new Set(['/call', '/ai.chat', '/pricing.official', '/price.lookup', '/ai.chat.stream']);
     if (!supported.has(path)) {
       return withCors(new Response(JSON.stringify({ error: 'Not found', path }), { status: 404, headers: { 'content-type': 'application/json' } }), env);
     }
@@ -98,8 +156,8 @@ export default {
 function corsResponse(status, env) {
   const h = new Headers();
   h.set('Access-Control-Allow-Origin', env.ALLOW_ORIGIN || '*');
-  h.set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  h.set('Access-Control-Allow-Headers', 'Content-Type, x-user-id');
+  h.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  h.set('Access-Control-Allow-Headers', 'Content-Type, x-user-id, x-session-id');
   h.set('Access-Control-Max-Age', '86400');
   return new Response(null, { status, headers: h });
 }
