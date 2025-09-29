@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZANTARA – Bali Zero</title>
-    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
-    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    <title>BALI ZERO AI - Welcome</title>
+    <link rel="icon" type="image/jpeg" href="public/images/zantara-logo.jpeg">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#8B5CF6">
+    <meta name="theme-color" content="#9B59B6">
 
     <!-- SEO Meta Tags -->
-    <meta name="description" content="ZANTARA - AI-powered team workspace for Bali Zero. Access visa services, company setup, and tax solutions through one intelligent portal.">
-    <meta name="keywords" content="ZANTARA, Bali Zero, AI Assistant, Visa Services, Company Setup, Tax Services">
+    <meta name="description" content="BALI ZERO AI - Intelligent Business Assistant powered by ZANTARA. Access visa services, company setup, and tax solutions through AI-powered chat.">
+    <meta name="keywords" content="ZANTARA, Bali Zero, AI Assistant, Visa Services, Company Setup, Tax Services, Indonesia Business">
 
-    <!-- Redirect to Syncra UI (cache-busted) -->
-    <meta http-equiv="refresh" content="0; url=syncra.html?v=prod10">
+    <!-- Redirect to Login -->
+    <meta http-equiv="refresh" content="0; url=login-claude-style.html">
 
     <style>
         body {
@@ -42,18 +39,18 @@
           // If already has a version param, skip to prevent loops
           if (!q.has('v')) {
             var v = 'prod10';
-            location.replace('syncra.html?v=' + v);
+            location.replace('login-claude-style.html');
           }
         } catch(_) {
-          location.href = 'syncra.html?v=prod10';
+          location.href = 'login-claude-style.html';
         }
       })();
     </script>
 </head>
 <body>
     <div class="loading">
-        <h2>ZANTARA</h2>
-        <p>Redirecting to portal...</p>
+        <h2>BALI ZERO AI</h2>
+        <p>Loading...</p>
     </div>
 </body>
 </html>
