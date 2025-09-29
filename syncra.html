@@ -11,9 +11,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#8B5CF6">
   <style>
-    #splash-screen{display:none!important}
-    #welcome-screen{display:none!important}
-    #chat-interface{display:flex!important}
+    /* Background elements non-interactive */
     .red-particles, .bg-wave, .logo-breakout, .parallax-logo { pointer-events:none !important; z-index:-1 !important; }
   </style>
   <!-- Removed forced chat display - now respects login flow -->
@@ -80,7 +78,7 @@
 
     <main class="main-content">
       <!-- Welcome Screen -->
-      <div id="welcome-screen" class="welcome-screen" style="display:none">
+      <div id="welcome-screen" class="welcome-screen">
         <div class="welcome-card glass-card">
           <h2>Hi there,</h2>
           <p>Give any command naturally, from generating content to managing your tasks</p>
@@ -104,7 +102,7 @@
       </div>
 
       <!-- Chat Interface -->
-      <div id="chat-interface" class="chat-interface" aria-live="polite" aria-label="Chat interface" style="display:flex">
+      <div id="chat-interface" class="chat-interface" aria-live="polite" aria-label="Chat interface" style="display:none">
         <div class="messages-container"></div>
         <div class="input-area glass-card">
           <button class="attach-button" aria-label="Attach file">
