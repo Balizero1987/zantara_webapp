@@ -63,6 +63,58 @@
   <script src="js/app.js?v=prod15"></script>
   <script src="js/theme-switcher.js?v=prod15"></script>
   <script>
+    (function(){
+      // Ultra-compat fallback: works even if app.js/api helper fail to init on older WebViews
+      function qs(sel){ return document.querySelector(sel); }
+      function addBubble(sender, html){
+        var c=qs('.messages-container'); if(!c) return;
+        var d=document.createElement('div'); d.className='message '+sender;
+        var safe = html;
+        if (!/</.test(html)) { // treat plain text
+          safe = html.replace(/[&<>]/g,function(ch){return ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]);});
+        }
+        if (sender==='assistant') d.innerHTML='<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">'+safe+'</div>';
+        else d.innerHTML='<div class="message-bubble">'+safe+'</div>';
+        c.appendChild(d); c.scrollTop=c.scrollHeight;
+        return d;
+      }
+      function typingOn(){ var c=qs('.messages-container'); if(!c) return; var d=document.createElement('div'); d.className='message assistant typing-message'; d.innerHTML='<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble"><div class="typing-indicator"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div></div>'; c.appendChild(d); c.scrollTop=c.scrollHeight; }
+      function typingOff(){ var t=qs('.typing-message'); if(t) t.parentNode.removeChild(t); }
+      function extractReply(obj){ try{
+        if (!obj) return '';
+        if (typeof obj==='string'){ try{ return extractReply(JSON.parse(obj)); }catch(e){ return obj; } }
+        if (typeof obj.reply==='string') return obj.reply;
+        if (typeof obj.message==='string') return obj.message;
+        if (typeof obj.text==='string') return obj.text;
+        if (obj.data){ if (typeof obj.data.response==='string') return obj.data.response; if (typeof obj.data.reply==='string') return obj.data.reply; if (typeof obj.data.text==='string') return obj.data.text; }
+        if (obj.choices && obj.choices[0] && obj.choices[0].message && obj.choices[0].message.content) return obj.choices[0].message.content;
+        return JSON.stringify(obj);
+      }catch(e){ return 'OK.'; } }
+      function safeSend(){
+        try{
+          if (window.zantaraApp && window.zantaraApp.sendMessage) { window.zantaraApp.sendMessage(); return false; }
+          var inp=qs('#message-input'); if(!inp) return false; var text=(inp.value||'').replace(/^\s+|\s+$/g,''); if(!text) return false; inp.value='';
+          addBubble('user', text);
+          typingOn();
+          var endpoint='https://zantara-web-proxy-himaadsxua-ew.a.run.app/api/zantara/call';
+          var user=''; try{ user=localStorage.getItem('zantara-user-email')||''; }catch(e){}
+          var body=JSON.stringify({ key:'ai.chat', params:{ prompt: text } });
+          var xhr=new XMLHttpRequest();
+          xhr.open('POST', endpoint, true);
+          xhr.setRequestHeader('Content-Type','application/json');
+          if (user) xhr.setRequestHeader('x-user-id', user);
+          xhr.onreadystatechange=function(){ if (xhr.readyState===4){ typingOff(); try{ var res=JSON.parse(xhr.responseText||'{}'); var out=extractReply(res)||'OK.'; addBubble('assistant', out); }catch(e){ addBubble('assistant','Request failed. Please try again.'); } } };
+          xhr.onerror=function(){ typingOff(); addBubble('assistant','Network error. Please try again.'); };
+          xhr.send(body);
+        }catch(e){ try{ typingOff(); }catch(_){ } addBubble('assistant','Error. Please reload and try again.'); }
+        return false;
+      }
+      window.safeSend = safeSend;
+      // Wire form fallback if app not present
+      window.addEventListener('load', function(){ try{ var fm=document.getElementById('chat-form'); if(fm){ fm.onsubmit=function(){ return safeSend(); }; } var sb=document.getElementById('send-button'); if (sb) sb.onclick=function(){ return safeSend(); }; }catch(e){} });
+    })();
+  </script>
+  <script>
     // Safety: ensure handlers exist
     window.addEventListener('load', function(){
       try {
