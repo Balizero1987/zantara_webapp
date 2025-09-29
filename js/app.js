@@ -727,6 +727,16 @@ class ZantaraApp {
 }
 
 // Initialize app when DOM is ready
-document.addEventListener('DOMContentLoaded', () => { window.zantaraApp = new ZantaraApp(); });
+document.addEventListener('DOMContentLoaded', () => {
+  // Check if user is logged in
+  const userEmail = localStorage.getItem('zantara-user-email');
+  if (!userEmail) {
+    // Not logged in, redirect to login
+    window.location.href = '/portal.html';
+    return;
+  }
+
+  window.zantaraApp = new ZantaraApp();
+});
     // Default language: Indonesian unless user explicitly changes it
     try { if (!localStorage.getItem('zantara-forced-lang')) localStorage.setItem('zantara-forced-lang', 'id'); } catch(_) {}

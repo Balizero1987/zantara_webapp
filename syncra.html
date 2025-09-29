@@ -10,12 +10,7 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#8B5CF6">
-  <style>
-    /* Critical inline override (cache-safe): always show chat */
-    #splash-screen{display:none!important}
-    #welcome-screen{display:none!important}
-    #chat-interface{display:flex!important}
-  </style>
+  <!-- Removed forced chat display - now respects login flow -->
   <link rel="stylesheet" href="styles/design-system.css">
   <link rel="stylesheet" href="styles/theme-indonesia.css">
   <link rel="stylesheet" href="styles/design-enhancements.css">
@@ -25,9 +20,9 @@
   <link rel="stylesheet" href="styles/virtualization-config.css">
   <link rel="stylesheet" href="styles/test-console.css">
   <link rel="stylesheet" href="styles/zantara-theme.css">
-  <link rel="stylesheet" href="styles/zantara-theme-day.css?v=prod11">
-  <link rel="stylesheet" href="styles/zantara-theme-night-enhanced.css?v=prod11">
-  <link rel="stylesheet" href="styles/components.css?v=prod11">
+  <link rel="stylesheet" href="styles/zantara-theme-day.css?v=prod12">
+  <link rel="stylesheet" href="styles/zantara-theme-night-enhanced.css?v=prod12">
+  <link rel="stylesheet" href="styles/components.css?v=prod12">
 </head>
 <body>
   <!-- Splash Screen -->
@@ -79,7 +74,7 @@
 
     <main class="main-content">
       <!-- Welcome Screen -->
-      <div id="welcome-screen" class="welcome-screen" style="display:none">
+      <div id="welcome-screen" class="welcome-screen">
         <div class="welcome-card glass-card">
           <h2>Hi there,</h2>
           <p>Give any command naturally, from generating content to managing your tasks</p>
@@ -103,17 +98,17 @@
       </div>
 
       <!-- Chat Interface -->
-      <div id="chat-interface" class="chat-interface" aria-live="polite" aria-label="Chat interface" style="display:flex">
+      <div id="chat-interface" class="chat-interface" aria-live="polite" aria-label="Chat interface" style="display:none">
         <div class="messages-container"></div>
         <div class="input-area glass-card">
           <button class="attach-button" aria-label="Attach file">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="2"/></svg>
           </button>
-          <input type="text" id="message-input" class="message-input" placeholder="Type a message or use voice..." aria-label="Message input">
+          <input type="text" id="message-input" class="message-input" placeholder="Type a message or use voice..." aria-label="Message input" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); window.zantaraApp && window.zantaraApp.sendMessage && window.zantaraApp.sendMessage(); }">
           <button id="voice-input" class="voice-input-button" aria-label="Start voice input">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
           </button>
-          <button id="send-button" class="send-button" aria-label="Send message">
+          <button id="send-button" class="send-button" aria-label="Send message" onclick="window.zantaraApp && window.zantaraApp.sendMessage && window.zantaraApp.sendMessage()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2"/></svg>
           </button>
         </div>
@@ -137,16 +132,16 @@
     </nav>
   </div>
 
-  <script src="js/api-config.js?v=prod11"></script>
-  <script src="js/app.js?v=prod11" type="module"></script>
+  <script src="js/api-config.js?v=prod12"></script>
+  <script src="js/app.js?v=prod12" type="module"></script>
   <script src="js/streaming-toggle.js"></script>
   <!-- 🚀 STREAMING LIVE IN PRODUCTION - ALWAYS ON! -->
   <script src="js/streaming-client.js"></script>
   <script src="js/streaming-ui.js"></script>
   <script src="js/streaming-toggle-ui.js"></script>
   <script src="js/message-virtualization.js"></script>
-  <script src="js/test-console.js?v=prod11"></script>
-  <script src="js/theme-switcher.js?v=prod11"></script>
+  <script src="js/test-console.js?v=prod12"></script>
+  <script src="js/theme-switcher.js?v=prod12"></script>
   <script src="js/logo-interactions.js"></script>
   <script>
     // Update connection badge (Proxy/Direct + host)
