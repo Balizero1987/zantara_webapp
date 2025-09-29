@@ -19,14 +19,21 @@ class ZantaraApp {
     const local = email.endsWith('@balizero.com');
     const name = email ? (email.split('@')[0] || '').replace(/\W+/g,' ').trim() : '';
     // Language routing per counterpart
-    let lang = 'en';
-    if (local) {
-      // default Indonesian for collaborators
+    // Rule: default is Indonesian; Zero=IT; Ruslana/Marta/Olena=UK; externals=EN; if unknown counterpart → Indonesian
+    let lang = 'id';
+    if (email) {
+      if (local) {
+        lang = 'id';
+        if (/^zero\b/.test(name)) lang = 'it';
+        if (/^(ruslana|marta|olena)\b/.test(name)) lang = 'uk';
+      } else {
+        lang = 'en';
+      }
+    } else {
+      // unknown counterpart → Indonesian
       lang = 'id';
-      if (/^zero\b/.test(name)) lang = 'it';
-      if (/^(ruslana|marta|olena)\b/.test(name)) lang = 'uk';
     }
-    return { email, name: name || '', isLocal: local, isExternal: !local, lang };
+    return { email, name: name || '', isLocal: local, isExternal: !local, isUnknown: !email, lang };
   }
 
   buildSystemPrompt(profile) {
@@ -124,7 +131,7 @@ class ZantaraApp {
     const div = document.createElement('div'); div.className = `message ${sender}`;
     const content = opts.html ? String(text) : this.escape(text);
     if (sender === 'assistant') {
-      div.innerHTML = `<div class="message-avatar"><img src="assets/logobianco.jpeg" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`;
+      div.innerHTML = `<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`;
     } else {
       div.innerHTML = `<div class="message-bubble">${content}</div>`;
     }
@@ -141,7 +148,7 @@ class ZantaraApp {
     const d = document.createElement('div');
     d.className = 'message assistant typing-message';
     d.innerHTML = `
-      <div class="message-avatar"><img src="assets/logobianco.jpeg" alt="ZANTARA"></div>
+      <div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div>
       <div class="message-bubble">
         <div class="typing-indicator">
           <span class="typing-dot"></span>
@@ -166,9 +173,16 @@ class ZantaraApp {
       const greet = /^(hi|hello|hey|ciao|halo|hai|hola|salve)\b/.test(t);
       if (greet) {
         this.hideTypingIndicator();
-        let reply = 'Hello! How can I help you today?';
-        if (t.startsWith('ciao')) reply = 'Ciao! Come posso aiutarti?';
-        else if (t.startsWith('halo') || t.startsWith('hai')) reply = 'Halo! Ada yang bisa saya bantu?';
+        const p = this.getCounterpartProfile();
+        let reply;
+        switch (p.lang) {
+          case 'it': reply = 'Ciao! Come posso aiutarti?'; break;
+          case 'uk': reply = 'Привіт! Чим можу допомогти?'; break;
+          case 'id': reply = 'Halo! Ada yang bisa saya bantu?'; break;
+          default: reply = 'Hello! How can I help you today?';
+        }
+        // If counterpart unknown, politely ask identification in Bahasa
+        if (p.isUnknown) reply += ' Boleh tahu nama atau email Anda?';
         return this.renderAssistantReply(reply);
       }
 
@@ -334,7 +348,7 @@ class ZantaraApp {
     for (const m of visible) {
       const div = document.createElement('div'); div.className = `message ${m.sender}`;
       const content = m.html ? String(m.text) : this.escape(m.text);
-      if (m.sender === 'assistant') div.innerHTML = `<div class="message-avatar"><img src="/zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`;
+      if (m.sender === 'assistant') div.innerHTML = `<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`;
       else div.innerHTML = `<div class="message-bubble">${content}</div>`;
       container.appendChild(div);
     }
