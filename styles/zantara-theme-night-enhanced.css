@@ -62,16 +62,8 @@ body[data-theme="night"]::before {
 .typing-dot[data-theme="night"] { background: linear-gradient(135deg, #BD00FF, #00D9FF); box-shadow: 0 0 10px currentColor; }
 
 /* Message Bubbles Night Enhanced */
-.message.user .message-bubble[data-theme="night"] {
-  background: linear-gradient(135deg, rgba(255, 0, 64, 0.85) 0%, rgba(255, 0, 128, 0.8) 45%, rgba(189, 0, 255, 0.75) 100%);
-  box-shadow: 0 6px 22px rgba(255, 0, 64, 0.32), 0 0 28px rgba(255, 0, 64, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 0, 128, 0.28);
-}
-.message.assistant .message-bubble[data-theme="night"] {
-  background: linear-gradient(135deg, rgba(46, 16, 101, 0.6) 0%, rgba(10, 1, 24, 0.8) 100%);
-  border: 1px solid rgba(0, 217, 255, 0.3);
-  box-shadow: 0 4px 20px rgba(0, 217, 255, 0.2), inset 0 1px 0 rgba(0, 217, 255, 0.1);
-}
+.message.user .message-bubble[data-theme="night"] { background: linear-gradient(135deg, rgba(255, 0, 64, 0.85) 0%, rgba(255, 0, 128, 0.8) 45%, rgba(189, 0, 255, 0.75) 100%); box-shadow: 0 6px 22px rgba(255, 0, 64, 0.32), 0 0 28px rgba(255, 0, 64, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.18); }
+.message.assistant .message-bubble[data-theme="night"] { background: linear-gradient(135deg, rgba(46, 16, 101, 0.6) 0%, rgba(10, 1, 24, 0.8) 100%); box-shadow: 0 4px 20px rgba(0, 217, 255, 0.2), inset 0 1px 0 rgba(0, 217, 255, 0.1); }
 
 /* Tool Cards Night Enhanced */
 .tool-card[data-theme="night"] {
