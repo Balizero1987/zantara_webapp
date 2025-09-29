@@ -331,7 +331,8 @@
             log('Transport: ' + (viaHelper ? 'ZANTARA_API helper (CORS-aware)' : 'Direct fetch'));
             log('API (helper): ' + helperBase);
             log('API (fallback): ' + API_BASE);
-            log('Key: ' + API_KEY.substring(0, 10) + '...');
+            const user = localStorage.getItem('zantara-user-email') || '(unknown user)';
+            log('User: ' + user);
             testHealth();
         };
     </script>
