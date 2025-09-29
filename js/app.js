@@ -213,6 +213,10 @@ class ZantaraApp {
   escape(s) { return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 
   renderAssistantReply(text) {
+    // Coerce JSON-looking strings into human text
+    if (typeof text === 'string' && text.trim().startsWith('{') && text.trim().endsWith('}')) {
+      try { const obj = JSON.parse(text); text = this.extractReply(obj) || text; } catch(_) {}
+    }
     const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const streamingEnabled = !!(window.ZANTARA_STREAMING && window.ZANTARA_STREAMING.isEnabled && window.ZANTARA_STREAMING.isEnabled());
     if (!streamingEnabled || prefersReduced) { this.addMessage('assistant', text); return; }
