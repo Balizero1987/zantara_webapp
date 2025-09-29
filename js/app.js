@@ -171,6 +171,10 @@ class ZantaraApp {
 
   extractReply(res) {
     if (!res) return '';
+    // If backend returned a JSON string, parse it
+    if (typeof res === 'string') {
+      try { const p = JSON.parse(res); return this.extractReply(p); } catch(_) {}
+    }
     if (typeof res.reply === 'string') return res.reply;
     if (typeof res.message === 'string') return res.message;
     if (typeof res.text === 'string') return res.text;
@@ -182,6 +186,20 @@ class ZantaraApp {
         if (typeof res.data.text === 'string') return res.data.text;
       }
     } catch(_){}
+    // Fallback: attempt to find a string under common keys deep inside the object
+    try {
+      const stack = [res];
+      const keys = new Set(['response','reply','text','content']);
+      while (stack.length) {
+        const cur = stack.pop();
+        if (!cur || typeof cur !== 'object') continue;
+        for (const k of Object.keys(cur)) {
+          const v = cur[k];
+          if (typeof v === 'string' && keys.has(k)) return v;
+          if (v && typeof v === 'object') stack.push(v);
+        }
+      }
+    } catch(_) {}
     return JSON.stringify(res, null, 2);
   }
 
