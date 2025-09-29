@@ -358,7 +358,130 @@
             line-height: 1.4;
         }
 
-        /* Design 6: WhatsApp Style */
+        /* Design 6: Claude Anthropic Style */
+        .design6 {
+            background: #FAF9F7;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Inter', -apple-system, sans-serif;
+        }
+
+        .design6-header {
+            background: #FFFFFF;
+            padding: 16px 20px;
+            border-bottom: 1px solid #E5E3DF;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .design6-logo {
+            width: 32px;
+            height: 32px;
+            background: #D97706;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .design6-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1F1E1C;
+        }
+
+        .design6-messages {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .design6-msg-group {
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .design6-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .design6-avatar.user {
+            background: #5E5C57;
+            color: white;
+        }
+
+        .design6-avatar.ai {
+            background: #D97706;
+            color: white;
+        }
+
+        .design6-content {
+            flex: 1;
+            color: #1F1E1C;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .design6-input-area {
+            background: white;
+            border-top: 1px solid #E5E3DF;
+            padding: 16px 20px;
+        }
+
+        .design6-input-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            background: #FAF9F7;
+            border: 1px solid #E5E3DF;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .design6-input {
+            flex: 1;
+            border: none;
+            background: none;
+            outline: none;
+            font-size: 15px;
+            color: #1F1E1C;
+            resize: none;
+        }
+
+        .design6-send {
+            width: 32px;
+            height: 32px;
+            background: #D97706;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .design6-send:hover {
+            background: #B45309;
+        }
+
+        /* Design 7: WhatsApp Style */
         .design6 {
             background: #e5ddd5;
             padding: 0;
@@ -533,25 +656,36 @@
                 </div>
             </div>
 
-            <!-- Design 6: WhatsApp Style -->
+            <!-- Design 6: Claude Anthropic Style -->
             <div class="design-card">
                 <div class="design-preview">
                     <div class="design6">
                         <div class="design6-header">
-                            <div class="design6-avatar"></div>
-                            <div>ZANTARA Support</div>
+                            <div class="design6-logo">Z</div>
+                            <div class="design6-title">ZANTARA</div>
                         </div>
                         <div class="design6-messages">
-                            <div class="design6-msg ai">Ciao! 👋</div>
-                            <div class="design6-msg user">Ciao ZANTARA</div>
-                            <div class="design6-msg ai">Come posso aiutarti?</div>
+                            <div class="design6-msg-group">
+                                <div class="design6-avatar user">U</div>
+                                <div class="design6-content">Ciao ZANTARA, puoi aiutarmi?</div>
+                            </div>
+                            <div class="design6-msg-group">
+                                <div class="design6-avatar ai">Z</div>
+                                <div class="design6-content">Certo! Sono qui per assisterti con visti, company setup e servizi fiscali. Come posso aiutarti oggi?</div>
+                            </div>
+                        </div>
+                        <div class="design6-input-area">
+                            <div class="design6-input-container">
+                                <textarea class="design6-input" placeholder="Scrivi un messaggio..." rows="1"></textarea>
+                                <button class="design6-send">→</button>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="design-info">
-                    <div class="design-title">WhatsApp Style</div>
-                    <div class="design-desc">Familiare come WhatsApp. Verde e intuitivo.</div>
-                    <a href="#" class="btn-apply" onclick="applyDesign('whatsapp'); return false;">Applica Design</a>
+                    <div class="design-title">Claude Anthropic Style</div>
+                    <div class="design-desc">Ispirato all'interfaccia di Claude. Beige/crema, pulito e professionale.</div>
+                    <a href="#" class="btn-apply" onclick="applyDesign('claude'); return false;">Applica Design</a>
                 </div>
             </div>
         </div>

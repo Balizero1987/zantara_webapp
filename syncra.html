@@ -59,9 +59,7 @@
     </nav>
   </div>
 
-  <script src="js/api-config.js?v=prod15"></script>
-  <script src="js/app.js?v=prod15"></script>
-  <script src="js/theme-switcher.js?v=prod15"></script>
+  <!-- SAFE BUILD: no external JS needed for send -->
   <script>
     (function(){
       // Ultra-compat fallback: works even if app.js/api helper fail to init on older WebViews
@@ -121,11 +119,6 @@
         var sb=document.getElementById('send-button'); if(sb) sb.onclick=function(){ if(window.zantaraApp&&window.zantaraApp.sendMessage){ window.zantaraApp.sendMessage(); }};
         var fm=document.getElementById('chat-form'); if(fm){ fm.onsubmit=function(){ try{ if(window.zantaraApp&&window.zantaraApp.sendMessage){ window.zantaraApp.sendMessage(); } }catch(e){} return false; }; }
       } catch(e){}
-      // Connection badge
-      try{
-        var el=document.getElementById('conn-badge');
-        if(el&&window.ZANTARA_API){ var cfg=window.ZANTARA_API.config||{}; var p=(cfg.proxy&&cfg.proxy.production&&cfg.proxy.production.base)||''; var d=(cfg.production&&cfg.production.base)||''; el.textContent=p?'Connected: Proxy':(d?'Connected: Direct':'Connected'); }
-      }catch(e){}
     });
   </script>
 </body>
