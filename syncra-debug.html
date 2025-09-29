@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ZANTARA Debug</title>
+  <style>
+    body {
+      font-family: -apple-system, system-ui, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      margin: 0 0 20px 0;
+      color: #333;
+    }
+    .messages {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      height: 300px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      background: #f9f9f9;
+    }
+    .message {
+      margin: 10px 0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      word-wrap: break-word;
+    }
+    .user {
+      background: #667eea;
+      color: white;
+      align-self: flex-end;
+      margin-left: auto;
+      max-width: 70%;
+    }
+    .assistant {
+      background: #e0e0e0;
+      color: #333;
+      max-width: 70%;
+    }
+    .input-area {
+      display: flex;
+      gap: 10px;
+    }
+    input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px 24px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    button:hover {
+      background: #5a67d8;
+    }
+    .status {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f0f0f0;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 ZANTARA Debug Chat</h1>
+
+    <div class="messages" id="messages"></div>
+
+    <div class="input-area">
+      <input
+        type="text"
+        id="message-input"
+        placeholder="Type a message..."
+        onkeydown="if(event.key==='Enter'){ sendMessage(); }"
+      >
+      <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <div class="status" id="status">Ready</div>
+  </div>
+
+  <script>
+    // Status logger
+    function log(msg) {
+      console.log(msg);
+      const status = document.getElementById('status');
+      const time = new Date().toLocaleTimeString();
+      status.innerHTML = `[${time}] ${msg}<br>` + status.innerHTML;
+    }
+
+    // Add message to chat
+    function addMessage(sender, text) {
+      const container = document.getElementById('messages');
+      const div = document.createElement('div');
+      div.className = `message ${sender}`;
+      div.textContent = text;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+      log(`Added ${sender} message: "${text}"`);
+    }
+
+    // Send message function
+    async function sendMessage() {
+      const input = document.getElementById('message-input');
+      const text = input.value.trim();
+
+      if (!text) {
+        log('❌ No text to send');
+        return;
+      }
+
+      log(`📤 Sending: "${text}"`);
+      addMessage('user', text);
+      input.value = '';
+
+      // Try sending
+      try {
+        // Test endpoint
+        const endpoint = 'https://zantara-v520-production-1064094238013.europe-west1.run.app/api/call';
+        log(`🔗 Using endpoint: ${endpoint}`);
+
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-id': 'test@debug.com'
+          },
+          body: JSON.stringify({
+            key: 'ai.chat',
+            params: { prompt: text }
+          })
+        });
+
+        log(`📡 Response status: ${response.status}`);
+
+        if (response.ok) {
+          const data = await response.json();
+          log(`✅ Got response: ${JSON.stringify(data).substring(0, 100)}...`);
+
+          // Extract reply
+          const reply = data.reply || data.message || data.text ||
+                       (data.data && data.data.response) ||
+                       'No reply found';
+
+          addMessage('assistant', reply);
+        } else {
+          const error = await response.text();
+          log(`❌ Error ${response.status}: ${error}`);
+          addMessage('assistant', `Error: ${response.status}`);
+        }
+
+      } catch (err) {
+        log(`❌ Network error: ${err.message}`);
+        addMessage('assistant', `Network error: ${err.message}`);
+      }
+    }
+
+    // Initialize
+    log('Debug chat ready');
+    log('Press Enter or click Send to send message');
+  </script>
+</body>
+</html>
