@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Login Flow</title>
+  <style>
+    body {
+      font-family: system-ui;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    button {
+      background: white;
+      color: #667eea;
+      border: none;
+      padding: 12px 24px;
+      margin: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+    .status {
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    h1 {
+      text-align: center;
+    }
+    pre {
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Test Login Flow</h1>
+
+  <div class="status">
+    <h2>Current Status:</h2>
+    <pre id="status">Checking...</pre>
+  </div>
+
+  <div style="text-align: center;">
+    <button onclick="clearAuth()">1. Clear Authentication</button>
+    <button onclick="testRedirect()">2. Test Redirect to Portal</button>
+    <button onclick="simulateLogin()">3. Simulate Login</button>
+    <button onclick="testAccess()">4. Test Access to Syncra</button>
+  </div>
+
+  <div class="status">
+    <h2>Test Results:</h2>
+    <pre id="results">No tests run yet</pre>
+  </div>
+
+  <script>
+    function updateStatus() {
+      const email = localStorage.getItem('zantara-user-email');
+      const status = document.getElementById('status');
+      status.textContent = `Email in localStorage: ${email || '(not logged in)'}
+Session: ${localStorage.getItem('zantara-session-id') || '(none)'}
+Streaming enabled: ${localStorage.getItem('zantara-streaming') || 'false'}`;
+    }
+
+    function log(message) {
+      const results = document.getElementById('results');
+      results.textContent += `\n${new Date().toLocaleTimeString()}: ${message}`;
+    }
+
+    function clearAuth() {
+      localStorage.removeItem('zantara-user-email');
+      localStorage.removeItem('zantara-session-id');
+      localStorage.removeItem('zantara_user');
+      log('✅ Cleared authentication data');
+      updateStatus();
+    }
+
+    function testRedirect() {
+      const email = localStorage.getItem('zantara-user-email');
+      if (!email) {
+        log('✅ No email found - redirect to /portal.html expected');
+        window.open('/syncra.html', '_blank');
+      } else {
+        log('⚠️ Email found - no redirect expected');
+      }
+    }
+
+    function simulateLogin() {
+      localStorage.setItem('zantara-user-email', 'test@example.com');
+      localStorage.setItem('zantara-session-id', `sess_${Date.now()}`);
+      log('✅ Simulated login with test@example.com');
+      updateStatus();
+    }
+
+    function testAccess() {
+      const email = localStorage.getItem('zantara-user-email');
+      if (email) {
+        log('✅ Logged in - accessing Syncra should work');
+        window.open('/syncra.html', '_blank');
+      } else {
+        log('⚠️ Not logged in - will redirect to portal');
+      }
+    }
+
+    // Initialize
+    updateStatus();
+    log('Test page ready');
+  </script>
+</body>
+</html>

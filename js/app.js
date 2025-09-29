@@ -234,8 +234,8 @@ class ZantaraApp {
     this.initEventListeners();
     this.initVoiceRecognition();
 
-    // Enter chat by default
-    this.showChatInterface();
+    // Show chat interface only if logged in (checked in DOMContentLoaded)
+    // this.showChatInterface() is called after login check passes
 
     // Non-blocking identity check
     try {
@@ -768,7 +768,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // User is logged in, initialize app and show chat
   window.zantaraApp = new ZantaraApp();
+  window.zantaraApp.showChatInterface();
 });
     // Default language: Indonesian unless user explicitly changes it
     try { if (!localStorage.getItem('zantara-forced-lang')) localStorage.setItem('zantara-forced-lang', 'id'); } catch(_) {}
