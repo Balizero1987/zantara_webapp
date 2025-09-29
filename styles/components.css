@@ -96,6 +96,14 @@
 .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 @keyframes typing { 0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); } 30% { opacity: 1; transform: scale(1.2); } }
 
+/* Typing indicator harmonized with theme */
+.typing-dot[data-theme="day"] { background: linear-gradient(135deg, #FF0040, #FFA500); box-shadow: 0 0 6px rgba(255,0,64,0.35); }
+.typing-dot[data-theme="night"] { /* night-enhanced already styles via theme CSS; keep a subtle fallback */ box-shadow: 0 0 6px rgba(189,0,255,0.35); }
+
+/* Theme FAB subtle day pulse */
+.theme-toggle-fab[data-theme="day"] { animation: dayFabPulse 2.6s ease-in-out infinite; }
+@keyframes dayFabPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,0,64,0.0), var(--glass-shadow); } 50% { box-shadow: 0 0 18px 4px rgba(255,0,64,0.25), var(--glass-shadow); } }
+
 /* Load Earlier Chip */
 .load-earlier-chip { position: sticky; top: 8px; margin: 0 20px 8px; padding: 8px 12px; border: none; background: var(--bg-glass); border-radius: 999px; color: var(--text-secondary); cursor: pointer; font-size: 12px; align-self: flex-start; z-index: 2; transition: transform 0.15s var(--ease-smooth), background 0.2s var(--ease-smooth); }
 .load-earlier-chip:hover { transform: translateY(-1px); background: var(--bg-glass-hover); color: var(--text-primary); }

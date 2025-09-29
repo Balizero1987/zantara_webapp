@@ -56,6 +56,8 @@ class ThemeManager {
     document.body.setAttribute('data-theme', theme);
     document.querySelectorAll('.glass-card, .voice-button, .action-card, .message-bubble, .tool-card, .typing-dot')
       .forEach(el => el.setAttribute('data-theme', theme));
+    // Sync theme on FAB if present
+    document.querySelectorAll('.theme-toggle-fab').forEach(el => el.setAttribute('data-theme', theme));
     this.currentTheme = theme;
     try { localStorage.setItem('zantara-theme', theme); } catch (_) {}
   }
