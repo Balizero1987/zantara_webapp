@@ -531,6 +531,32 @@
     <!-- Team sync from backend -->
     <script src="sync-team.js"></script>
 
+    <script>
+        // Theme Toggle Function (must be global for onclick)
+        window.toggleTheme = function() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const themeIcon = document.getElementById('themeIcon');
+
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('zantara-theme', newTheme);
+
+            // Update icon
+            themeIcon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+        }
+
+        // Initialize theme on load
+        (function() {
+            const savedTheme = localStorage.getItem('zantara-theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+            const themeIcon = document.getElementById('themeIcon');
+            if (themeIcon) {
+                themeIcon.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+            }
+        })();
+    </script>
+
     <script type="module">
         // Import team configuration
         // TEAM MEMBERS DATABASE (Fallback if backend sync fails)
@@ -1392,27 +1418,6 @@
         function showError(message) {
             addMessage('assistant', `❌ ${message}`);
         }
-
-        // Theme Toggle Function
-        function toggleTheme() {
-            const body = document.body;
-            const currentTheme = body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            const themeIcon = document.getElementById('themeIcon');
-
-            body.setAttribute('data-theme', newTheme);
-            localStorage.setItem('zantara-theme', newTheme);
-
-            // Update icon
-            themeIcon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
-        }
-
-        // Initialize theme on load
-        (function() {
-            const savedTheme = localStorage.getItem('zantara-theme') || 'light';
-            document.body.setAttribute('data-theme', savedTheme);
-            document.getElementById('themeIcon').textContent = savedTheme === 'dark' ? '🌙' : '☀️';
-        })();
 
         // Initialize all enhancement systems
         const enhancementScripts = [
