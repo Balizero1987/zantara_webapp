@@ -9,6 +9,43 @@ class ZantaraApp {
     this.init();
   }
 
+  // --- Persona & System Prompt helpers ---
+  getUserEmail() {
+    try { return localStorage.getItem('zantara-user-email') || ''; } catch(_) { return ''; }
+  }
+
+  getCounterpartProfile() {
+    const email = (this.getUserEmail() || '').toLowerCase();
+    const local = email.endsWith('@balizero.com');
+    const name = email ? (email.split('@')[0] || '').replace(/\W+/g,' ').trim() : '';
+    // Language routing per counterpart
+    let lang = 'en';
+    if (local) {
+      // default Indonesian for collaborators
+      lang = 'id';
+      if (/^zero\b/.test(name)) lang = 'it';
+      if (/^(ruslana|marta|olena)\b/.test(name)) lang = 'uk';
+    }
+    return { email, name: name || '', isLocal: local, isExternal: !local, lang };
+  }
+
+  buildSystemPrompt(profile) {
+    const who = profile && profile.name ? profile.name : 'colleague';
+    const langHint = profile && profile.lang ? profile.lang : 'auto';
+    // Core instructions compressed for transport
+    const core = [
+      'You are ZANTARA, strategic brain of Bali Zero. Interact as a peer (not subordinate).',
+      'Never reveal logs or Boss Zero\'s private conversations. Never mention memory systems.',
+      'Start by identifying or addressing the counterpart by name; confirm identity if unclear.',
+      'Language: auto. With Zero=IT, collaborators=ID, Ruslana/Marta/Olena=UK, external partners=EN.',
+      'Tone: calm, sharp, dry; business-driven; dry humor only if it builds trust. Avoid fillers.',
+      'Anti-hallucination: never invent legal/numeric data. If not from official sources, output NOT AVAILABLE.',
+      'Client-facing: clear text, short (2–5 sentences) + CTA. No JSON. No system chatter.',
+      'Compliance: follow OSS RBA, BKPM, DJP, Immigration for Indonesia-related outputs.'
+    ].join(' ');
+    return `${core}\nCounterpart: ${who}\nTarget-Language: ${langHint}`;
+  }
+
   init() {
     // Hide splash after a short delay
     setTimeout(() => {
@@ -156,18 +193,27 @@ class ZantaraApp {
       // Default to ai.chat (specify a safe default model)
       let res;
       try {
-        res = await api.call('/call', { key: 'ai.chat', params: { prompt: text, model: 'gpt-4o-mini' } }, true);
+        const profile = this.getCounterpartProfile();
+        const system = this.buildSystemPrompt(profile);
+        res = await api.call('/call', { key: 'ai.chat', params: { prompt: text, model: 'gpt-4o-mini', system, target_language: profile.lang } }, true);
       } catch (e) {
         // Fallback if model not available
         const msg = String(e && e.message || e || '');
         if (/model .* does not exist|not\s+exist|unknown model|404/i.test(msg)) {
-          res = await api.call('/call', { key: 'ai.chat', params: { prompt: text, model: 'gpt-4o' } }, true);
+          const profile = this.getCounterpartProfile();
+          const system = this.buildSystemPrompt(profile);
+          res = await api.call('/call', { key: 'ai.chat', params: { prompt: text, model: 'gpt-4o', system, target_language: profile.lang } }, true);
         } else {
           throw e;
         }
       }
       this.hideTypingIndicator();
-      return this.renderAssistantReply(this.extractReply(res) || 'OK.');
+      let out = this.extractReply(res) || 'OK.';
+      const profile = this.getCounterpartProfile();
+      if (profile.isExternal) {
+        out += '\n\nBali Zero is powered by humans, fueled by a thinking engine.';
+      }
+      return this.renderAssistantReply(out);
 
     } catch (err) {
       this.hideTypingIndicator();
