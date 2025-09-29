@@ -1,0 +1,466 @@
+/* ZANTARA Night Theme - Elegant White Sphere */
+
+/* Dark mode detection */
+@media (prefers-color-scheme: dark),
+       (not (prefers-color-scheme: light)) {
+  :root {
+    --sphere-glow: #FFFFFF;
+    --sphere-core: rgba(255, 255, 255, 0.95);
+    --sphere-halo: rgba(255, 255, 255, 0.1);
+    --night-bg: #0a0a0a;
+    --night-surface: #151515;
+  }
+}
+
+/* Night mode class override */
+.night-mode,
+[data-theme="night"] {
+  --sphere-glow: #FFFFFF;
+  --sphere-core: rgba(255, 255, 255, 0.95);
+  --sphere-halo: rgba(255, 255, 255, 0.1);
+  --night-bg: #0a0a0a;
+  --night-surface: #151515;
+}
+
+/* Sphere Container for Logos */
+.logo-sphere {
+  position: relative;
+  display: inline-block;
+  border-radius: 50%;
+}
+
+/* Main Sphere Effect */
+.logo-sphere::before {
+  content: '';
+  position: absolute;
+  inset: -30px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center,
+    var(--sphere-core) 0%,
+    rgba(255, 255, 255, 0.8) 20%,
+    rgba(255, 255, 255, 0.4) 40%,
+    rgba(255, 255, 255, 0.1) 60%,
+    rgba(255, 255, 255, 0.05) 80%,
+    transparent 100%);
+  filter: blur(2px);
+  animation: spherePulse 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Inner Glow */
+.logo-sphere::after {
+  content: '';
+  position: absolute;
+  inset: -15px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center,
+    transparent 30%,
+    rgba(255, 255, 255, 0.03) 50%,
+    rgba(255, 255, 255, 0.08) 70%,
+    rgba(255, 255, 255, 0.02) 100%);
+  box-shadow:
+    inset 0 0 30px rgba(255, 255, 255, 0.2),
+    inset 0 0 60px rgba(255, 255, 255, 0.1);
+  animation: innerGlow 3s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* Sphere Animations */
+@keyframes spherePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes innerGlow {
+  from {
+    filter: brightness(1) blur(2px);
+  }
+  to {
+    filter: brightness(1.2) blur(3px);
+  }
+}
+
+/* Orbital Rings */
+.logo-orbital {
+  position: relative;
+}
+
+.logo-orbital::before,
+.logo-orbital::after {
+  content: '';
+  position: absolute;
+  inset: -40px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  animation: orbit 20s linear infinite;
+  pointer-events: none;
+}
+
+.logo-orbital::before {
+  animation-duration: 15s;
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: rotateX(60deg) rotateZ(0deg);
+}
+
+.logo-orbital::after {
+  animation-duration: 25s;
+  animation-direction: reverse;
+  border-color: rgba(255, 255, 255, 0.08);
+  transform: rotateX(30deg) rotateZ(0deg);
+}
+
+@keyframes orbit {
+  from {
+    transform: rotateX(60deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(60deg) rotateZ(360deg);
+  }
+}
+
+/* Logo 3D with Sphere Effect */
+.night-mode .logo-3d,
+[data-theme="night"] .logo-3d {
+  position: relative;
+  box-shadow:
+    0 0 60px rgba(255, 255, 255, 0.4),
+    0 0 120px rgba(255, 255, 255, 0.2),
+    0 0 180px rgba(255, 255, 255, 0.1),
+    inset 0 0 20px rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background:
+    radial-gradient(circle at 30% 30%,
+      rgba(255, 255, 255, 0.3) 0%,
+      transparent 50%),
+    url('assets/logo-night.jpeg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Floating Light Particles */
+.light-particles {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.light-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  animation: float-light 15s infinite;
+}
+
+@keyframes float-light {
+  0% {
+    transform: translateY(100vh) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(100px);
+    opacity: 0;
+  }
+}
+
+/* Create 20 light particles */
+.light-particle:nth-child(1) { left: 5%; animation-delay: 0s; animation-duration: 12s; }
+.light-particle:nth-child(2) { left: 10%; animation-delay: 2s; animation-duration: 15s; }
+.light-particle:nth-child(3) { left: 15%; animation-delay: 4s; animation-duration: 18s; }
+.light-particle:nth-child(4) { left: 20%; animation-delay: 6s; animation-duration: 10s; }
+.light-particle:nth-child(5) { left: 25%; animation-delay: 8s; animation-duration: 14s; }
+.light-particle:nth-child(6) { left: 30%; animation-delay: 1s; animation-duration: 16s; }
+.light-particle:nth-child(7) { left: 35%; animation-delay: 3s; animation-duration: 11s; }
+.light-particle:nth-child(8) { left: 40%; animation-delay: 5s; animation-duration: 13s; }
+.light-particle:nth-child(9) { left: 45%; animation-delay: 7s; animation-duration: 17s; }
+.light-particle:nth-child(10) { left: 50%; animation-delay: 9s; animation-duration: 12s; }
+.light-particle:nth-child(11) { left: 55%; animation-delay: 0.5s; animation-duration: 14s; }
+.light-particle:nth-child(12) { left: 60%; animation-delay: 2.5s; animation-duration: 16s; }
+.light-particle:nth-child(13) { left: 65%; animation-delay: 4.5s; animation-duration: 11s; }
+.light-particle:nth-child(14) { left: 70%; animation-delay: 6.5s; animation-duration: 13s; }
+.light-particle:nth-child(15) { left: 75%; animation-delay: 8.5s; animation-duration: 15s; }
+.light-particle:nth-child(16) { left: 80%; animation-delay: 1.5s; animation-duration: 17s; }
+.light-particle:nth-child(17) { left: 85%; animation-delay: 3.5s; animation-duration: 12s; }
+.light-particle:nth-child(18) { left: 90%; animation-delay: 5.5s; animation-duration: 14s; }
+.light-particle:nth-child(19) { left: 95%; animation-delay: 7.5s; animation-duration: 16s; }
+.light-particle:nth-child(20) { left: 100%; animation-delay: 9.5s; animation-duration: 18s; }
+
+/* Enhanced Night Logo Breakout */
+.night-mode .logo-breakout img,
+[data-theme="night"] .logo-breakout img {
+  border-radius: 50%;
+  box-shadow:
+    0 0 80px rgba(255, 255, 255, 0.6),
+    0 0 150px rgba(255, 255, 255, 0.4),
+    0 0 200px rgba(255, 255, 255, 0.2),
+    inset 0 0 40px rgba(255, 255, 255, 0.1);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+}
+
+/* Sphere Halo Effect */
+.night-mode .logo-breakout::before,
+[data-theme="night"] .logo-breakout::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.08) 25%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 75%);
+  border-radius: 50%;
+  animation: haloRotate 30s linear infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes haloRotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Parallax Logo Night Sphere */
+.night-mode .parallax-logo img,
+[data-theme="night"] .parallax-logo img {
+  border-radius: 50%;
+  box-shadow:
+    0 0 40px rgba(255, 255, 255, 0.5),
+    0 0 80px rgba(255, 255, 255, 0.3),
+    0 0 120px rgba(255, 255, 255, 0.1),
+    inset 0 0 20px rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 100%),
+    url('assets/logo-night.jpeg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Aurora Borealis Effect */
+.night-mode body::before,
+[data-theme="night"] body::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.02) 25%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.02) 75%,
+    transparent 100%);
+  animation: aurora 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes aurora {
+  0%, 100% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translate(-30%, -30%) rotate(90deg) scale(1.2);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-70%, -70%) rotate(180deg) scale(1);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translate(-40%, -60%) rotate(270deg) scale(1.1);
+    opacity: 0.6;
+  }
+}
+
+/* Glass Cards Night Mode */
+.night-mode .glass-card,
+[data-theme="night"] .glass-card {
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Header Night Sphere Glow */
+.night-mode .app-header,
+[data-theme="night"] .app-header {
+  background: linear-gradient(135deg,
+    rgba(15, 15, 15, 0.98) 0%,
+    rgba(20, 20, 20, 0.95) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.8),
+    0 0 40px rgba(255, 255, 255, 0.05);
+}
+
+/* Logo Reflection */
+.logo-reflection {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: scaleY(-0.8) translateY(10px);
+  opacity: 0.2;
+  filter: blur(2px);
+  mask: linear-gradient(to bottom,
+    rgba(255, 255, 255, 0.5) 0%,
+    transparent 50%);
+  -webkit-mask: linear-gradient(to bottom,
+    rgba(255, 255, 255, 0.5) 0%,
+    transparent 50%);
+  pointer-events: none;
+}
+
+/* Lens Flare Effect */
+.lens-flare {
+  position: fixed;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.4) 10%,
+    rgba(255, 255, 255, 0.2) 20%,
+    transparent 50%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: flareMove 10s ease-in-out infinite;
+  z-index: 100;
+  mix-blend-mode: screen;
+}
+
+@keyframes flareMove {
+  0%, 100% {
+    transform: translate(100vw, 20vh);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(50vw, 50vh);
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.4;
+  }
+}
+
+/* Button Night Glow */
+.night-mode .send-button:hover,
+.night-mode .voice-input-button:hover,
+.night-mode .attach-button:hover,
+[data-theme="night"] .send-button:hover,
+[data-theme="night"] .voice-input-button:hover,
+[data-theme="night"] .attach-button:hover {
+  color: white;
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.8),
+    0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+/* Message Bubble Night Sphere */
+.night-mode .message.user .message-bubble,
+[data-theme="night"] .message.user .message-bubble {
+  background: linear-gradient(135deg,
+    rgba(139, 92, 246, 0.9) 0%,
+    rgba(168, 85, 247, 0.8) 100%);
+  box-shadow:
+    0 4px 15px rgba(139, 92, 246, 0.4),
+    0 0 30px rgba(139, 92, 246, 0.2);
+}
+
+.night-mode .message.assistant .message-bubble,
+[data-theme="night"] .message.assistant .message-bubble {
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Input Area Night Glow */
+.night-mode .input-area,
+[data-theme="night"] .input-area {
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 -4px 20px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.night-mode .input-area:focus-within,
+[data-theme="night"] .input-area:focus-within {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.1),
+    0 -4px 20px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Crystalline Effect */
+.crystal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    repeating-linear-gradient(45deg,
+      transparent,
+      transparent 35px,
+      rgba(255, 255, 255, 0.01) 35px,
+      rgba(255, 255, 255, 0.01) 70px);
+  pointer-events: none;
+  animation: crystal-shift 30s linear infinite;
+  z-index: 1;
+}
+
+@keyframes crystal-shift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(70px);
+  }
+}

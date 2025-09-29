@@ -307,6 +307,22 @@ class ZantaraApp {
     } else {
       div.innerHTML = `<div class="message-bubble">${content}</div>`;
     }
+
+    // Add click handler to copy message text
+    const bubble = div.querySelector('.message-bubble');
+    if (bubble) {
+      bubble.style.cursor = 'pointer';
+      bubble.addEventListener('click', () => {
+        const textToCopy = text; // Use original text, not HTML
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          // Show feedback
+          const originalBg = bubble.style.background;
+          bubble.style.background = 'rgba(139, 92, 246, 0.2)';
+          setTimeout(() => { bubble.style.background = originalBg; }, 200);
+        }).catch(err => console.error('Failed to copy:', err));
+      });
+    }
+
     container.appendChild(div); container.scrollTop = container.scrollHeight;
     this.messages.push({ sender, text, timestamp: Date.now(), html: !!opts.html });
     this.applyVirtualizationTrim();
@@ -712,6 +728,22 @@ class ZantaraApp {
       const content = m.html ? String(m.text) : this.escape(m.text);
       if (m.sender === 'assistant') div.innerHTML = `<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`;
       else div.innerHTML = `<div class="message-bubble">${content}</div>`;
+
+      // Add click handler to copy message text
+      const bubble = div.querySelector('.message-bubble');
+      if (bubble) {
+        bubble.style.cursor = 'pointer';
+        bubble.addEventListener('click', () => {
+          const textToCopy = m.text; // Use original text
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            // Show feedback
+            const originalBg = bubble.style.background;
+            bubble.style.background = 'rgba(139, 92, 246, 0.2)';
+            setTimeout(() => { bubble.style.background = originalBg; }, 200);
+          }).catch(err => console.error('Failed to copy:', err));
+        });
+      }
+
       container.appendChild(div);
     }
     container.scrollTop = container.scrollHeight;
