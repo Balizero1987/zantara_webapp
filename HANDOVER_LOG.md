@@ -65,6 +65,36 @@
   - Prefers `ZANTARA_STREAMING_CLIENT` over legacy names
   - Graceful fallback for compatibility
 
+2025-09-29 – Premium Design Enhancements
+- Logo upgrade: integrated new logo (logza.jpeg) with multiple animated effects
+  - 3D rotating logo in header with hover tilt effects
+  - Breakout animation logo (top-right corner with glitch effect)
+  - Parallax floating logo (bottom-right with magnetic cursor follow)
+- Design system enhancements (design-enhancements.css):
+  - Modern micro-interactions and smooth animations
+  - Animated gradient backgrounds with mesh effects
+  - Premium glassmorphism components with backdrop blur
+  - Skeleton loading states with shimmer animations
+  - Enhanced typography with responsive scaling
+- Logo interactions (logo-animations.css + logo-interactions.js):
+  - Magnetic effect following cursor movement
+  - 3D perspective transforms on hover
+  - Particle explosion on click
+  - Glitch effects and morphing shapes
+  - Parallax scrolling animations
+- Premium UI components (premium-ui.css):
+  - Enhanced buttons with ripple effects
+  - Animated placeholder text in inputs
+  - Premium scrollbar styling
+  - Smooth focus states and transitions
+  - Connection badge with pulse animation
+- Accessibility improvements:
+  - Respects prefers-reduced-motion
+  - High contrast mode support
+  - Enhanced focus indicators
+  - Screen reader optimizations
+- Performance: GPU-accelerated animations, optimized transforms
+
 Open Items / Next Steps
 - Backend implementation: waiting for PROGETTO MADRE to implement `/api/chat` endpoint with NDJSON streaming
 - SSE migration: POST streaming ready as STEP 1, SSE can be added later as enhancement
