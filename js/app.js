@@ -175,7 +175,13 @@ class ZantaraApp {
     if (typeof res.message === 'string') return res.message;
     if (typeof res.text === 'string') return res.text;
     try { if (Array.isArray(res.choices) && res.choices[0]?.message?.content) return res.choices[0].message.content; } catch(_){}
-    try { if (res.data && typeof res.data.reply === 'string') return res.data.reply; } catch(_){}
+    try {
+      if (res.data) {
+        if (typeof res.data.response === 'string') return res.data.response; // openai.chat / ai.chat (wrapped)
+        if (typeof res.data.reply === 'string') return res.data.reply;
+        if (typeof res.data.text === 'string') return res.data.text;
+      }
+    } catch(_){}
     return JSON.stringify(res, null, 2);
   }
 
