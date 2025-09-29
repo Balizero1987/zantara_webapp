@@ -140,5 +140,12 @@ Open Items / Next Steps
 - GIFs/screenshots for onboarding (P4)
 - Backend coordination: SSE integration plan, model routing, V2 handler contract (P1)
 
+2025-09-29 – Login & Click-to-Copy Fixes
+- **Fixed login bypass**: Removed forced chat display (syncra.html lines 77/101)
+- **Added auth check**: app.js now checks for `zantara-user-email` on load, redirects to `/portal.html` if missing
+- **Click-to-copy messages**: All message bubbles now clickable with clipboard copy + visual feedback
+- **Streaming always on**: Removed conditional loading, streaming modules always active in production
+- **Background elements**: Made decorative elements non-interactive (`pointer-events:none`)
+
 Policy
 - LAW: Structural code changes must be proposed/approved for the Mother Project before merging here.

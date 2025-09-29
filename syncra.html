@@ -74,7 +74,7 @@
 
     <main class="main-content">
       <!-- Welcome Screen -->
-      <div id="welcome-screen" class="welcome-screen" style="display:none">
+      <div id="welcome-screen" class="welcome-screen">
         <div class="welcome-card glass-card">
           <h2>Hi there,</h2>
           <p>Give any command naturally, from generating content to managing your tasks</p>
@@ -98,7 +98,7 @@
       </div>
 
       <!-- Chat Interface -->
-      <div id="chat-interface" class="chat-interface" aria-live="polite" aria-label="Chat interface" style="display:flex">
+      <div id="chat-interface" class="chat-interface" aria-live="polite" aria-label="Chat interface" style="display:none">
         <div class="messages-container"></div>
         <div class="input-area glass-card">
           <button class="attach-button" aria-label="Attach file">
@@ -135,15 +135,10 @@
   <script src="js/api-config.js?v=prod13"></script>
   <script src="js/app.js?v=prod13" type="module"></script>
   <script src="js/streaming-toggle.js"></script>
-  <!-- Streaming modules: load only if explicitly enabled to avoid 404s -->
-  <script>
-    (function(){
-      var enabled = location.search.indexOf('streaming=true') !== -1 || localStorage.getItem('zantara-streaming') === 'true';
-      if (!enabled) return;
-      ['js/streaming-client.js','js/streaming-ui.js','js/streaming-toggle-ui.js'].forEach(function(src){ var s=document.createElement('script'); s.src=src; document.head.appendChild(s); });
-      console.log('[Syncra] Streaming modules requested');
-    })();
-  </script>
+  <!-- 🚀 STREAMING LIVE IN PRODUCTION - ALWAYS ON! -->
+  <script src="js/streaming-client.js"></script>
+  <script src="js/streaming-ui.js"></script>
+  <script src="js/streaming-toggle-ui.js"></script>
   <script src="js/message-virtualization.js"></script>
   <script src="js/test-console.js?v=prod13"></script>
   <script src="js/theme-switcher.js?v=prod13"></script>
