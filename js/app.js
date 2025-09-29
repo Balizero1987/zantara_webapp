@@ -150,6 +150,10 @@ class ZantaraApp {
     } catch (err) {
       this.hideTypingIndicator();
       console.error(err);
+      const msg = String(err && err.message || err || '');
+      if (/OpenAI failed/i.test(msg)) {
+        return this.addMessage('assistant', 'AI chat is temporarily unavailable (backend config). Pricing and tools are available. Try asking for prices (e.g., "Price for D12").');
+      }
       return this.addMessage('assistant', 'Request failed. Please try again.');
     }
   }
