@@ -482,7 +482,7 @@ class ZantaraApp {
       // Company canonical contacts
       const CONTACT = {
         email: 'info@balizero.com',
-        whatsapp: '+62 859 0436 9574',
+        whatsapp: '+62 859 5424 1699',
         website: 'https://balizero.com',
         app: 'https://zantara.balizero.com',
         landing: 'https://welcome.balizero.com'
