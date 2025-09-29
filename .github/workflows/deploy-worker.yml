@@ -1,0 +1,28 @@
+name: Deploy Cloudflare Worker (Proxy/BFF)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'proxy-worker/**'
+      - '.github/workflows/deploy-worker.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install Wrangler
+        run: npm i -g wrangler
+      - name: Publish Worker
+        working-directory: proxy-worker
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          wrangler deploy --var ZANTARA_BASE_URL:${{ vars.ZANTARA_BASE_URL || 'https://zantara-v520-production-1064094238013.europe-west1.run.app' }} \
+                          --var ALLOW_ORIGIN:${{ vars.ALLOW_ORIGIN || 'https://zantara.balizero.com' }}

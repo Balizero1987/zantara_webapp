@@ -2,23 +2,29 @@
 // This file manages API connections with CORS handling
 
 const API_CONFIG = {
-  // Production ZANTARA endpoints
+  // Mode: 'proxy' in production (recommended), 'direct' only for local/dev
+  mode: 'proxy',
+  // Proxy/BFF endpoints (server-side adds x-api-key, client sends x-user-id)
+  proxy: {
+    production: {
+      // Default to the provided Cloud Run proxy; still overridable via window/localStorage
+      base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://zantara-web-proxy-himaadsxua-ew.a.run.app/api/zantara',
+      call: '/call',
+      ai: '/ai.chat',
+      aiStream: '/ai.chat.stream',
+      pricingOfficial: '/pricing.official',
+      priceLookup: '/price.lookup',
+      health: '/health'
+    }
+  },
+  // Direct endpoints (Cloud Run) — used only when explicitly forced in dev
   production: {
-    // Unified Cloud Run endpoint with CORS enabled (production)
     base: 'https://zantara-v520-production-1064094238013.europe-west1.run.app',
     call: '/call',
     health: '/health'
   },
-
-  // No public CORS proxies needed (Cloud Run CORS enabled)
-
-  // API Key (should be in environment variable in production)
-  apiKey: 'zantara-internal-dev-key-2025',
-
-  // Default headers
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  // Default headers (client)
+  headers: { 'Content-Type': 'application/json' }
 };
 
 // Lightweight Telemetry
@@ -95,30 +101,59 @@ const ZTelemetry = (() => {
 // Function to make API calls with CORS handling
 async function callZantaraAPI(endpoint, data, useProxy = true) {
   try {
-    const isGitHubPages = window.location.hostname.includes('github.io');
-    const isCustomDomain = window.location.hostname === 'zantara.balizero.com';
     const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const forceDirect = (new URLSearchParams(location.search)).get('direct') === 'true';
 
-    let apiUrl = API_CONFIG.production.base + endpoint;
+    // Determine base URL: prefer proxy in production
+    let base = '';
+    let viaProxy = API_CONFIG.mode === 'proxy' && !forceDirect;
+    if (viaProxy) {
+      base = API_CONFIG.proxy.production.base;
+      if (!base) {
+        // Allow setting at runtime
+        const overrideProxy = (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base')));
+        if (overrideProxy) base = overrideProxy;
+      }
+      // If still no proxy base, fallback to direct only in dev
+      if (!base) {
+        viaProxy = false;
+      }
+    }
 
-    // For development, use local proxy
-    if (isDevelopment) {
-      apiUrl = 'http://localhost:3003' + endpoint;
-      console.log('Using local proxy for development');
+    let apiUrl = '';
+    if (viaProxy) {
+      apiUrl = base + endpoint;
+    } else {
+      // Direct mode: only allowed in dev or if explicitly forced (for testing)
+      apiUrl = API_CONFIG.production.base + endpoint;
+      if (isDevelopment) {
+        apiUrl = 'http://localhost:3003' + endpoint;
+        console.log('Using local proxy for development');
+      }
     }
 
     const started = performance.now();
-    const response = await fetch(apiUrl, {
+    // Build headers: never send x-api-key from client; always include x-user-id if available
+    const userId = (typeof window !== 'undefined') ? (localStorage.getItem('zantara-user-email') || '') : '';
+    const headers = {
+      ...API_CONFIG.headers,
+      ...(userId ? { 'x-user-id': userId } : {})
+    };
+
+    // Exponential backoff (429/5xx)
+    const attempt = async (n) => {
+      const resp = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        ...API_CONFIG.headers,
-        'x-api-key': API_CONFIG.apiKey,
-        ...(typeof window !== 'undefined' && window.ZANTARA_SESSION_ID
-          ? { 'x-session-id': window.ZANTARA_SESSION_ID }
-          : {})
-      },
+      headers,
       body: JSON.stringify(data)
-    });
+      });
+      if (resp.status === 429 || resp.status >= 500) {
+        if (n < 3) { await new Promise(r => setTimeout(r, Math.pow(2, n) * 500)); return attempt(n + 1); }
+      }
+      return resp;
+    };
+
+    const response = await attempt(0);
 
     const ms = Math.round(performance.now() - started);
     const key = (data && (data.key || data?.params?.key)) || endpoint;
@@ -145,14 +180,21 @@ async function callZantaraAPI(endpoint, data, useProxy = true) {
   }
 }
 
-// Function to check API health (always attempts direct fetch)
+// Function to check API health (tries proxy then backend)
 async function checkAPIHealth() {
   try {
-    const healthUrl = API_CONFIG.production.base + '/health';
-    const resp = await fetch(healthUrl, { method: 'GET' });
-    if (resp.ok) {
-      try { const data = await resp.json(); console.log('✅ ZANTARA API is healthy:', data); } catch (_) {}
-      return true;
+    const proxyBase = (API_CONFIG.proxy.production.base || (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base')))) || '';
+    const directBase = API_CONFIG.production.base;
+
+    if (proxyBase) {
+      try {
+        const r = await fetch(proxyBase + '/health', { method: 'GET' });
+        if (r.ok) { try { console.log('✅ ZANTARA API (proxy) healthy:', await r.clone().json()); } catch(_){}; return true; }
+      } catch (_) {}
+    }
+    if (directBase) {
+      const r2 = await fetch(directBase + '/health', { method: 'GET' });
+      if (r2.ok) { try { console.log('✅ ZANTARA API (backend) healthy:', await r2.clone().json()); } catch(_){}; return true; }
     }
     return false;
   } catch (error) {
@@ -197,37 +239,36 @@ document.addEventListener('DOMContentLoaded', () => {
   checkAPIHealth().then(healthy => {
     if (healthy) {
       console.log('🟢 ZANTARA API connection established');
-    } else {
-      console.log('🟡 ZANTARA API not reachable, some features may be limited');
-
-      // Show a user-friendly message
-      const notification = document.createElement('div');
-      notification.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: rgba(251, 191, 36, 0.1);
-        border: 1px solid rgba(251, 191, 36, 0.3);
-        color: #fbbf24;
-        padding: 12px 20px;
-        border-radius: 8px;
-        font-size: 14px;
-        z-index: 9999;
-        backdrop-filter: blur(10px);
-      `;
-      notification.innerHTML = `
-        <strong>Limited Mode:</strong> Using demo data.
-        <a href="#" style="color: #fbbf24; text-decoration: underline; margin-left: 8px;"
-           onclick="this.parentElement.remove(); return false;">Dismiss</a>
-      `;
-      document.body.appendChild(notification);
-
-      // Auto-dismiss after 10 seconds
-      setTimeout(() => {
-        if (notification.parentElement) {
-          notification.remove();
-        }
-      }, 10000);
+      return;
     }
+    console.log('🟡 ZANTARA API not reachable, some features may be limited');
+
+    // Only show the Limited Mode banner in development (or with ?dev=true)
+    try {
+      const params = new URLSearchParams(location.search);
+      const isDev = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || params.get('dev') === 'true');
+      if (!isDev) return;
+    } catch (_) {}
+
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      color: #fbbf24;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 9999;
+      backdrop-filter: blur(10px);
+    `;
+    notification.innerHTML = `
+      <strong>Limited Mode:</strong> Using demo data.
+      <a href="#" style="color: #fbbf24; text-decoration: underline; margin-left: 8px;" onclick="this.parentElement.remove(); return false;">Dismiss</a>
+    `;
+    document.body.appendChild(notification);
+    setTimeout(() => { if (notification.parentElement) notification.remove(); }, 10000);
   });
 });

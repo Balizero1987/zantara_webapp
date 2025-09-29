@@ -1,5 +1,39 @@
 # HANDOVER LOG – ZANTARA WEBAPP
 
+2025-09-29 – Production Alignment (Syncra Mode Default)
+- Backend base: set client default to Cloud Run prod `https://zantara-v520-production-1064094238013.europe-west1.run.app`; added base‑override UI in test console; fallback `API_BASE` updated.
+- Syncra UI: added `syncra.html` + `js/app.js` + `styles/zantara-theme.css` + `styles/components.css`.
+  - Voice‑first, quick actions wired (backend‑first with ai.chat fallback), streaming simulation (toggle), message virtualization, “Load earlier” chip.
+  - Integrated streaming toggle, virtualization UI, test console (Ctrl+Shift+T), telemetry (per‑key counts/latencies, console summary).
+- Login (Syncra style): replaced demo with minimal EN sign‑in using `identity.resolve`; redirect to Syncra on success.
+  - Pages: `login-clean.html` and `portal.html` (same content, Syncra theme). Root `index.html` → `portal.html` with cache‑busting.
+  - Removed `login-animated.html` (old demo). Classic UI link hidden; `chat.html` redirects to Syncra (use `?force=true` only for debug).
+- Branding: new logos `assets/logozantara.jpeg` (favicon) and `assets/logobianco.jpeg` (UI/avatars); applied to Syncra, Login, Classic; PWA icons generated (`assets/icon-192.png`, `assets/icon-512.png`) and `manifest.json` updated.
+- Health/banner: fixed health check (always tries `/health`) to avoid false “Limited Mode” banner; verified 200.
+- CORS: guidance added; ensure Cloud Run has `CORS_ORIGINS=https://zantara.balizero.com,https://balizero1987.github.io,...`.
+- GitHub Pages: aligned `gh-pages` with main to avoid stale builds; index uses cache‑busting.
+
+2025-09-29 – Login Cleanup + Proxy Worker
+- Login pages simplified: removed legacy video intro, kept minimal EN sign-in (`login-clean.html`).
+- Root now redirects to `login-clean.html` (cache-busted). `portal.html` redirects to login.
+- Favicon unified to `assets/logozantara.jpeg` across pages.
+- Limited Mode banner gated to dev only (use `?dev=true` to display).
+- Syncra app now routes pricing flows via official endpoints (`pricing.official` / `price.lookup`) with redirect handling (“PREZZI UFFICIALI 2025”).
+- Added Cloudflare Worker proxy (`proxy-worker/`) with CORS, secrets, SSE piping, and GitHub Action.
+- Client remains in proxy mode by default; set `window.ZANTARA_PROXY_BASE` or `localStorage['zantara-proxy-base']` to Worker URL (e.g., `https://<worker>.workers.dev/api/zantara`).
+
+Open Items / Next Steps
+- SSE real streaming: draft and align contract (keys/chunks/heartbeats), client flag/fallback plan.
+- Observability: optional UI badge (Syncra header) and expanded metrics (p95 per handler), server‑side logs.
+- Content polish: optional “Connected to: Production” badge in Syncra, final copy review.
+- Hardening: confirm Cloud Run CORS env set on prod service; consider rate limits/quotas and error surfaces in login.
+
+Live Check (expected)
+- Root → login (Syncra): https://zantara.balizero.com/
+- Login (Syncra): https://zantara.balizero.com/portal.html
+- Syncra UI: https://zantara.balizero.com/syncra.html
+- Test Console: https://zantara.balizero.com/test-api.html
+
 2025-09-28 – Session Summary
 - CORS: enabled on Cloud Run for Pages origin
 - Endpoint: unified to Cloud Run canonical; proxies removed

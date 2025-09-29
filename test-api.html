@@ -83,8 +83,7 @@
     <div id="output"></div>
 
     <script>
-        const API_BASE = 'https://zantara-v520-production-1064094238013.europe-west1.run.app';
-        const API_KEY = 'zantara-internal-dev-key-2025';
+        const API_BASE = (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base') || (window.ZANTARA_API && window.ZANTARA_API.config && window.ZANTARA_API.config.proxy && window.ZANTARA_API.config.proxy.production && window.ZANTARA_API.config.proxy.production.base) || '');
 
         function log(message, type = '') {
             const output = document.getElementById('output');
@@ -96,8 +95,20 @@
         async function testHealth() {
             log('Testing /health endpoint...');
             try {
-                const response = await fetch(`${API_BASE}/health`);
-                const data = await response.json();
+                let url = `${API_BASE}/health`;
+                let resp = null;
+                if (API_BASE) {
+                  resp = await fetch(url);
+                }
+                if (!resp || !resp.ok) {
+                  const backend = (window.ZANTARA_API && window.ZANTARA_API.config && window.ZANTARA_API.config.production && window.ZANTARA_API.config.production.base) || '';
+                  if (backend) {
+                    url = backend + '/health';
+                    resp = await fetch(url);
+                  }
+                }
+                if (!resp) throw new Error('No health endpoint reachable');
+                const data = await resp.json();
                 log('✅ Health: ' + JSON.stringify(data, null, 2), 'success');
             } catch (error) {
                 log('❌ Health error: ' + error.message, 'error');
@@ -141,7 +152,7 @@
             try {
                 const data = window.ZANTARA_API && window.ZANTARA_API.call
                   ? await window.ZANTARA_API.call('/call', { key: 'team.list', params: {} }, true)
-                  : await (await fetch(`${API_BASE}/call`, { method:'POST', headers:{'Content-Type':'application/json','x-api-key': API_KEY}, body: JSON.stringify({ key:'team.list', params:{} }) })).json();
+                  : await (await fetch(`${API_BASE}/call`, { method:'POST', headers:{'Content-Type':'application/json','x-user-id': (localStorage.getItem('zantara-user-email')||'') }, body: JSON.stringify({ key:'team.list', params:{} }) })).json();
                 log('✅ Team list: ' + JSON.stringify(data, null, 2), 'success');
             } catch (error) {
                 log('❌ Team list error: ' + error.message, 'error');
@@ -153,7 +164,7 @@
             try {
                 const data = window.ZANTARA_API && window.ZANTARA_API.call
                   ? await window.ZANTARA_API.call('/call', { key: 'contact.info', params: {} }, true)
-                  : await (await fetch(`${API_BASE}/call`, { method:'POST', headers:{'Content-Type':'application/json','x-api-key': API_KEY}, body: JSON.stringify({ key:'contact.info', params:{} }) })).json();
+                  : await (await fetch(`${API_BASE}/call`, { method:'POST', headers:{'Content-Type':'application/json','x-user-id': (localStorage.getItem('zantara-user-email')||'') }, body: JSON.stringify({ key:'contact.info', params:{} }) })).json();
                 log('✅ Contact info: ' + JSON.stringify(data, null, 2), 'success');
             } catch (error) {
                 log('❌ Contact info error: ' + error.message, 'error');
@@ -165,7 +176,7 @@
             try {
                 const data = window.ZANTARA_API && window.ZANTARA_API.call
                   ? await window.ZANTARA_API.call('/call', { key: 'ai.chat', params: { prompt: 'Hello, test from ZANTARA console'} }, true)
-                  : await (await fetch(`${API_BASE}/call`, { method:'POST', headers:{'Content-Type':'application/json','x-api-key': API_KEY}, body: JSON.stringify({ key:'ai.chat', params:{ prompt: 'Hello, test from ZANTARA console'} }) })).json();
+                  : await (await fetch(`${API_BASE}/call`, { method:'POST', headers:{'Content-Type':'application/json','x-user-id': (localStorage.getItem('zantara-user-email')||'') }, body: JSON.stringify({ key:'ai.chat', params:{ prompt: 'Hello, test from ZANTARA console'} }) })).json();
                 log('✅ AI response: ' + JSON.stringify(data, null, 2), 'success');
             } catch (error) {
                 log('❌ AI chat error: ' + error.message, 'error');
@@ -184,7 +195,7 @@
             try {
                 const data = window.ZANTARA_API && window.ZANTARA_API.call
                   ? await window.ZANTARA_API.call('/call', { key, params }, true)
-                  : await (await fetch(`${API_BASE}/call`, { method:'POST', headers:{'Content-Type':'application/json','x-api-key': API_KEY}, body: JSON.stringify({ key, params }) })).json();
+                  : await (await fetch(`${API_BASE}/call`, { method:'POST', headers:{'Content-Type':'application/json','x-user-id': (localStorage.getItem('zantara-user-email')||'') }, body: JSON.stringify({ key, params }) })).json();
                 log('✅ Result: ' + JSON.stringify(data, null, 2), 'success');
             } catch (error) {
                 log('❌ Custom error: ' + error.message, 'error');

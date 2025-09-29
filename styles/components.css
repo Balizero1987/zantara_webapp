@@ -81,6 +81,9 @@
 .nav-item:focus-visible { outline: none; box-shadow: var(--z-focus, var(--focus-ring)); border-radius: 12px; }
 .nav-item span { font-size: 0.75rem; font-weight: 500; }
 
+/* Connection Badge */
+.conn-badge { margin-left: 8px; padding: 4px 8px; border-radius: 999px; font-size: 12px; line-height: 1; color: var(--text-primary); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(10px); opacity: 0.9; }
+
 /* Typing indicator */
 .typing-indicator { display: flex; gap: 4px; padding: 12px 16px; }
 .typing-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple-light); animation: typing 1.4s infinite; }
@@ -95,4 +98,3 @@
 
 /* Responsive */
 @media (min-width: 768px) { .app-container { max-width: 800px; margin: 0 auto; } .quick-actions { grid-template-columns: repeat(4, 1fr); } .bottom-nav { display: none; } }
-
