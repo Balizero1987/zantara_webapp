@@ -67,6 +67,7 @@
 /* Defensive: remove any default inner focus rings */
 input.message-input::-moz-focus-inner { border: 0; }
 input.message-input::-webkit-contacts-auto-fill-button { visibility: hidden; display: none !important; }
+.input-area input, .input-area input:focus, .input-area input:focus-visible { outline: none !important; border: none !important; box-shadow: none !important; }
 .message-input::placeholder { color: var(--text-muted); }
 .attach-button, .voice-input-button, .send-button { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 8px; transition: all 0.2s; }
 .attach-button:hover, .voice-input-button:hover, .send-button:hover { color: var(--red-bright, var(--purple-light)); transform: scale(1.1); text-shadow: 0 0 8px rgba(255, 0, 64, 0.4); }

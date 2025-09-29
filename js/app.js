@@ -124,6 +124,17 @@ class ZantaraApp {
       const api = window.ZANTARA_API;
       if (!api || !api.call) { this.hideTypingIndicator(); return this.renderAssistantReply('API not available.'); }
 
+      // Friendly greeting handler (avoid irrelevant memory mentions)
+      const t = String(text || '').trim().toLowerCase();
+      const greet = /^(hi|hello|hey|ciao|halo|hai|hola|salve)\b/.test(t);
+      if (greet) {
+        this.hideTypingIndicator();
+        let reply = 'Hello! How can I help you today?';
+        if (t.startsWith('ciao')) reply = 'Ciao! Come posso aiutarti?';
+        else if (t.startsWith('halo') || t.startsWith('hai')) reply = 'Halo! Ada yang bisa saya bantu?';
+        return this.renderAssistantReply(reply);
+      }
+
       const wantsPricing = /\b(price|pricing|cost|fee|fees|prezzo|prezzi|costo|costi)\b/i.test(text || '');
       const codeMatch = /\b(?:[CDE]\d{1,2}[A-Z]?)\b/i.exec(text || '');
 
@@ -205,8 +216,35 @@ class ZantaraApp {
 
   formatPricing(res) {
     if (!res) return 'No pricing data available.';
-    const obj = (res.data && res.data.pricing) ? res.data.pricing : res.pricing || res.data || res;
-    try { return 'Official pricing:\n' + JSON.stringify(obj, null, 2); } catch(_) { return 'Official pricing available.'; }
+    try {
+      const data = res.data || res;
+      const s = data.service || data.pricing || {};
+      const name = s.name || s.title || 'Official pricing';
+      const p1 = s.price_1y || s.price1 || s.one_year || '';
+      const p2 = s.price_2y || s.price2 || s.two_years || '';
+      const ext = s.extension || s.extend || '';
+      const notes = s.notes ? `\nNote: ${s.notes}` : '';
+      // Company canonical contacts
+      const CONTACT = {
+        email: 'info@balizero.com',
+        whatsapp: '+62 859 0436 9574',
+        website: 'https://balizero.com',
+        app: 'https://zantara.balizero.com',
+        landing: 'https://welcome.balizero.com'
+      };
+      const contact = data.contact || {};
+      const email = contact.email || CONTACT.email;
+      const wa = contact.whatsapp || CONTACT.whatsapp;
+      const sites = `${CONTACT.website} | ${CONTACT.app} | ${CONTACT.landing}`;
+      const contactLine = `\nContact: ${[email, wa].filter(Boolean).join(' | ')}\nSites: ${sites}`;
+      const lines = [
+        `Official pricing – ${name}`,
+        [p1 && `• 1 Year: ${p1}`, p2 && `• 2 Years: ${p2}`, ext && `• Extension: ${ext}`].filter(Boolean).join('\n')
+      ].filter(Boolean).join('\n');
+      return (lines + notes + contactLine).trim();
+    } catch(_) {
+      return 'Official pricing available.';
+    }
   }
 
   switchView(view) { console.log('Switching to view:', view); }
