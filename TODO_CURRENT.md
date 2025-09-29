@@ -12,7 +12,7 @@ P2 – Frontend UX/Perf
 
 P3 – Tests & Observability
 - [x] **Enhanced Test Console**: 8 test scenarios, performance metrics, export functionality ✅
-- [ ] Add basic telemetry (counts/latency) surfaced in console logs for quick triage
+- [x] Add basic telemetry (counts/latency) surfaced in console logs for quick triage ✅
 
 P4 – Docs & Onboarding
 - [x] **Complete Onboarding System**: Welcome flow (6 steps), feature discovery, help center, F1/? shortcuts ✅

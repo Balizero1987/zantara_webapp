@@ -10,18 +10,24 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#8B5CF6">
+  <style>
+    /* Critical inline override (cache-safe): always show chat */
+    #splash-screen{display:none!important}
+    #welcome-screen{display:none!important}
+    #chat-interface{display:flex!important}
+  </style>
   <link rel="stylesheet" href="styles/design-system.css">
   <link rel="stylesheet" href="styles/streaming-toggle.css">
   <link rel="stylesheet" href="styles/virtualization-config.css">
   <link rel="stylesheet" href="styles/test-console.css">
   <link rel="stylesheet" href="styles/zantara-theme.css">
-  <link rel="stylesheet" href="styles/zantara-theme-day.css?v=prod7">
-  <link rel="stylesheet" href="styles/zantara-theme-night-enhanced.css">
-  <link rel="stylesheet" href="styles/components.css?v=prod8">
+  <link rel="stylesheet" href="styles/zantara-theme-day.css?v=prod9">
+  <link rel="stylesheet" href="styles/zantara-theme-night-enhanced.css?v=prod9">
+  <link rel="stylesheet" href="styles/components.css?v=prod9">
 </head>
 <body>
   <!-- Splash Screen -->
-  <div id="splash-screen" class="splash-screen" role="status" aria-live="polite">
+  <div id="splash-screen" class="splash-screen" role="status" aria-live="polite" style="display:none">
     <img src="assets/lotus-day.svg" class="lotus-splash" alt="ZANTARA">
     <h1 class="splash-title">ZANTARA</h1>
     <div class="splash-loader" aria-hidden="true"></div>
@@ -42,7 +48,7 @@
 
     <main class="main-content">
       <!-- Welcome Screen -->
-      <div id="welcome-screen" class="welcome-screen">
+      <div id="welcome-screen" class="welcome-screen" style="display:none">
         <div class="welcome-card glass-card">
           <h2>Hi there,</h2>
           <p>Give any command naturally, from generating content to managing your tasks</p>
@@ -66,7 +72,7 @@
       </div>
 
       <!-- Chat Interface -->
-      <div id="chat-interface" class="chat-interface" aria-live="polite" aria-label="Chat interface">
+      <div id="chat-interface" class="chat-interface" aria-live="polite" aria-label="Chat interface" style="display:flex">
         <div class="messages-container"></div>
         <div class="input-area glass-card">
           <button class="attach-button" aria-label="Attach file">
@@ -100,13 +106,13 @@
     </nav>
   </div>
 
-  <script src="js/api-config.js?v=prod8"></script>
+  <script src="js/api-config.js?v=prod9"></script>
   <!-- removed unused streaming UI placeholders to avoid 404s -->
-  <script src="js/app.js?v=prod8" type="module"></script>
+  <script src="js/app.js?v=prod9" type="module"></script>
   <script src="js/streaming-toggle.js"></script>
   <script src="js/message-virtualization.js"></script>
-  <script src="js/test-console.js?v=prod8"></script>
-  <script src="js/theme-switcher.js?v=prod8"></script>
+  <script src="js/test-console.js?v=prod9"></script>
+  <script src="js/theme-switcher.js?v=prod9"></script>
   <script>
     // Update connection badge (Proxy/Direct + host)
     (function(){
