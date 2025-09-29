@@ -6,6 +6,12 @@
   --red-soft: #FF6B6B;
   --orange-glow: #FFA500;
   --coral-accent: #FF6B9D;
+  /* Beam Colors (light beams) */
+  --beam-red: rgba(255, 0, 64, 0.10);
+  --beam-blue: rgba(0, 136, 255, 0.10);
+  --beam-purple: rgba(131, 56, 236, 0.10);
+  --beam-yellow: rgba(255, 221, 0, 0.10);
+  --beam-green: rgba(0, 200, 83, 0.10);
 
   /* Light Theme Base */
   --bg-primary: #FFFFFF;
@@ -29,24 +35,59 @@
   --surface-hover: rgba(255, 0, 64, 0.03);
 }
 
-/* Animated Background Day Mode */
+/* Base white background */
+body[data-theme="day"] { background: #FFFFFF; }
+
+/* Animated Background Day Mode – multi‑color Syncra beams */
 body[data-theme="day"]::before {
   content: '';
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  position: fixed; inset: 0;
   background:
-    radial-gradient(circle at 30% 20%, rgba(255, 0, 64, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 70% 60%, rgba(255, 107, 107, 0.06) 0%, transparent 40%),
-    radial-gradient(circle at 90% 90%, rgba(255, 165, 0, 0.04) 0%, transparent 50%),
-    linear-gradient(180deg, #FFFFFF 0%, #FFF5F5 100%);
-  animation: dayPulse 15s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 0;
+    /* Red beam */
+    linear-gradient(110deg, var(--beam-red) 0%, rgba(255,0,64,0) 40%),
+    /* Blue beam */
+    linear-gradient(140deg, var(--beam-blue) 10%, rgba(0,136,255,0) 55%),
+    /* Purple beam */
+    linear-gradient(165deg, var(--beam-purple) 15%, rgba(131,56,236,0) 60%),
+    /* Yellow beam */
+    linear-gradient(190deg, var(--beam-yellow) 0%, rgba(255,221,0,0) 50%),
+    /* Green beam */
+    linear-gradient(215deg, var(--beam-green) 20%, rgba(0,200,83,0) 70%),
+    /* Soft base gradient */
+    linear-gradient(180deg, #FFFFFF 0%, #FFF8F8 100%);
+  filter: saturate(110%);
+  animation: beamsShift 24s ease-in-out infinite;
+  pointer-events: none; z-index: 0;
 }
 
-@keyframes dayPulse {
-  0%, 100% { opacity: 1; filter: hue-rotate(0deg); }
-  50% { opacity: 0.8; filter: hue-rotate(10deg); }
+/* Subtle second layer for parallax beams */
+body[data-theme="day"]::after {
+  content: '';
+  position: fixed; inset: -10%;
+  background:
+    linear-gradient(125deg, rgba(255,0,64,0.05) 0%, rgba(255,0,64,0) 40%),
+    linear-gradient(150deg, rgba(0,136,255,0.05) 15%, rgba(0,136,255,0) 60%),
+    linear-gradient(175deg, rgba(131,56,236,0.05) 25%, rgba(131,56,236,0) 65%),
+    linear-gradient(205deg, rgba(255,221,0,0.06) 5%, rgba(255,221,0,0) 55%),
+    linear-gradient(230deg, rgba(0,200,83,0.05) 25%, rgba(0,200,83,0) 65%);
+  mix-blend-mode: multiply;
+  animation: beamsDrift 40s linear infinite;
+  pointer-events: none; z-index: 0;
+}
+
+@keyframes beamsShift {
+  0% { transform: translate3d(0,0,0); opacity: 1; }
+  50% { transform: translate3d(1.5%, -1%, 0); opacity: 0.95; }
+  100% { transform: translate3d(0,0,0); opacity: 1; }
+}
+@keyframes beamsDrift {
+  0% { transform: translate3d(0,0,0) rotate(0.001deg); }
+  100% { transform: translate3d(-2%, 1.5%, 0) rotate(0.001deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-theme="day"]::before,
+  body[data-theme="day"]::after { animation: none; }
 }
 
 /* Glass Cards Day Mode */
