@@ -79,10 +79,21 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 24px;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 32px;
+            background: var(--z-bg-card);
+            border-bottom: 1px solid var(--z-border-subtle);
+            position: relative;
+        }
+
+        .chat-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--z-gradient-red);
+            opacity: 0.5;
         }
 
         .header-left {
@@ -92,26 +103,34 @@
         }
 
         .assistant-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            background: #ffffff;
+            width: 48px;
+            height: 48px;
+            border-radius: var(--z-radius-lg);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+            overflow: hidden;
+            border: 2px solid var(--z-border-accent);
+            box-shadow: var(--z-shadow-red);
+        }
+
+        .assistant-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .assistant-info h2 {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 20px;
+            font-weight: var(--z-font-bold);
             letter-spacing: -0.01em;
+            color: var(--z-text-primary);
         }
 
         .assistant-info p {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            color: var(--z-text-muted);
+            margin-top: 2px;
         }
 
         .header-actions {
@@ -121,19 +140,20 @@
         }
 
         .header-btn {
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 13px;
+            padding: 10px 20px;
+            background: transparent;
+            border: 2px solid var(--z-border-accent);
+            border-radius: var(--z-radius-md);
+            color: var(--z-text-accent);
+            font-size: 14px;
+            font-weight: var(--z-font-semibold);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all var(--z-transition-base);
         }
 
         .header-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.25);
+            background: var(--z-accent-soft);
+            transform: translateY(-1px);
         }
 
         /* Messages Area */
@@ -179,15 +199,18 @@
 
         .message-content {
             max-width: 70%;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 16px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--z-bg-card);
+            border-radius: var(--z-radius-xl);
+            padding: 18px 24px;
+            border: 1px solid var(--z-border-subtle);
+            box-shadow: var(--z-shadow-sm);
         }
 
         .message.user .message-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
+            background: var(--z-gradient-red);
+            color: var(--z-white);
+            box-shadow: var(--z-shadow-red);
+            border: none;
         }
 
         .message-text {
@@ -209,15 +232,17 @@
         }
 
         .welcome-message .welcome-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 100px;
+            height: 100px;
+            border-radius: var(--z-radius-xl);
+            background: var(--z-bg-card);
+            border: 2px solid var(--z-border-accent);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
-            margin: 0 auto 24px;
+            margin: 0 auto 28px;
+            box-shadow: var(--z-shadow-red);
+            overflow: hidden;
         }
 
         .welcome-message h3 {
@@ -300,24 +325,25 @@
 
         .input-field {
             flex: 1;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 14px;
+            background: var(--z-bg-elevated);
+            border: 2px solid var(--z-border-default);
+            border-radius: var(--z-radius-md);
             padding: 14px 18px;
-            color: #ffffff;
+            color: var(--z-text-primary);
             font-size: 15px;
+            font-family: var(--z-font-primary);
             line-height: 1.4;
             resize: none;
             max-height: 120px;
             min-height: 48px;
-            transition: all 0.2s ease;
+            transition: all var(--z-transition-base);
         }
 
         .input-field:focus {
             outline: none;
-            border-color: #667eea;
-            background: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--z-border-accent);
+            background: var(--z-bg-card);
+            box-shadow: var(--z-focus);
         }
 
         .input-field::placeholder {
@@ -327,22 +353,22 @@
         .send-btn {
             width: 48px;
             height: 48px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--z-gradient-red);
             border: none;
-            border-radius: 12px;
-            color: #ffffff;
+            border-radius: var(--z-radius-md);
+            color: var(--z-white);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            transition: all 0.2s ease;
+            font-size: 20px;
+            transition: all var(--z-transition-base);
             flex-shrink: 0;
         }
 
         .send-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+            box-shadow: var(--z-shadow-red-intense);
         }
 
         .send-btn:disabled {
@@ -433,12 +459,17 @@
     </style>
 </head>
 <body>
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+        <span id="themeIcon">☀️</span>
+    </button>
+
     <div class="chat-container">
         <!-- Header -->
         <div class="chat-header">
             <div class="header-left">
                 <div class="assistant-avatar">
-                    <img src="assets/logobianco.jpeg" alt="ZANTARA" style="width: 24px; height: 24px;">
+                    <img src="public/images/zantara-logo.jpeg" alt="ZANTARA">
                 </div>
                 <div class="assistant-info">
                     <h2>ZANTARA</h2>
@@ -456,7 +487,7 @@
             <!-- Welcome Message -->
             <div class="welcome-message">
                 <div class="welcome-icon">
-                <img src="assets/logobianco.jpeg" alt="ZANTARA" style="width: 48px; height: 48px; opacity: 0.8;">
+                <img src="public/images/zantara-logo.jpeg" alt="ZANTARA" style="width: 64px; height: 64px;">
                 </div>
                 <h3>ZANTARA Awaits</h3>
                 <p>Visas, business, clarity — one channel.</p>
@@ -468,8 +499,8 @@
 
         <!-- Typing Indicator -->
         <div class="typing-indicator" id="typingIndicator">
-            <div class="message-avatar" style="background: white; clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);">
-                <img src="assets/logobianco.jpeg" alt="ZANTARA" style="width: 20px; height: 20px;">
+            <div class="message-avatar">
+                <img src="public/images/zantara-logo.jpeg" alt="ZANTARA" style="width: 24px; height: 24px;">
             </div>
             <div class="typing-content">
                 <div class="typing-dots">
@@ -875,7 +906,7 @@
             messageDiv.className = `message ${role}`;
 
             const timeStr = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const avatar = role === 'user' ? '👤' : '<img src="assets/logobianco.jpeg" alt="Z" style="width: 20px; height: 20px;">';
+            const avatar = role === 'user' ? '👤' : '<img src="public/images/zantara-logo.jpeg" alt="Z" style="width: 24px; height: 24px;">';
 
             messageDiv.innerHTML = `
                 <div class="message-avatar">${avatar}</div>
@@ -1360,6 +1391,27 @@
         function showError(message) {
             addMessage('assistant', `❌ ${message}`);
         }
+
+        // Theme Toggle Function
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const themeIcon = document.getElementById('themeIcon');
+
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('zantara-theme', newTheme);
+
+            // Update icon
+            themeIcon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+        }
+
+        // Initialize theme on load
+        (function() {
+            const savedTheme = localStorage.getItem('zantara-theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+            document.getElementById('themeIcon').textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+        })();
 
         // Initialize all enhancement systems
         const enhancementScripts = [
