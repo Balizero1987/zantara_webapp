@@ -7,11 +7,11 @@
   --orange-glow: #FFA500;
   --coral-accent: #FF6B9D;
   /* Beam Colors (light beams) */
-  --beam-red: rgba(255, 0, 64, 0.10);
-  --beam-blue: rgba(0, 136, 255, 0.10);
-  --beam-purple: rgba(131, 56, 236, 0.10);
-  --beam-yellow: rgba(255, 221, 0, 0.10);
-  --beam-green: rgba(0, 200, 83, 0.10);
+  --beam-red: rgba(255, 0, 64, 0.16);
+  --beam-blue: rgba(0, 136, 255, 0.16);
+  --beam-purple: rgba(131, 56, 236, 0.16);
+  --beam-yellow: rgba(255, 221, 0, 0.16);
+  --beam-green: rgba(0, 200, 83, 0.16);
 
   /* Light Theme Base */
   --bg-primary: #FFFFFF;
@@ -44,18 +44,18 @@ body[data-theme="day"]::before {
   position: fixed; inset: 0;
   background:
     /* Red beam */
-    linear-gradient(110deg, var(--beam-red) 0%, rgba(255,0,64,0) 40%),
+    linear-gradient(100deg, var(--beam-red) 0%, rgba(255,0,64,0) 65%),
     /* Blue beam */
-    linear-gradient(140deg, var(--beam-blue) 10%, rgba(0,136,255,0) 55%),
+    linear-gradient(125deg, var(--beam-blue) 5%, rgba(0,136,255,0) 70%),
     /* Purple beam */
-    linear-gradient(165deg, var(--beam-purple) 15%, rgba(131,56,236,0) 60%),
+    linear-gradient(150deg, var(--beam-purple) 10%, rgba(131,56,236,0) 75%),
     /* Yellow beam */
-    linear-gradient(190deg, var(--beam-yellow) 0%, rgba(255,221,0,0) 50%),
+    linear-gradient(175deg, var(--beam-yellow) 0%, rgba(255,221,0,0) 70%),
     /* Green beam */
-    linear-gradient(215deg, var(--beam-green) 20%, rgba(0,200,83,0) 70%),
+    linear-gradient(200deg, var(--beam-green) 12%, rgba(0,200,83,0) 80%),
     /* Soft base gradient */
     linear-gradient(180deg, #FFFFFF 0%, #FFF8F8 100%);
-  filter: saturate(110%);
+  filter: saturate(130%);
   animation: beamsShift 24s ease-in-out infinite;
   pointer-events: none; z-index: 0;
 }
@@ -65,11 +65,11 @@ body[data-theme="day"]::after {
   content: '';
   position: fixed; inset: -10%;
   background:
-    linear-gradient(125deg, rgba(255,0,64,0.05) 0%, rgba(255,0,64,0) 40%),
-    linear-gradient(150deg, rgba(0,136,255,0.05) 15%, rgba(0,136,255,0) 60%),
-    linear-gradient(175deg, rgba(131,56,236,0.05) 25%, rgba(131,56,236,0) 65%),
-    linear-gradient(205deg, rgba(255,221,0,0.06) 5%, rgba(255,221,0,0) 55%),
-    linear-gradient(230deg, rgba(0,200,83,0.05) 25%, rgba(0,200,83,0) 65%);
+    linear-gradient(115deg, rgba(255,0,64,0.08) 0%, rgba(255,0,64,0) 60%),
+    linear-gradient(140deg, rgba(0,136,255,0.08) 10%, rgba(0,136,255,0) 70%),
+    linear-gradient(165deg, rgba(131,56,236,0.08) 20%, rgba(131,56,236,0) 75%),
+    linear-gradient(190deg, rgba(255,221,0,0.09) 0%, rgba(255,221,0,0) 65%),
+    linear-gradient(215deg, rgba(0,200,83,0.08) 18%, rgba(0,200,83,0) 78%);
   mix-blend-mode: multiply;
   animation: beamsDrift 40s linear infinite;
   pointer-events: none; z-index: 0;
