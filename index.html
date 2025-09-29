@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZANTARA - Bali Zero AI Portal</title>
-    <link rel="icon" type="image/png" href="assets/logozantara.jpeg">
-    <meta name="theme-color" content="#6366f1">
+    <title>ZANTARA – Bali Zero</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8B5CF6">
 
     <!-- SEO Meta Tags -->
     <meta name="description" content="ZANTARA - AI-powered team workspace for Bali Zero. Access visa services, company setup, and tax solutions through one intelligent portal.">
     <meta name="keywords" content="ZANTARA, Bali Zero, AI Assistant, Visa Services, Company Setup, Tax Services">
 
-    <!-- Redirect to Syncra login (cache-busted) -->
-    <meta http-equiv="refresh" content="0; url=login-clean.html?v=prod5">
+    <!-- Redirect to Syncra UI (cache-busted) -->
+    <meta http-equiv="refresh" content="0; url=syncra.html?v=prod10">
 
     <style>
         body {
@@ -37,11 +41,11 @@
           var q = new URLSearchParams(location.search);
           // If already has a version param, skip to prevent loops
           if (!q.has('v')) {
-            var v = 'prod5';
-            location.replace('login-clean.html?v=' + v);
+            var v = 'prod10';
+            location.replace('syncra.html?v=' + v);
           }
         } catch(_) {
-          location.href = 'login-clean.html?v=prod';
+          location.href = 'syncra.html?v=prod10';
         }
       })();
     </script>

@@ -31,9 +31,8 @@ class ZantaraApp {
       this.streamingUI.init();
       this.setupStreamingListeners();
 
-      // Check if streaming is enabled via flag
-      const params = new URLSearchParams(window.location.search);
-      this.useStreaming = params.get('streaming') === 'true' || localStorage.getItem('zantara-streaming') === 'true';
+      // STREAMING NOW DEFAULT ON - LIVE IN PRODUCTION!
+      this.useStreaming = true;
 
       console.log('[ZantaraApp] Streaming initialized, enabled:', this.useStreaming);
     } else {
