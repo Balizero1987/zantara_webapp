@@ -6,6 +6,12 @@ class ZantaraApp {
     this.messages = [];
     this.recognition = null;
     this.extraLoaded = 0; // for "Load earlier" control
+    this.langChips = {
+      it: [ ['📋','Preventivo'], ['📞','Chiama 15\''], ['📄','Documenti'], ['▶️','Avvia Pratica'], ['💬','WhatsApp'], ['✉️','Email'] ],
+      en: [ ['📋','Quote'], ['📞','Call 15\''], ['📄','Documents'], ['▶️','Start Process'], ['💬','WhatsApp'], ['✉️','Email'] ],
+      id: [ ['📋','Penawaran'], ['📞','Telpon 15\''], ['📄','Dokumen'], ['▶️','Mulai Proses'], ['💬','WhatsApp'], ['✉️','Email'] ],
+      uk: [ ['📋','Кошторис'], ['📞','Дзвінок 15\''], ['📄','Документи'], ['▶️','Почати процес'], ['💬','WhatsApp'], ['✉️','Email'] ]
+    };
     this.init();
   }
 
@@ -237,7 +243,13 @@ class ZantaraApp {
           id: 'Selamat datang. Pilih area: Visa • Company • Pajak • Properti. Atau tulis perintah singkat.',
           en: 'Welcome. Choose an area: Visa • Company • Tax • Real Estate. Or type your request in one sentence.'
         };
-        return this.renderAssistantReply(byLang[msgLang] || byLang.en);
+        const title = (
+          msgLang === 'it' ? 'Benvenuto — Scegli un’area' :
+          msgLang === 'uk' ? 'Вітаю — Оберіть напрям' :
+          msgLang === 'en' ? 'Welcome — Choose An Area' :
+                             'Selamat Datang — Pilih Area'
+        );
+        return this.renderStructured('landing', title, byLang[msgLang] || byLang.en, msgLang);
       }
 
       // "Who am I?" intent
@@ -317,7 +329,9 @@ class ZantaraApp {
       if (profile.isExternal) {
         out += '\n\nBali Zero is powered by humans, fueled by a thinking engine.';
       }
-      return this.renderAssistantReply(out);
+      const cat = this.detectCategory(text);
+      const title = this.defaultTitle(cat, msgLang);
+      return this.renderStructured(cat, title, out, msgLang);
 
     } catch (err) {
       this.hideTypingIndicator();
@@ -328,6 +342,97 @@ class ZantaraApp {
       }
       return this.addMessage('assistant', 'Request failed. Please try again.');
     }
+  }
+
+  detectCategory(text='') {
+    const t = String(text).toLowerCase();
+    if (/(\b[cd]\d{1,2}[a-z]?\b|visa|kitas|kitap|imigrasi|immigration)/i.test(t)) return 'visa';
+    if (/(pt\s*pma|company|perseroan|izin usaha|license|oss\s*rba)/i.test(t)) return 'company';
+    if (/(npwp|spt|pajak|tax|accounting|bpjs)/i.test(t)) return 'tax';
+    if (/(pbg|slf|notaris|freehold|leasehold|due diligence|properti|property|real\s*estate)/i.test(t)) return 'property';
+    return 'general';
+  }
+
+  defaultTitle(cat, lang='id') {
+    const map = {
+      visa: { id:'Visa — Langkah Berikutnya', it:'Visti — Prossimi Passi', en:'Visa — Next Steps', uk:'Віза — Наступні кроки' },
+      company: { id:'Company — Set Up', it:'Company — Set Up', en:'Company — Set Up', uk:'Компанія — Запуск' },
+      tax: { id:'Tax — Kepatuhan & Jadwal', it:'Tax — Compliance & Cadence', en:'Tax — Compliance & Cadence', uk:'Податки — Комплаєнс і графік' },
+      property: { id:'Property — Due Diligence', it:'Property — Due Diligence', en:'Property — Due Diligence', uk:'Нерухомість — Due Diligence' },
+      landing: { id:'Selamat Datang — Pilih Area', it:'Benvenuto — Scegli un’area', en:'Welcome — Choose An Area', uk:'Вітаю — Оберіть напрям' },
+      general: { id:'ZANTARA — Rangkuman', it:'ZANTARA — Sintesi', en:'ZANTARA — Summary', uk:'ZANTARA — Підсумок' }
+    };
+    return (map[cat] && (map[cat][lang] || map[cat].en)) || 'ZANTARA';
+  }
+
+  renderStructured(category, title, body, lang='id') {
+    // Build a structured card + chips and append as assistant message (HTML mode)
+    const chips = this.langChips[lang] || this.langChips.en;
+    const chipsHtml = chips.map(([icon,label]) => `<button class="action-chip" data-label="${label}">${icon} ${label}</button>`).join('');
+    const html = `
+      <div class="zantara-response">
+        <h3 class="response-title">${this.escape(title)}</h3>
+        <p class="response-body">${this.escape(body)}</p>
+        <div class="action-chips" data-lang="${lang}" data-cat="${category}">${chipsHtml}</div>
+      </div>
+    `;
+    const node = this.addMessage('assistant', html, { html: true });
+    this.bindChips(node);
+    return node;
+  }
+
+  bindChips(node) {
+    try {
+      const wrap = node.querySelector('.action-chips'); if (!wrap) return;
+      const lang = wrap.getAttribute('data-lang') || 'id';
+      const cat = wrap.getAttribute('data-cat') || 'general';
+      wrap.querySelectorAll('.action-chip').forEach(btn => {
+        btn.addEventListener('click', () => this.handleChipClick(btn.getAttribute('data-label') || '', lang, cat));
+      });
+    } catch (_) {}
+  }
+
+  handleChipClick(label, lang, cat) {
+    const lower = (label || '').toLowerCase();
+    if (/preventivo|quote|penawaran|кошторис/.test(lower)) return this.actionQuote(cat, lang);
+    if (/chiama|call|telpon|дзвінок/.test(lower)) return this.actionCall15(lang);
+    if (/documenti|documents|dokumen|документи/.test(lower)) return this.actionDocuments(cat, lang);
+    if (/avvia|start|mulai|почати/.test(lower)) return this.actionStartProcess(cat, lang);
+    if (/whatsapp/.test(lower)) return this.actionWhatsApp();
+    if (/email/.test(lower)) return this.actionEmail();
+  }
+
+  actionWhatsApp() { window.open('https://wa.me/6285954241699','_blank','noopener'); }
+  actionEmail() { location.href = 'mailto:info@balizero.com?subject=ZANTARA%20Web%20App'; }
+  actionCall15(lang='id') { window.open('https://calendly.com/balizero/consultation','_blank','noopener'); this.addMessage('assistant', (lang==='it'?'Ti ho aperto il link per prenotare 15\'':'I opened the link for a 15\' consult.'), { html:false }); }
+
+  async actionQuote(cat, lang='id') {
+    try {
+      const api = window.ZANTARA_API; if (!api) return;
+      const user = localStorage.getItem('zantara-user-email') || '';
+      await api.call('/call', { key:'lead.save', params:{ channel:'webapp', category:cat, email:user, note:'Quote requested from structured chips' } }, true);
+      this.addMessage('assistant', (lang==='it'?'Ok, preparo un preventivo e ti contatto via email.':'Baik, saya siapkan penawaran dan menghubungi via email.' ));
+    } catch (_) { this.addMessage('assistant', (lang==='it'?'Errore temporaneo, riprova.':'Gangguan sementara, coba lagi.')); }
+  }
+
+  async actionDocuments(cat, lang='id') {
+    // Stub: in assenza di endpoint requirements.*, rispondi con breve checklist generica
+    const generic = (
+      lang==='it' ? 'Documenti tipici: passaporto/ID, dati contatto, info servizio. Se vuoi, ti mando la checklist dettagliata via email.' :
+      lang==='en' ? 'Typical docs: passport/ID, contact details, service info. I can send a detailed checklist by email.' :
+      lang==='uk' ? 'Типові документи: паспорт/ID, контакти, інформація про послугу. Можу надіслати детальний список на email.' :
+                    'Dokumen umum: paspor/ID, kontak, info layanan. Saya bisa kirim checklist rinci via email.'
+    );
+    this.addMessage('assistant', generic);
+  }
+
+  async actionStartProcess(cat, lang='id') {
+    try {
+      const api = window.ZANTARA_API; if (!api) return;
+      const user = localStorage.getItem('zantara-user-email') || '';
+      await api.call('/call', { key:'lead.save', params:{ channel:'webapp', category:cat, email:user, intent:'start' } }, true);
+      this.addMessage('assistant', (lang==='it'?'Avvio registrato. Ti accompagno passo passo.':'Proses dimulai. Saya pandu langkah demi langkah.'));
+    } catch (_) { this.addMessage('assistant', (lang==='it'?'Errore temporaneo, riprova.':'Gangguan sementara, coba lagi.')); }
   }
 
   extractReply(res) {

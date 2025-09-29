@@ -95,6 +95,34 @@
   --z-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
+/* ZANTARA V2 Tokens (Palette & Typo) */
+:root {
+  /* Typography */
+  --z-font-primary: 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
+  --z-font-mono: 'Geist Mono', 'SF Mono', Monaco, monospace;
+
+  /* Day Palette */
+  --primary-red: #CE1126;
+  --primary-white: #FFFFFF;
+  --accent-gold: #FFB800;
+  --neutral-900: #0A0E27;
+  --neutral-700: #2D3142;
+  --neutral-500: #64748B;
+  --neutral-300: #CBD5E1;
+  --neutral-100: #F8FAFC;
+
+  /* Night Palette */
+  --night-bg: #0A0E27;
+  --night-purple: #8B5CF6;
+  --night-blue: #3B82F6;
+  --night-cyan: #06B6D4;
+}
+
+/* Safe area helpers */
+.safe-top { padding-top: calc(12px + env(safe-area-inset-top, 0px)); }
+.safe-bottom { padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+
+
 /* Glassmorphism Card */
 .glass-card {
   background: var(--z-bg-card);

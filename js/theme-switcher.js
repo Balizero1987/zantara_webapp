@@ -10,6 +10,13 @@ class ThemeManager {
     this.applyTheme(this.currentTheme);
     this.createThemeToggle();
     this.scheduleAutoSwitch();
+    // Day beams variant via query or localStorage (soft|power)
+    try {
+      const qp = new URLSearchParams(location.search).get('dayVariant');
+      const pref = qp || localStorage.getItem('zantara-day-variant') || 'soft';
+      document.body.setAttribute('data-day-variant', (pref === 'power') ? 'power' : 'soft');
+      if (qp) localStorage.setItem('zantara-day-variant', pref);
+    } catch (_) {}
   }
 
   // Compute theme by Bali timezone (WITA, UTC+8)
@@ -54,7 +61,7 @@ class ThemeManager {
   applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     document.body.setAttribute('data-theme', theme);
-    document.querySelectorAll('.glass-card, .voice-button, .action-card, .message-bubble, .tool-card, .typing-dot, .input-area')
+    document.querySelectorAll('.glass-card, .voice-button, .action-card, .message-bubble, .tool-card, .typing-dot, .input-area, .action-chip')
       .forEach(el => el.setAttribute('data-theme', theme));
     // Sync theme on FAB if present
     document.querySelectorAll('.theme-toggle-fab').forEach(el => el.setAttribute('data-theme', theme));

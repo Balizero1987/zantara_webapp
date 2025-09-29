@@ -36,42 +36,40 @@
 }
 
 /* Base white background */
-body[data-theme="day"] { background: #FFFFFF; }
+body[data-theme="day"] { background: var(--primary-white, #FFFFFF); font-family: var(--z-font-primary, system-ui); }
 
 /* Animated Background Day Mode – multi‑color Syncra beams */
+/* Day beams (default = soft) */
+body[data-theme="day"][data-day-variant="soft"]::before,
 body[data-theme="day"]::before {
   content: '';
   position: fixed; inset: 0;
   will-change: transform, opacity;
   background:
     /* Red beam */
-    linear-gradient(92deg, var(--beam-red) 0%, rgba(255,0,64,0) 80%),
+    linear-gradient(92deg, rgba(206,17,38,0.03) 0%, rgba(206,17,38,0) 80%),
     /* Blue beam */
-    linear-gradient(118deg, var(--beam-blue) 8%, rgba(0,136,255,0) 82%),
+    linear-gradient(118deg, rgba(255,184,0,0.02) 8%, rgba(255,184,0,0) 82%),
     /* Purple beam */
-    linear-gradient(142deg, var(--beam-purple) 12%, rgba(131,56,236,0) 85%),
+    radial-gradient(at 80% 0%, rgba(206, 17, 38, 0.03) 0%, transparent 50%),
     /* Yellow beam */
-    linear-gradient(168deg, var(--beam-yellow) 4%, rgba(255,221,0,0) 82%),
-    /* Green beam */
-    linear-gradient(196deg, var(--beam-green) 15%, rgba(0,200,83,0) 88%),
+    radial-gradient(at 100% 0%, rgba(255, 184, 0, 0.02) 0%, transparent 50%),
     /* Soft base gradient */
     linear-gradient(180deg, #FFFFFF 0%, #FFF8F8 100%);
-  filter: saturate(140%);
+  filter: saturate(120%);
   animation: beamsShift 24s ease-in-out infinite;
   pointer-events: none; z-index: 0;
 }
 
 /* Subtle second layer for parallax beams */
+body[data-theme="day"][data-day-variant="soft"]::after,
 body[data-theme="day"]::after {
   content: '';
   position: fixed; inset: -10%;
   will-change: transform;
   background:
-    linear-gradient(115deg, rgba(255,0,64,0.08) 0%, rgba(255,0,64,0) 60%),
-    linear-gradient(140deg, rgba(0,136,255,0.08) 10%, rgba(0,136,255,0) 70%),
-    linear-gradient(165deg, rgba(131,56,236,0.08) 20%, rgba(131,56,236,0) 75%),
-    linear-gradient(190deg, rgba(255,221,0,0.09) 0%, rgba(255,221,0,0) 65%),
-    linear-gradient(215deg, rgba(0,200,83,0.08) 18%, rgba(0,200,83,0) 78%);
+    linear-gradient(115deg, rgba(206,17,38,0.025) 0%, rgba(206,17,38,0) 60%),
+    linear-gradient(140deg, rgba(255,184,0,0.02) 10%, rgba(255,184,0,0) 70%);
   mix-blend-mode: multiply;
   animation: beamsDrift 40s linear infinite;
   pointer-events: none; z-index: 0;
@@ -91,6 +89,22 @@ body[data-theme="day"]::after {
   body[data-theme="day"]::before,
   body[data-theme="day"]::after { animation: none; }
 }
+
+/* Power variant (stronger beams 5–7%) */
+body[data-theme="day"][data-day-variant="power"]::before {
+  content: '';
+  position: fixed; inset: 0; will-change: transform, opacity;
+  background:
+    linear-gradient(92deg, rgba(206,17,38,0.07) 0%, rgba(206,17,38,0) 78%),
+    linear-gradient(118deg, rgba(255,184,0,0.06) 10%, rgba(255,184,0,0) 80%),
+    radial-gradient(at 80% 0%, rgba(206, 17, 38, 0.05) 0%, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(255, 184, 0, 0.04) 0%, transparent 50%),
+    linear-gradient(180deg, #FFFFFF 0%, #FFF9F4 100%);
+  filter: saturate(125%);
+  animation: beamsShift 24s ease-in-out infinite;
+  pointer-events: none; z-index: 0;
+}
+body[data-theme="day"][data-day-variant="power"]::after { content: none; }
 
 /* Glass Cards Day Mode */
 .glass-card[data-theme="day"] {

@@ -7,10 +7,10 @@
   --deep-purple: #2E1065;
   --midnight: #0A0118;
 
-  --bg-primary: #0A0118;
+  --bg-primary: #0A0E27; /* Cosmic Lotus base */
   --bg-secondary: rgba(46, 16, 101, 0.3);
-  --bg-glass: rgba(189, 0, 255, 0.08);
-  --bg-glass-hover: rgba(189, 0, 255, 0.12);
+  --bg-glass: rgba(139, 92, 246, 0.08);
+  --bg-glass-hover: rgba(139, 92, 246, 0.12);
 
   --glow-neon: 0 0 60px rgba(189, 0, 255, 0.5);
   --glow-pink: 0 0 40px rgba(255, 0, 128, 0.4);
@@ -25,11 +25,11 @@ body[data-theme="night"]::before {
   content: '';
   position: fixed; inset: 0;
   background:
-    radial-gradient(circle at 20% 50%, rgba(189, 0, 255, 0.3) 0%, transparent 40%),
-    radial-gradient(circle at 80% 30%, rgba(255, 0, 128, 0.2) 0%, transparent 40%),
-    radial-gradient(circle at 50% 80%, rgba(0, 217, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(59, 130, 246, 0.10) 0%, transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(6, 182, 212, 0.10) 0%, transparent 50%),
     conic-gradient(from 0deg at 50% 50%, #0A0118 0deg, #2E1065 120deg, #0A0118 240deg, #2E1065 360deg);
-  animation: nightGradientRotate 30s linear infinite;
+  animation: nightGradientRotate 36s linear infinite;
 }
 
 @keyframes nightGradientRotate {
@@ -51,7 +51,7 @@ body[data-theme="night"]::before {
 .voice-button[data-theme="night"] {
   background: linear-gradient(135deg, #FF0040 0%, #FF0080 45%, #BD00FF 80%);
   box-shadow: 0 4px 32px rgba(255, 0, 64, 0.45), 0 0 60px rgba(255, 0, 64, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  animation: neonPulse 2s ease-in-out infinite;
+  animation: neonPulse 3s ease-in-out infinite;
 }
 @keyframes neonPulse {
   0%, 100% { box-shadow: 0 4px 30px rgba(189, 0, 255, 0.5), 0 0 60px rgba(189, 0, 255, 0.3); }
