@@ -762,13 +762,24 @@ class ZantaraApp {
 document.addEventListener('DOMContentLoaded', () => {
   // Check if user is logged in
   const userEmail = localStorage.getItem('zantara-user-email');
-  if (!userEmail) {
-    // Not logged in, redirect to login
+
+  // Check if we're in a "safe build" mode (chat forced visible)
+  const chatInterface = document.getElementById('chat-interface');
+  const isSafeBuild = chatInterface && chatInterface.style.display === 'flex';
+
+  if (!userEmail && !isSafeBuild) {
+    // Not logged in and not in safe mode, redirect to login
     window.location.href = '/portal.html';
     return;
   }
 
-  // User is logged in, initialize app and show chat
+  // If safe build mode, set a default email
+  if (isSafeBuild && !userEmail) {
+    localStorage.setItem('zantara-user-email', 'guest@zantara.app');
+    localStorage.setItem('zantara-session-id', `sess_${Date.now()}`);
+  }
+
+  // Initialize app and show chat
   window.zantaraApp = new ZantaraApp();
   window.zantaraApp.showChatInterface();
 });
