@@ -10,10 +10,10 @@ class ZantaraApp {
     this.streamingClient = null;
     this.streamingUI = null;
     this.langChips = {
-      it: [ ['📋','Preventivo'], ['📞','Chiama 15\''], ['📄','Documenti'], ['▶️','Avvia Pratica'], ['💬','WhatsApp'], ['✉️','Email'] ],
-      en: [ ['📋','Quote'], ['📞','Call 15\''], ['📄','Documents'], ['▶️','Start Process'], ['💬','WhatsApp'], ['✉️','Email'] ],
-      id: [ ['📋','Penawaran'], ['📞','Telpon 15\''], ['📄','Dokumen'], ['▶️','Mulai Proses'], ['💬','WhatsApp'], ['✉️','Email'] ],
-      uk: [ ['📋','Кошторис'], ['📞','Дзвінок 15\''], ['📄','Документи'], ['▶️','Почати процес'], ['💬','WhatsApp'], ['✉️','Email'] ]
+      it: [ ['📋','Preventivo'], ["📞","Chiama 15'"], ['📄','Documenti'], ['▶️','Avvia Pratica'], ['💬','WhatsApp'], ['✉️','Email'] ],
+      en: [ ['📋','Quote'], ["📞","Call 15'"], ['📄','Documents'], ['▶️','Start Process'], ['💬','WhatsApp'], ['✉️','Email'] ],
+      id: [ ['📋','Penawaran'], ["📞","Telpon 15'"], ['📄','Dokumen'], ['▶️','Mulai Proses'], ['💬','WhatsApp'], ['✉️','Email'] ],
+      uk: [ ['📋','Кошторис'], ["📞","Дзвінок 15'"], ['📄','Документи'], ['▶️','Почати процес'], ['💬','WhatsApp'], ['✉️','Email'] ]
     };
     this.initStreaming();
     this.init();
@@ -556,7 +556,7 @@ class ZantaraApp {
 
   actionWhatsApp() { window.open('https://wa.me/6285954241699','_blank','noopener'); }
   actionEmail() { location.href = 'mailto:info@balizero.com?subject=ZANTARA%20Web%20App'; }
-  actionCall15(lang='id') { window.open('https://calendly.com/balizero/consultation','_blank','noopener'); this.addMessage('assistant', (lang==='it'?'Ti ho aperto il link per prenotare 15\'':'I opened the link for a 15\' consult.'), { html:false }); }
+  actionCall15(lang='id') { window.open('https://calendly.com/balizero/consultation','_blank','noopener'); this.addMessage('assistant', (lang==='it'?"Ti ho aperto il link per prenotare 15'":"I opened the link for a 15' consult."), { html:false }); }
 
   async actionQuote(cat, lang='id') {
     try {

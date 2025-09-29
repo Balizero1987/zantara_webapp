@@ -17,13 +17,16 @@
     #chat-interface{display:flex!important}
   </style>
   <link rel="stylesheet" href="styles/design-system.css">
+  <link rel="stylesheet" href="styles/design-enhancements.css">
+  <link rel="stylesheet" href="styles/logo-animations.css">
+  <link rel="stylesheet" href="styles/premium-ui.css">
   <link rel="stylesheet" href="styles/streaming-toggle.css">
   <link rel="stylesheet" href="styles/virtualization-config.css">
   <link rel="stylesheet" href="styles/test-console.css">
   <link rel="stylesheet" href="styles/zantara-theme.css">
-  <link rel="stylesheet" href="styles/zantara-theme-day.css?v=prod9">
-  <link rel="stylesheet" href="styles/zantara-theme-night-enhanced.css?v=prod9">
-  <link rel="stylesheet" href="styles/components.css?v=prod9">
+  <link rel="stylesheet" href="styles/zantara-theme-day.css?v=prod11">
+  <link rel="stylesheet" href="styles/zantara-theme-night-enhanced.css?v=prod11">
+  <link rel="stylesheet" href="styles/components.css?v=prod11">
 </head>
 <body>
   <!-- Splash Screen -->
@@ -33,11 +36,21 @@
     <div class="splash-loader" aria-hidden="true"></div>
   </div>
 
+  <!-- Logo Breakout Animation -->
+  <div class="logo-breakout">
+    <img src="assets/logza.jpeg" alt="ZANTARA Logo" class="logo-glitch">
+  </div>
+
+  <!-- Parallax Logo -->
+  <div class="parallax-logo">
+    <img src="assets/logza.jpeg" alt="ZANTARA" class="logo-magnetic">
+  </div>
+
   <!-- Main App Container -->
   <div id="app" class="app-container" aria-label="ZANTARA App">
     <header class="app-header glass-card">
       <div class="header-content">
-        <img src="assets/lotus-day.svg" class="lotus-logo logo-polish" alt="ZANTARA">
+        <img src="assets/logza.jpeg" class="logo-3d" alt="ZANTARA" style="width: 45px; height: 45px; border-radius: 50%;">
         <span class="app-title">ZANTARA</span>
         <span id="conn-badge" class="conn-badge" title="Connection mode">Connected</span>
         <button class="menu-toggle" aria-label="Open menu">
@@ -106,14 +119,8 @@
     </nav>
   </div>
 
-<<<<<<< HEAD
-  <script src="js/api-config.js?v=prod9"></script>
-  <!-- removed unused streaming UI placeholders to avoid 404s -->
-  <script src="js/app.js?v=prod9" type="module"></script>
-=======
-  <script src="js/api-config.js?v=prod6"></script>
-  <script src="js/app.js?v=prod6" type="module"></script>
->>>>>>> origin/feat/streaming-ndjson
+  <script src="js/api-config.js?v=prod11"></script>
+  <script src="js/app.js?v=prod11" type="module"></script>
   <script src="js/streaming-toggle.js"></script>
   <!-- Load real streaming modules only with flag ?streaming=true or localStorage -->
   <script>
@@ -137,8 +144,9 @@
     })();
   </script>
   <script src="js/message-virtualization.js"></script>
-  <script src="js/test-console.js?v=prod9"></script>
-  <script src="js/theme-switcher.js?v=prod9"></script>
+  <script src="js/test-console.js?v=prod11"></script>
+  <script src="js/theme-switcher.js?v=prod11"></script>
+  <script src="js/logo-interactions.js"></script>
   <script>
     // Update connection badge (Proxy/Direct + host)
     (function(){
