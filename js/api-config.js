@@ -159,8 +159,16 @@ async function callZantaraAPI(endpoint, data, useProxy = true) {
     const key = (data && (data.key || data?.params?.key)) || endpoint;
 
     if (!response.ok) {
-      ZTelemetry.record({ key, endpoint, ok: false, ms, ts: Date.now(), error: `HTTP ${response.status}` });
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      let extra = '';
+      try {
+        const clone = response.clone();
+        const data = await clone.json();
+        if (data && data.error) extra = ` | ${data.error}`;
+      } catch (_) {
+        try { const t = await response.clone().text(); if (t) extra = ` | ${String(t).slice(0,200)}`; } catch(_) {}
+      }
+      ZTelemetry.record({ key, endpoint, ok: false, ms, ts: Date.now(), error: `HTTP ${response.status}${extra}` });
+      throw new Error(`HTTP ${response.status}: ${response.statusText}${extra}`);
     }
 
     const json = await response.json();

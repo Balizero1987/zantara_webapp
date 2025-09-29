@@ -125,7 +125,7 @@ class ZantaraApp {
       if (!api || !api.call) { this.hideTypingIndicator(); return this.renderAssistantReply('API not available.'); }
 
       const wantsPricing = /\b(price|pricing|cost|fee|fees|prezzo|prezzi|costo|costi)\b/i.test(text || '');
-      const codeMatch = /\bD\d{2}\b/i.exec(text || '');
+      const codeMatch = /\b(?:[CDE]\d{1,2}[A-Z]?)\b/i.exec(text || '');
 
       if (wantsPricing || codeMatch) {
         // Official pricing only (policy)
@@ -150,6 +150,10 @@ class ZantaraApp {
     } catch (err) {
       this.hideTypingIndicator();
       console.error(err);
+      const msg = String(err && err.message || err || '');
+      if (/OpenAI failed/i.test(msg)) {
+        return this.addMessage('assistant', 'AI chat is temporarily unavailable (backend config). Pricing and tools are available. Try asking for prices (e.g., "Price for D12").');
+      }
       return this.addMessage('assistant', 'Request failed. Please try again.');
     }
   }
