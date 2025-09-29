@@ -12,6 +12,7 @@
 - Health/banner: fixed health check (always tries `/health`) to avoid false “Limited Mode” banner; verified 200.
 - CORS: guidance added; ensure Cloud Run has `CORS_ORIGINS=https://zantara.balizero.com,https://balizero1987.github.io,...`.
 - GitHub Pages: aligned `gh-pages` with main to avoid stale builds; index uses cache‑busting.
+- Telemetry (dev): added concise rolling console summary every 5 calls (counts/avg/p95/last) behind dev flag or `?dev=true`.
 
 2025-09-29 – Login Cleanup + Proxy Worker
 - Login pages simplified: removed legacy video intro, kept minimal EN sign-in (`login-clean.html`).
@@ -22,10 +23,54 @@
 - Added Cloudflare Worker proxy (`proxy-worker/`) with CORS, secrets, SSE piping, and GitHub Action.
 - Client remains in proxy mode by default; set `window.ZANTARA_PROXY_BASE` or `localStorage['zantara-proxy-base']` to Worker URL (e.g., `https://<worker>.workers.dev/api/zantara`).
 
+2025-09-29 – STEP 1: POST Streaming Implementation (WEBAPP)
+- Implemented POST streaming client (`js/streaming-client.js`):
+  - NDJSON parser with ReadableStream
+  - Event-driven architecture (delta, tool-start, tool-result, final, done)
+  - AbortController for stop functionality
+  - Error handling with fallback to regular API calls
+- Created streaming UI components (`js/streaming-ui.js`):
+  - Browsing pill indicator (shows during web_search)
+  - Citations renderer with copy functionality
+  - Progressive text rendering with delta animations
+  - Tool status notifications
+- Integrated streaming into app.js:
+  - Feature flag control (URL param `?streaming=true` or localStorage)
+  - Seamless fallback to regular API when streaming unavailable
+  - Event listeners for all chunk types
+- Added dev-mode streaming toggle (`js/streaming-toggle-ui.js`):
+  - Visual toggle in Syncra UI (only in dev mode)
+  - Persistent state in localStorage
+  - Toast notifications for state changes
+- Created test page (`test-streaming.html`):
+  - 6 pre-configured test scenarios (simple, search, multi-tool, long, error, abort)
+  - Real-time NDJSON output display
+  - API configuration override
+  - Session management
+
+2025-09-29 – PATCH 2: Namespace Unification & URL Alignment
+- Unified namespaces to avoid collisions:
+  - `window.ZANTARA_STREAMING_CLIENT` for real streaming client
+  - `window.ZANTARA_STREAMING_TOGGLE` for legacy toggle (if needed)
+- Added `getStreamingUrl()` helper in api-config.js:
+  - Returns proxy URL (`/api/zantara/chat`) when in proxy mode
+  - Returns direct URL (`/api/chat`) when in direct mode
+- Updated streaming-client.js:
+  - Uses `getStreamingUrl()` for proper endpoint resolution
+  - Adds `x-user-id` header for user identification
+- Conditional loading in syncra.html:
+  - Streaming modules load only with `?streaming=true` or localStorage flag
+  - Reduces bundle size when streaming not needed
+- Namespace updates in app.js:
+  - Prefers `ZANTARA_STREAMING_CLIENT` over legacy names
+  - Graceful fallback for compatibility
+
 Open Items / Next Steps
-- SSE real streaming: draft and align contract (keys/chunks/heartbeats), client flag/fallback plan.
-- Observability: optional UI badge (Syncra header) and expanded metrics (p95 per handler), server‑side logs.
-- Content polish: optional “Connected to: Production” badge in Syncra, final copy review.
+- Backend implementation: waiting for PROGETTO MADRE to implement `/api/chat` endpoint with NDJSON streaming
+- SSE migration: POST streaming ready as STEP 1, SSE can be added later as enhancement
+- Production enablement: feature flag currently dev-only, needs backend capability check
+- Observability: streaming metrics can be added to telemetry system
+- Content polish: optional "Connected to: Production" badge in Syncra, final copy review
 - Hardening: confirm Cloud Run CORS env set on prod service; consider rate limits/quotas and error surfaces in login.
 
 Live Check (expected)
