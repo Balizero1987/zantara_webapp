@@ -3,7 +3,7 @@
 
 const API_CONFIG = {
   // Mode: 'proxy' in production (recommended), 'direct' only for local/dev
-  mode: 'proxy',
+  mode: 'proxy', // prod default: proxy-first (LIVE)
   // Proxy/BFF endpoints (server-side adds x-api-key, client sends x-user-id)
   proxy: {
     production: {
