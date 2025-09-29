@@ -181,34 +181,13 @@ class ZantaraApp {
       const api = window.ZANTARA_API;
       if (!api || !api.call) { this.hideTypingIndicator(); return this.renderAssistantReply('API not available.'); }
 
-      // Capture identity if user provided an email address
-      const emailMatch = String(text || '').match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
-      if (emailMatch && emailMatch[0]) {
-        try { localStorage.setItem('zantara-user-email', emailMatch[0]); } catch(_) {}
-        this.hideTypingIndicator();
-        const lang = this.detectLanguage(text);
-        const ack = (
-          lang === 'it' ? `Grazie. Ti ho riconosciuto come ${emailMatch[0]}. Come posso aiutarti?` :
-          lang === 'uk' ? `Дякую. Я впізнала вас як ${emailMatch[0]}. Чим можу допомогти?` :
-          lang === 'en' ? `Thanks. I recognized you as ${emailMatch[0]}. How can I help?` :
-                          `Terima kasih. Saya mengenali Anda sebagai ${emailMatch[0]}. Ada yang bisa saya bantu?`
-        );
-        return this.renderAssistantReply(ack);
-      }
-
-      // If counterpart is unknown, request identification first
-      const profile0 = this.getCounterpartProfile();
-      if (profile0.isUnknown) {
-        this.hideTypingIndicator();
-        const lang = this.detectLanguage(text);
-        const ask = (
-          lang === 'it' ? 'Prima di iniziare, dimmi il tuo nome o email aziendale (es. nome@balizero.com).' :
-          lang === 'uk' ? "Перш ніж почати, напишіть ваше ім'я або корпоративний email (приклад: name@balizero.com)." :
-          lang === 'en' ? 'Before we start, please share your name or company email (e.g., name@balizero.com).' :
-                          'Sebelum mulai, sebutkan nama atau email perusahaan Anda (mis. nama@balizero.com).'
-        );
-        return this.renderAssistantReply(ask);
-      }
+      // Optional: if a user types an email in a message, store it silently (no chat interruption)
+      try {
+        const emailMatch = String(text || '').match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+        if (emailMatch && emailMatch[0]) {
+          localStorage.setItem('zantara-user-email', emailMatch[0]);
+        }
+      } catch (_) {}
 
       // Friendly greeting handler (avoid irrelevant memory mentions)
       const t = String(text || '').trim().toLowerCase();
@@ -222,17 +201,6 @@ class ZantaraApp {
           case 'uk': reply = 'Привіт! Чим можу допомогти?'; break;
           case 'id': reply = 'Halo! Ada yang bisa saya bantu?'; break;
           default: reply = 'Hello! How can I help you today?';
-        }
-        // If counterpart unknown, politely ask identification in the detected language
-        if (p.isUnknown) {
-          const askLang = this.detectLanguage(text);
-          const ask = (
-            askLang === 'it' ? ' Per procedere, qual è il tuo nome o email aziendale?' :
-            askLang === 'uk' ? " Щоб продовжити, напишіть ім'я або корпоративний email." :
-            askLang === 'en' ? ' To proceed, what is your name or company email?' :
-                               ' Untuk lanjut, apa nama atau email perusahaan Anda?'
-          );
-          reply += ask;
         }
         return this.renderAssistantReply(reply);
       }
