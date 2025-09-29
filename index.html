@@ -12,8 +12,8 @@
     <meta name="description" content="BALI ZERO AI - Intelligent Business Assistant powered by ZANTARA. Access visa services, company setup, and tax solutions through AI-powered chat.">
     <meta name="keywords" content="ZANTARA, Bali Zero, AI Assistant, Visa Services, Company Setup, Tax Services, Indonesia Business">
 
-    <!-- Redirect to Login -->
-    <meta http-equiv="refresh" content="0; url=login-claude-style.html">
+    <!-- Redirect to Chat -->
+    <meta http-equiv="refresh" content="0; url=chat-claude-style.html">
 
     <style>
         body {
@@ -39,10 +39,10 @@
           // If already has a version param, skip to prevent loops
           if (!q.has('v')) {
             var v = 'prod10';
-            location.replace('login-claude-style.html');
+            location.replace('chat-claude-style.html');
           }
         } catch(_) {
-          location.href = 'login-claude-style.html';
+          location.href = 'chat-claude-style.html';
         }
       })();
     </script>
