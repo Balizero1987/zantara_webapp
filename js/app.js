@@ -6,13 +6,154 @@ class ZantaraApp {
     this.messages = [];
     this.recognition = null;
     this.extraLoaded = 0; // for "Load earlier" control
+    this.useStreaming = false; // Will be true when backend supports it
+    this.streamingClient = null;
+    this.streamingUI = null;
     this.langChips = {
       it: [ ['📋','Preventivo'], ['📞','Chiama 15\''], ['📄','Documenti'], ['▶️','Avvia Pratica'], ['💬','WhatsApp'], ['✉️','Email'] ],
       en: [ ['📋','Quote'], ['📞','Call 15\''], ['📄','Documents'], ['▶️','Start Process'], ['💬','WhatsApp'], ['✉️','Email'] ],
       id: [ ['📋','Penawaran'], ['📞','Telpon 15\''], ['📄','Dokumen'], ['▶️','Mulai Proses'], ['💬','WhatsApp'], ['✉️','Email'] ],
       uk: [ ['📋','Кошторис'], ['📞','Дзвінок 15\''], ['📄','Документи'], ['▶️','Почати процес'], ['💬','WhatsApp'], ['✉️','Email'] ]
     };
+    this.initStreaming();
     this.init();
+  }
+
+  // Initialize streaming components
+  initStreaming() {
+    // Check if streaming modules are available (prefer CLIENT namespace)
+    const client = window.ZANTARA_STREAMING_CLIENT || window.ZANTARA_STREAMING;
+    const ui = window.ZANTARA_STREAMING_UI;
+
+    if (client && ui) {
+      this.streamingClient = client;
+      this.streamingUI = ui;
+      this.streamingUI.init();
+      this.setupStreamingListeners();
+
+      // Check if streaming is enabled via flag
+      const params = new URLSearchParams(window.location.search);
+      this.useStreaming = params.get('streaming') === 'true' || localStorage.getItem('zantara-streaming') === 'true';
+
+      console.log('[ZantaraApp] Streaming initialized, enabled:', this.useStreaming);
+    } else {
+      console.log('[ZantaraApp] Streaming modules not available');
+    }
+  }
+
+  // Setup streaming event listeners
+  setupStreamingListeners() {
+    if (!this.streamingClient) return;
+
+    // Handle streaming start
+    this.streamingClient.on('start', (data) => {
+      console.log('[Streaming] Started', data);
+      this.hideTypingIndicator();
+    });
+
+    // Handle delta chunks
+    this.streamingClient.on('delta', (data) => {
+      const container = document.querySelector('.messages-container');
+      if (!container) return;
+
+      let messageEl = container.querySelector('[data-streaming="true"] .message-content');
+      if (!messageEl) {
+        // Create new streaming message
+        const messageDiv = this.streamingUI.createStreamingMessage('assistant');
+        const avatarHtml = '<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div>';
+        messageDiv.innerHTML = avatarHtml + messageDiv.innerHTML;
+        container.appendChild(messageDiv);
+        messageEl = messageDiv.querySelector('.message-content');
+        container.scrollTop = container.scrollHeight;
+      }
+
+      this.streamingUI.appendDelta(data.content, messageEl);
+      container.scrollTop = container.scrollHeight;
+    });
+
+    // Handle tool start (browsing)
+    this.streamingClient.on('tool-start', (data) => {
+      console.log('[Streaming] Tool started:', data.name, data.args);
+      if (data.name === 'web_search') {
+        this.streamingUI.showBrowsingPill(true);
+        const query = data.args?.query || '';
+        this.streamingUI.showToolStatus(`Searching: ${query}`);
+      }
+    });
+
+    // Handle tool results (citations)
+    this.streamingClient.on('tool-result', (data) => {
+      console.log('[Streaming] Tool result:', data.name, data.data);
+      if (data.name === 'web_search' && data.data) {
+        const container = document.querySelector('.messages-container');
+        const messageEl = container?.querySelector('[data-streaming="true"]');
+        if (messageEl) {
+          this.streamingUI.renderCitations(data.data, messageEl);
+        }
+      }
+    });
+
+    // Handle final message
+    this.streamingClient.on('final', (data) => {
+      const container = document.querySelector('.messages-container');
+      const messageEl = container?.querySelector('[data-streaming="true"] .message-content');
+      if (messageEl && data.content) {
+        this.streamingUI.setFinalContent(data.content, messageEl);
+      }
+    });
+
+    // Handle completion
+    this.streamingClient.on('done', () => {
+      console.log('[Streaming] Completed');
+      this.streamingUI.showBrowsingPill(false);
+
+      // Mark message as complete
+      const container = document.querySelector('.messages-container');
+      const messageEl = container?.querySelector('[data-streaming="true"]');
+      if (messageEl) {
+        messageEl.removeAttribute('data-streaming');
+      }
+    });
+
+    // Handle errors
+    this.streamingClient.on('error', (data) => {
+      console.error('[Streaming] Error:', data.error);
+      this.hideTypingIndicator();
+      this.streamingUI.showBrowsingPill(false);
+      this.addMessage('assistant', `Error: ${data.error}`);
+    });
+  }
+
+  // Check if streaming should be used
+  shouldUseStreaming(text) {
+    // Check if streaming is available and enabled
+    if (!this.streamingClient || !this.useStreaming) return false;
+
+    // For now, use streaming when enabled
+    return true;
+  }
+
+  // Process message with streaming
+  async processWithStreaming(text) {
+    try {
+      // Build messages array
+      const messages = [
+        { role: 'user', content: text }
+      ];
+
+      // Get session ID
+      const sessionId = localStorage.getItem('zantara-session-id') || `sess_${Date.now()}`;
+      localStorage.setItem('zantara-session-id', sessionId);
+
+      // Start streaming
+      await this.streamingClient.streamChat(messages, sessionId);
+
+    } catch (err) {
+      console.error('[Streaming] Failed:', err);
+      this.hideTypingIndicator();
+      // Fallback to regular processing
+      return this.processWithZantaraRegular(text);
+    }
   }
 
   // --- Persona & System Prompt helpers ---
@@ -195,6 +336,16 @@ class ZantaraApp {
   hideTypingIndicator() { const t = document.querySelector('.typing-message'); if (t) t.remove(); }
 
   async processWithZantara(text) {
+    // Check if we should use streaming
+    if (this.shouldUseStreaming(text)) {
+      return this.processWithStreaming(text);
+    }
+
+    // Original processing logic
+    return this.processWithZantaraRegular(text);
+  }
+
+  async processWithZantaraRegular(text) {
     try {
       this.showTypingIndicator();
       const api = window.ZANTARA_API;

@@ -106,10 +106,36 @@
     </nav>
   </div>
 
+<<<<<<< HEAD
   <script src="js/api-config.js?v=prod9"></script>
   <!-- removed unused streaming UI placeholders to avoid 404s -->
   <script src="js/app.js?v=prod9" type="module"></script>
+=======
+  <script src="js/api-config.js?v=prod6"></script>
+  <script src="js/app.js?v=prod6" type="module"></script>
+>>>>>>> origin/feat/streaming-ndjson
   <script src="js/streaming-toggle.js"></script>
+  <!-- Load real streaming modules only with flag ?streaming=true or localStorage -->
+  <script>
+    (function(){
+      const enabled = location.search.includes('streaming=true') || localStorage.getItem('zantara-streaming') === 'true';
+      if (!enabled) return;
+
+      const s1 = document.createElement('script');
+      s1.src = 'js/streaming-client.js';
+      document.head.appendChild(s1);
+
+      const s2 = document.createElement('script');
+      s2.src = 'js/streaming-ui.js';
+      document.head.appendChild(s2);
+
+      const s3 = document.createElement('script');
+      s3.src = 'js/streaming-toggle-ui.js';
+      document.head.appendChild(s3);
+
+      console.log('[Syncra] Streaming modules loaded');
+    })();
+  </script>
   <script src="js/message-virtualization.js"></script>
   <script src="js/test-console.js?v=prod9"></script>
   <script src="js/theme-switcher.js?v=prod9"></script>

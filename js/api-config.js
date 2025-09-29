@@ -3,7 +3,7 @@
 
 const API_CONFIG = {
   // Mode: 'proxy' in production (recommended), 'direct' only for local/dev
-  mode: 'proxy',
+  mode: 'proxy', // prod default: proxy-first (LIVE)
   // Proxy/BFF endpoints (server-side adds x-api-key, client sends x-user-id)
   proxy: {
     production: {
@@ -23,12 +23,24 @@ const API_CONFIG = {
     call: '/call',
     health: '/health'
   },
+  // Streaming configuration
+  streaming: {
+    path: '/chat' // NDJSON endpoint (proxied as /api/zantara/chat)
+  },
   // Default headers (client)
   headers: { 'Content-Type': 'application/json' }
 };
 
 // Lightweight Telemetry
 const ZTelemetry = (() => {
+  // Dev mode detection for safe, non-intrusive console summaries
+  let DEV_MODE = false;
+  try {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(location.search);
+      DEV_MODE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || p.get('dev') === 'true');
+    }
+  } catch (_) {}
   const state = {
     total: 0,
     ok: 0,
@@ -53,6 +65,20 @@ const ZTelemetry = (() => {
     if (ok) rec.ok += 1; else rec.err += 1;
     rec.latencies.push(ms);
     clampArr(rec.latencies, 50);
+
+    // Dev-only: concise rolling summary for quick triage (every 5 calls)
+    try {
+      if (DEV_MODE && state.total % 5 === 0) {
+        const per = summary();
+        const k = key || endpoint || 'unknown';
+        const stats = per.perKey[k] || { count: 0, ok: 0, err: 0, avgMs: 0, p95Ms: 0, lastMs: ms };
+        // Single-line snapshot to avoid noisy logs
+        console.log(
+          `[ZANTARA][Telemetry] calls=${per.totals.total} ok=${per.totals.ok} err=${per.totals.err} | ` +
+          `key=${k} last=${stats.lastMs}ms avg=${stats.avgMs}ms p95=${stats.p95Ms}ms`
+        );
+      }
+    } catch(_) {}
   };
 
   const percentile = (arr, p) => {
@@ -221,11 +247,21 @@ if (typeof window !== 'undefined') {
     }
   } catch (_) {}
 
+  // Helper function to get streaming URL
+  function getStreamingUrl() {
+    const isProxy = API_CONFIG.mode === 'proxy';
+    if (isProxy) {
+      return `${API_CONFIG.proxy.production.base}${API_CONFIG.streaming.path}`; // /api/zantara/chat
+    }
+    return `${API_CONFIG.production.base}${API_CONFIG.streaming.path}`; // /api/chat
+  }
+
   window.ZANTARA_API = {
     config: API_CONFIG,
     call: callZantaraAPI,
     checkHealth: checkAPIHealth,
-    setBase: (base) => { if (typeof base === 'string' && base.startsWith('http')) API_CONFIG.production.base = base; }
+    setBase: (base) => { if (typeof base === 'string' && base.startsWith('http')) API_CONFIG.production.base = base; },
+    getStreamingUrl: getStreamingUrl
   };
 
   // Expose Telemetry API
