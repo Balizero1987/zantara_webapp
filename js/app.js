@@ -142,8 +142,19 @@ class ZantaraApp {
         return this.renderAssistantReply(this.formatPricing(res));
       }
 
-      // Default to ai.chat
-      const res = await api.call('/call', { key: 'ai.chat', params: { prompt: text } }, true);
+      // Default to ai.chat (specify a safe default model)
+      let res;
+      try {
+        res = await api.call('/call', { key: 'ai.chat', params: { prompt: text, model: 'gpt-4o-mini' } }, true);
+      } catch (e) {
+        // Fallback if model not available
+        const msg = String(e && e.message || e || '');
+        if (/model .* does not exist|not\s+exist|unknown model|404/i.test(msg)) {
+          res = await api.call('/call', { key: 'ai.chat', params: { prompt: text, model: 'gpt-4o' } }, true);
+        } else {
+          throw e;
+        }
+      }
       this.hideTypingIndicator();
       return this.renderAssistantReply(this.extractReply(res) || 'OK.');
 
