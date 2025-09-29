@@ -27,6 +27,7 @@
       <div class="header-content">
         <img src="assets/logobianco.jpeg" class="lotus-logo" alt="ZANTARA">
         <span class="app-title">ZANTARA</span>
+        <span id="conn-badge" class="conn-badge" title="Connection mode">Connected</span>
         <button class="menu-toggle" aria-label="Open menu">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2"/></svg>
         </button>
@@ -98,5 +99,24 @@
   <script src="js/streaming-toggle.js"></script>
   <script src="js/message-virtualization.js"></script>
   <script src="js/test-console.js"></script>
+  <script>
+    // Update connection badge (Proxy/Direct + host)
+    (function(){
+      try {
+        const el = document.getElementById('conn-badge');
+        if (!el || !window.ZANTARA_API) return;
+        const cfg = window.ZANTARA_API.config || {};
+        const proxy = (cfg.proxy && cfg.proxy.production && cfg.proxy.production.base) || '';
+        const direct = (cfg.production && cfg.production.base) || '';
+        if (proxy) {
+          try { const u = new URL(proxy); el.textContent = 'Connected: Proxy'; el.title = 'Proxy ' + u.host; } catch(_) { el.textContent = 'Connected: Proxy'; }
+        } else if (direct) {
+          try { const u = new URL(direct); el.textContent = 'Connected: Direct'; el.title = 'Direct ' + u.host; } catch(_) { el.textContent = 'Connected: Direct'; }
+        } else {
+          el.textContent = 'Connected';
+        }
+      } catch (_) {}
+    })();
+  </script>
 </body>
 </html>
