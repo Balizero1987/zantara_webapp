@@ -23,6 +23,17 @@ class ZantaraApp {
     } catch (_) { return 'id'; }
   }
 
+  resolveMessageLanguage(text, profile) {
+    try {
+      const forced = localStorage.getItem('zantara-forced-lang');
+      if (forced) return forced;
+      const detected = this.detectLanguage(text);
+      const base = (profile && profile.lang) ? profile.lang : 'id';
+      // Prefer explicit detection from the current message; fallback to profile
+      return detected || base;
+    } catch (_) { return (profile && profile.lang) ? profile.lang : 'id'; }
+  }
+
   getUserEmail() {
     try { return localStorage.getItem('zantara-user-email') || ''; } catch(_) { return ''; }
   }
@@ -189,14 +200,37 @@ class ZantaraApp {
         }
       } catch (_) {}
 
+      // Compute language for this message (message-driven)
+      const profile = this.getCounterpartProfile();
+      let msgLang = this.resolveMessageLanguage(text, profile);
+
+      // Language switch intents (persist until changed)
+      const intent = String(text || '').toLowerCase();
+      const wantId = /(bahasa indonesia|pakai bahasa indonesia|bicara bahasa indonesia)/.test(intent);
+      const wantIt = /(in italiano|parla italiano|italiano per favore|italian please)/.test(intent);
+      const wantEn = /(in english|speak english|english please)/.test(intent);
+      const wantUk = /(українськ|по-українськ|ukrainian)/.test(intent);
+      if (wantId || wantIt || wantEn || wantUk) {
+        const chosen = wantId ? 'id' : wantIt ? 'it' : wantEn ? 'en' : 'uk';
+        try { localStorage.setItem('zantara-forced-lang', chosen); } catch(_) {}
+        msgLang = chosen;
+        this.hideTypingIndicator();
+        const ack = (
+          chosen === 'it' ? 'Ok, da ora rispondo in italiano.' :
+          chosen === 'uk' ? 'Гаразд, відтепер відповідаю українською.' :
+          chosen === 'en' ? 'Okay, I will reply in English from now on.' :
+                            'Baik, mulai sekarang saya akan membalas dalam Bahasa Indonesia.'
+        );
+        return this.renderAssistantReply(ack);
+      }
+
       // Friendly greeting handler (avoid irrelevant memory mentions)
       const t = String(text || '').trim().toLowerCase();
-      const greet = /^(hi|hello|hey|ciao|halo|hai|hola|salve)\b/.test(t);
+      const greet = /^(hi|hello|hey|ciao|halo|hallo|hai|hola|salve)\b/.test(t);
       if (greet) {
         this.hideTypingIndicator();
-        const p = this.getCounterpartProfile();
         let reply;
-        switch (p.lang) {
+        switch (msgLang) {
           case 'it': reply = 'Ciao! Come posso aiutarti?'; break;
           case 'uk': reply = 'Привіт! Чим можу допомогти?'; break;
           case 'id': reply = 'Halo! Ada yang bisa saya bantu?'; break;
@@ -205,7 +239,32 @@ class ZantaraApp {
         return this.renderAssistantReply(reply);
       }
 
-      const wantsPricing = /\b(price|pricing|cost|fee|fees|prezzo|prezzi|costo|costi)\b/i.test(text || '');
+      // "Who am I?" intent
+      const whoAmI = /(chi sono|io chi sono|siapa aku|aku siapa|who am i\??)/i.test(String(text || ''));
+      if (whoAmI) {
+        this.hideTypingIndicator();
+        const email = (localStorage.getItem('zantara-user-email') || '').trim();
+        const name = email ? (email.split('@')[0] || '').replace(/\W+/g, ' ').trim() : '';
+        let reply;
+        if (email) {
+          reply = (
+            msgLang === 'it' ? `Sei ${name} (${email}).` :
+            msgLang === 'uk' ? `Ви ${name} (${email}).` :
+            msgLang === 'en' ? `You are ${name} (${email}).` :
+                                `Kamu ${name} (${email}).`
+          );
+        } else {
+          reply = (
+            msgLang === 'it' ? 'Non ho i tuoi dati in questa sessione.' :
+            msgLang === 'uk' ? 'У мене немає ваших даних у цій сесії.' :
+            msgLang === 'en' ? 'I do not have your details in this session.' :
+                                'Saya tidak memiliki datamu di sesi ini.'
+          );
+        }
+        return this.renderAssistantReply(reply);
+      }
+
+      const wantsPricing = /\b(price|pricing|cost|fee|fees|prezzo|prezzi|costo|costi|harga|biaya)\b/i.test(text || '');
       const codeMatch = /\b(?:[CDE]\d{1,2}[A-Z]?)\b/i.exec(text || '');
 
       if (wantsPricing || codeMatch) {
@@ -226,16 +285,14 @@ class ZantaraApp {
       // Default to ai.chat (specify a safe default model)
       let res;
       try {
-        const profile = this.getCounterpartProfile();
-        const system = this.buildSystemPrompt(profile);
-        res = await api.call('/call', { key: 'ai.chat', params: { prompt: text, model: 'gpt-4o-mini', system, target_language: profile.lang } }, true);
+        const system = this.buildSystemPrompt({ ...profile, lang: msgLang });
+        res = await api.call('/call', { key: 'ai.chat', params: { prompt: text, model: 'gpt-4o-mini', system, target_language: msgLang } }, true);
       } catch (e) {
         // Fallback if model not available
         const msg = String(e && e.message || e || '');
         if (/model .* does not exist|not\s+exist|unknown model|404/i.test(msg)) {
-          const profile = this.getCounterpartProfile();
-          const system = this.buildSystemPrompt(profile);
-          res = await api.call('/call', { key: 'ai.chat', params: { prompt: text, model: 'gpt-4o', system, target_language: profile.lang } }, true);
+          const system = this.buildSystemPrompt({ ...profile, lang: msgLang });
+          res = await api.call('/call', { key: 'ai.chat', params: { prompt: text, model: 'gpt-4o', system, target_language: msgLang } }, true);
         } else {
           throw e;
         }
