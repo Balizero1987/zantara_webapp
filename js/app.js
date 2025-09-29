@@ -68,6 +68,7 @@ class ZantaraApp {
       'You are ZANTARA, strategic brain of Bali Zero. Interact as a peer (not subordinate).',
       'Never reveal logs or Boss Zero\'s private conversations. Never mention memory systems.',
       'Address the counterpart appropriately. Do not ask for identity in chat (already handled by login).',
+      'Never introduce yourself (e.g., “I am ZANTARA” or “I am an AI assistant”). Start with the answer.',
       'Language: strictly use Target-Language for all output.',
       'Tone: calm, sharp, dry; business-driven; dry humor only if it builds trust. Avoid fillers.',
       'Anti-hallucination: never invent legal/numeric data. If not from official sources, output NOT AVAILABLE.',
@@ -229,14 +230,14 @@ class ZantaraApp {
       const greet = /^(hi|hello|hey|ciao|halo|hallo|hai|hola|salve)\b/.test(t);
       if (greet) {
         this.hideTypingIndicator();
-        let reply;
-        switch (msgLang) {
-          case 'it': reply = 'Ciao! Come posso aiutarti?'; break;
-          case 'uk': reply = 'Привіт! Чим можу допомогти?'; break;
-          case 'id': reply = 'Halo! Ada yang bisa saya bantu?'; break;
-          default: reply = 'Hello! How can I help you today?';
-        }
-        return this.renderAssistantReply(reply);
+        // Minimal, business-first greeting with CTA in the chosen language
+        const byLang = {
+          it: 'Benvenuto. Scegli un’area: Visa • Company • Tax • Real Estate. Oppure scrivi la richiesta in una frase.',
+          uk: 'Вітаю. Оберіть напрям: Віза • Компанія • Податки • Нерухомість. Або напишіть запит одним реченням.',
+          id: 'Selamat datang. Pilih area: Visa • Company • Pajak • Properti. Atau tulis perintah singkat.',
+          en: 'Welcome. Choose an area: Visa • Company • Tax • Real Estate. Or type your request in one sentence.'
+        };
+        return this.renderAssistantReply(byLang[msgLang] || byLang.en);
       }
 
       // "Who am I?" intent
@@ -261,6 +262,19 @@ class ZantaraApp {
                                 'Saya tidak memiliki datamu di sesi ini.'
           );
         }
+        return this.renderAssistantReply(reply);
+      }
+
+      // "Who are you?" intent → succinct role (no self-intro as chatbot)
+      const whoAreYou = /(chi sei\??|siapa kamu\??|kamu siapa\??|who are you\??|хто ти\??)/i.test(String(text || ''));
+      if (whoAreYou) {
+        this.hideTypingIndicator();
+        const reply = (
+          msgLang === 'it' ? 'Partner operativo di Bali Zero: cervello strategico, memoria e orchestrazione. Dimmi cosa vuoi fare.' :
+          msgLang === 'uk' ? 'Операційний партнер Bali Zero: стратегічний мозок, пам’ять і оркестрація. Скажіть, що потрібно зробити.' :
+          msgLang === 'en' ? 'Operational partner of Bali Zero: strategic brain, memory and orchestration. Tell me what you want to get done.' :
+                              'Mitra operasional Bali Zero: otak strategis, memori, dan orkestrasi. Jelaskan yang ingin Anda capai.'
+        );
         return this.renderAssistantReply(reply);
       }
 
@@ -387,6 +401,8 @@ class ZantaraApp {
   escape(s) { return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 
   renderAssistantReply(text) {
+    // Clean generic self-intros or assistant boilerplate
+    text = this.sanitizeReply(text);
     // Coerce JSON-looking strings into human text
     if (typeof text === 'string' && text.trim().startsWith('{') && text.trim().endsWith('}')) {
       try { const obj = JSON.parse(text); text = this.extractReply(obj) || text; } catch(_) {}
@@ -402,6 +418,20 @@ class ZantaraApp {
     const words = String(text).split(/(\s+)/); let i = 0;
     const step = () => { if (i >= words.length) { this.applyVirtualizationTrim(); return; } bubble.textContent += words[i++]; const delay = Math.min(80, 10 + Math.floor(text.length / 100)); setTimeout(step, delay); };
     step();
+  }
+
+  sanitizeReply(text) {
+    try {
+      let t = String(text || '');
+      // Remove common self-intros in multiple languages at the start of the message
+      t = t.replace(/^\s*(ciao!?\s*)?sono\s+zantara[,\.!]?\s*/i, '');
+      t = t.replace(/^\s*(halo|hallo)!?\s*saya\s+zantara[,\.!]?\s*/i, '');
+      t = t.replace(/^\s*i\s*am\s*zantara[,\.!]?\s*/i, '');
+      t = t.replace(/^\s*я\s*зантара[,\.!]?\s*/i, '');
+      // Remove “I can help you with …” boilerplate openers
+      t = t.replace(/^\s*(posso\s+aiutarti|saya\s+bisa\s+membantu|i\s+can\s+help|я\s+можу\s+допомогти)[^\n]*\n?/i, '');
+      return t.trim();
+    } catch(_) { return text; }
   }
 
   applyVirtualizationTrim() {
@@ -442,3 +472,5 @@ class ZantaraApp {
 
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => { window.zantaraApp = new ZantaraApp(); });
+    // Default language: Indonesian unless user explicitly changes it
+    try { if (!localStorage.getItem('zantara-forced-lang')) localStorage.setItem('zantara-forced-lang', 'id'); } catch(_) {}
