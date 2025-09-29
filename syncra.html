@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>ZANTARA – AI Voice Assistant (Syncra UI)</title>
+  <title>ZANTARA – Chat</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
@@ -11,120 +11,43 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#8B5CF6">
   <style>
-    /* Background elements non-interactive */
-    .red-particles, .bg-wave, .logo-breakout, .parallax-logo { pointer-events:none !important; z-index:-1 !important; }
+    /* Safe build: force chat visible; remove any blockers */
+    #splash-screen{display:none!important}
+    #welcome-screen{display:none!important}
+    #chat-interface{display:flex!important}
+    /* Ensure nothing covers input */
+    .red-particles,.bg-wave,.logo-breakout,.parallax-logo{pointer-events:none!important;z-index:-1!important}
   </style>
-  <!-- Removed forced chat display - now respects login flow -->
   <link rel="stylesheet" href="styles/design-system.css">
-  <link rel="stylesheet" href="styles/theme-indonesia.css">
-  <link rel="stylesheet" href="styles/design-enhancements.css">
-  <link rel="stylesheet" href="styles/logo-animations.css">
-  <link rel="stylesheet" href="styles/premium-ui.css">
-  <link rel="stylesheet" href="styles/streaming-toggle.css">
-  <link rel="stylesheet" href="styles/virtualization-config.css">
-  <link rel="stylesheet" href="styles/test-console.css">
-  <link rel="stylesheet" href="styles/zantara-theme.css">
-  <link rel="stylesheet" href="styles/zantara-theme-day.css?v=prod13">
-  <link rel="stylesheet" href="styles/zantara-theme-night-enhanced.css?v=prod13">
-  <link rel="stylesheet" href="styles/components.css?v=prod13">
+  <link rel="stylesheet" href="styles/zantara-theme-day.css?v=prod15">
+  <link rel="stylesheet" href="styles/zantara-theme-night-enhanced.css?v=prod15">
+  <link rel="stylesheet" href="styles/components.css?v=prod15">
 </head>
 <body>
-  <!-- Splash Screen -->
-  <div id="splash-screen" class="splash-screen" role="status" aria-live="polite" style="display:none">
-    <img src="assets/lotus-day.svg" class="lotus-splash" alt="ZANTARA">
-    <h1 class="splash-title">ZANTARA</h1>
-    <div class="splash-loader" aria-hidden="true"></div>
-  </div>
-
-  <!-- Red Particles Background -->
-  <div class="red-particles" style="pointer-events:none;z-index:-1;">
-    <span class="red-particle"></span>
-    <span class="red-particle"></span>
-    <span class="red-particle"></span>
-    <span class="red-particle"></span>
-    <span class="red-particle"></span>
-    <span class="red-particle"></span>
-    <span class="red-particle"></span>
-    <span class="red-particle"></span>
-    <span class="red-particle"></span>
-    <span class="red-particle"></span>
-  </div>
-
-  <!-- Background Wave -->
-  <div class="bg-wave" style="pointer-events:none;z-index:-1;"></div>
-
-  <!-- Logo Breakout Animation -->
-  <div class="logo-breakout" style="pointer-events:none;z-index:-1;">
-    <img src="assets/logo-day.jpeg" alt="ZANTARA Logo" class="logo-glitch">
-  </div>
-
-  <!-- Parallax Logo -->
-  <div class="parallax-logo" style="pointer-events:none;z-index:-1;">
-    <img src="assets/logo-day.jpeg" alt="ZANTARA" class="logo-magnetic">
-  </div>
-
-  <!-- Main App Container -->
   <div id="app" class="app-container" aria-label="ZANTARA App">
     <header class="app-header glass-card">
       <div class="header-content">
-        <img src="assets/logo-day.jpeg" class="logo-3d" alt="ZANTARA" style="width: 45px; height: 45px; border-radius: 50%;">
+        <img src="assets/lotus-day.svg" class="lotus-logo logo-polish" alt="ZANTARA" style="width:40px;height:40px;">
         <span class="app-title">ZANTARA</span>
         <span id="conn-badge" class="conn-badge" title="Connection mode">Connected</span>
-        <button class="menu-toggle" aria-label="Open menu">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2"/></svg>
-        </button>
       </div>
     </header>
 
     <main class="main-content">
-      <!-- Welcome Screen -->
-      <div id="welcome-screen" class="welcome-screen">
-        <div class="welcome-card glass-card">
-          <h2>Hi there,</h2>
-          <p>Give any command naturally, from generating content to managing your tasks</p>
-          <div class="quick-actions" role="list">
-            <button class="action-card glass-card" data-action="generate" role="listitem"><div class="action-icon">📝</div><span>Generating Content</span></button>
-            <button class="action-card glass-card" data-action="document" role="listitem"><div class="action-icon">📄</div><span>Creating Document</span></button>
-            <button class="action-card glass-card" data-action="schedule" role="listitem"><div class="action-icon">📅</div><span>Scheduling Meeting</span></button>
-            <button class="action-card glass-card" data-action="note" role="listitem"><div class="action-icon">📝</div><span>Writing Note</span></button>
-          </div>
-          <button id="voice-button" class="voice-button">
-            <div class="voice-button-inner">
-              <svg class="microphone-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                <path d="M12 19v4m-4 0h8"/>
-              </svg>
-            </div>
-            <span class="voice-label">Tap here to start with ZANTARA</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Chat Interface -->
-      <div id="chat-interface" class="chat-interface" aria-live="polite" aria-label="Chat interface" style="display:none">
+      <div id="chat-interface" class="chat-interface" aria-live="polite" aria-label="Chat interface" style="display:flex">
         <div class="messages-container"></div>
-        <div class="input-area glass-card">
-          <button class="attach-button" aria-label="Attach file">
+        <form id="chat-form" class="input-area glass-card" onsubmit="try{ if(window.zantaraApp&&window.zantaraApp.sendMessage){ window.zantaraApp.sendMessage(); } }catch(e){} return false;">
+          <button class="attach-button" aria-label="Attach file" type="button">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="2"/></svg>
           </button>
-          <input type="text" id="message-input" name="message" class="message-input" placeholder="Type a message or use voice..." aria-label="Message input" enterkeyhint="send" inputmode="text" autocomplete="off" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); window.zantaraApp && window.zantaraApp.sendMessage && window.zantaraApp.sendMessage(); }">
-          <button id="voice-input" class="voice-input-button" aria-label="Start voice input">
+          <input type="text" id="message-input" name="message" class="message-input" placeholder="Type a message or use voice..." aria-label="Message input" enterkeyhint="send" inputmode="text" autocomplete="off">
+          <button id="voice-input" class="voice-input-button" aria-label="Start voice input" type="button">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
           </button>
-          <button id="send-button" class="send-button" aria-label="Send message" onclick="window.zantaraApp && window.zantaraApp.sendMessage && window.zantaraApp.sendMessage()">
+          <button id="send-button" class="send-button" aria-label="Send message" type="submit">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2"/></svg>
           </button>
-        </div>
-      </div>
-
-      <!-- Voice Recording Overlay -->
-      <div id="voice-overlay" class="voice-overlay" aria-hidden="true">
-        <div class="voice-recording-card glass-card">
-          <div class="voice-visualizer"><canvas id="voice-canvas"></canvas></div>
-          <p class="listening-text">Listening...</p>
-          <button class="stop-recording" aria-label="Stop recording"><svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
-        </div>
+        </form>
       </div>
     </main>
 
@@ -136,35 +59,22 @@
     </nav>
   </div>
 
-  <script src="js/api-config.js?v=prod13"></script>
-  <script src="js/app.js?v=prod14"></script>
-  <script src="js/streaming-toggle.js"></script>
-  <!-- 🚀 STREAMING LIVE IN PRODUCTION - ALWAYS ON! -->
-  <script src="js/streaming-client.js"></script>
-  <script src="js/streaming-ui.js"></script>
-  <script src="js/streaming-toggle-ui.js"></script>
-  <script src="js/message-virtualization.js"></script>
-  <script src="js/test-console.js?v=prod13"></script>
-  <script src="js/theme-switcher.js?v=prod13"></script>
-  <script src="js/logo-interactions.js"></script>
+  <script src="js/api-config.js?v=prod15"></script>
+  <script src="js/app.js?v=prod15"></script>
+  <script src="js/theme-switcher.js?v=prod15"></script>
   <script>
-    // Update connection badge (Proxy/Direct + host)
-    (function(){
+    // Safety: ensure handlers exist
+    window.addEventListener('load', function(){
       try {
-        const el = document.getElementById('conn-badge');
-        if (!el || !window.ZANTARA_API) return;
-        const cfg = window.ZANTARA_API.config || {};
-        const proxy = (cfg.proxy && cfg.proxy.production && cfg.proxy.production.base) || '';
-        const direct = (cfg.production && cfg.production.base) || '';
-        if (proxy) {
-          try { const u = new URL(proxy); el.textContent = 'Connected: Proxy'; el.title = 'Proxy ' + u.host; } catch(_) { el.textContent = 'Connected: Proxy'; }
-        } else if (direct) {
-          try { const u = new URL(direct); el.textContent = 'Connected: Direct'; el.title = 'Direct ' + u.host; } catch(_) { el.textContent = 'Connected: Direct'; }
-        } else {
-          el.textContent = 'Connected';
-        }
-      } catch (_) {}
-    })();
+        var sb=document.getElementById('send-button'); if(sb) sb.onclick=function(){ if(window.zantaraApp&&window.zantaraApp.sendMessage){ window.zantaraApp.sendMessage(); }};
+        var fm=document.getElementById('chat-form'); if(fm){ fm.onsubmit=function(){ try{ if(window.zantaraApp&&window.zantaraApp.sendMessage){ window.zantaraApp.sendMessage(); } }catch(e){} return false; }; }
+      } catch(e){}
+      // Connection badge
+      try{
+        var el=document.getElementById('conn-badge');
+        if(el&&window.ZANTARA_API){ var cfg=window.ZANTARA_API.config||{}; var p=(cfg.proxy&&cfg.proxy.production&&cfg.proxy.production.base)||''; var d=(cfg.production&&cfg.production.base)||''; el.textContent=p?'Connected: Proxy':(d?'Connected: Direct':'Connected'); }
+      }catch(e){}
+    });
   </script>
 </body>
 </html>
