@@ -95,11 +95,23 @@
           addBubble('user', text);
           typingOn();
           var endpoint='https://zantara-web-proxy-himaadsxua-ew.a.run.app/api/zantara/call';
-          var user=''; try{ user=localStorage.getItem('zantara-user-email')||''; }catch(e){}
-          var body=JSON.stringify({ key:'ai.chat', params:{ prompt: text } });
+          var user=''; try{ user=localStorage.getItem('zantara-user-email')||'anonymous@balizero.com'; }catch(e){ user='anonymous@balizero.com'; }
+          // Use AI chat with identity context for ZANTARA recognition
+          var body=JSON.stringify({
+            key:'ai.chat',
+            params:{
+              prompt: text,
+              userId: user,
+              context: {
+                userEmail: user,
+                userName: user.split('@')[0]
+              }
+            }
+          });
           var xhr=new XMLHttpRequest();
           xhr.open('POST', endpoint, true);
           xhr.setRequestHeader('Content-Type','application/json');
+          xhr.setRequestHeader('x-api-key','zantara-external-dev-key-2025');
           if (user) xhr.setRequestHeader('x-user-id', user);
           xhr.onreadystatechange=function(){ if (xhr.readyState===4){ typingOff(); try{ var res=JSON.parse(xhr.responseText||'{}'); var out=extractReply(res)||'OK.'; addBubble('assistant', out); }catch(e){ addBubble('assistant','Request failed. Please try again.'); } } };
           xhr.onerror=function(){ typingOff(); addBubble('assistant','Network error. Please try again.'); };
@@ -118,6 +130,18 @@
       try {
         var sb=document.getElementById('send-button'); if(sb) sb.onclick=function(){ if(window.zantaraApp&&window.zantaraApp.sendMessage){ window.zantaraApp.sendMessage(); }};
         var fm=document.getElementById('chat-form'); if(fm){ fm.onsubmit=function(){ try{ if(window.zantaraApp&&window.zantaraApp.sendMessage){ window.zantaraApp.sendMessage(); } }catch(e){} return false; }; }
+
+        // Auto-detect Zero user or prompt for email
+        var storedEmail = localStorage.getItem('zantara-user-email');
+        if (!storedEmail) {
+          var email = prompt('Enter your email to start (or press Cancel for anonymous):', 'zero@balizero.com');
+          if (email && email.indexOf('@') > 0) {
+            localStorage.setItem('zantara-user-email', email);
+            console.log('✅ User email set:', email);
+          }
+        } else {
+          console.log('✅ Welcome back:', storedEmail);
+        }
       } catch(e){}
     });
   </script>
