@@ -94,8 +94,8 @@
           var inp=qs('#message-input'); if(!inp) return false; var text=(inp.value||'').replace(/^\s+|\s+$/g,''); if(!text) return false; inp.value='';
           addBubble('user', text);
           typingOn();
-          // Try production backend first, fallback to web proxy
-          var endpoint='https://zantara-web-proxy-himaadsxua-ew.a.run.app/api/zantara/call';
+          // Use BFF (Backend-for-Frontend) - API key hidden server-side
+          var endpoint='http://localhost:4000/call';
           var user=''; try{ user=localStorage.getItem('zantara-user-email')||'anonymous@balizero.com'; }catch(e){ user='anonymous@balizero.com'; }
           // Use AI chat with identity context for ZANTARA recognition
           var body=JSON.stringify({
@@ -112,7 +112,7 @@
           var xhr=new XMLHttpRequest();
           xhr.open('POST', endpoint, true);
           xhr.setRequestHeader('Content-Type','application/json');
-          // Web proxy doesn't require x-api-key
+          // BFF handles API key server-side
           if (user) xhr.setRequestHeader('x-user-id', user);
           xhr.onreadystatechange=function(){
             if (xhr.readyState===4){

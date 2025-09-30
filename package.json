@@ -6,7 +6,12 @@
   "scripts": {
     "dev": "node proxy-server.cjs",
     "serve": "npx serve .",
-    "kb:import": "node scripts/kb-import.mjs"
+    "kb:import": "node scripts/kb-import.mjs",
+    "bff": "node bff-server.js",
+    "bff:dev": "nodemon bff-server.js",
+    "bff:prod": "NODE_ENV=production node bff-server.js",
+    "dev:full": "concurrently \"npm run serve\" \"npm run bff:dev\"",
+    "test:bff": "curl -s http://localhost:3001/health | jq ."
   },
   "keywords": [
     "zantara",
@@ -21,8 +26,13 @@
     "url": "git+https://github.com/Balizero1987/zantara_webapp.git"
   },
   "devDependencies": {
-    "serve": "^14.2.0",
+    "mammoth": "^1.6.0",
     "pdf-parse": "^1.1.1",
-    "mammoth": "^1.6.0"
+    "serve": "^14.2.0"
+  },
+  "dependencies": {
+    "axios": "^1.12.2",
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
   }
 }
