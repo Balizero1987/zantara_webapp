@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZANTARA - Chat</title>
-    <meta name="description" content="Zantara: Your AI companion for collaborative intelligence">
+    <title>ZANTARA - Chat (RAG Connected)</title>
+    <meta name="description" content="Zantara: Your AI companion for collaborative intelligence - RAG Backend Connected">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,7 +45,7 @@
             z-index: 0;
         }
 
-        /* Connection Status */
+        /* Connection Status Indicator */
         .connection-status {
             position: fixed;
             top: 16px;
@@ -157,163 +157,172 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
+            font-weight: 600;
+            font-size: 16px;
             cursor: pointer;
+            border: 2px solid rgba(168, 85, 247, 0.3);
         }
 
         /* Chat Container */
         .chat-container {
             position: relative;
+            z-index: 1;
             height: 100vh;
-            padding-top: 72px;
             display: flex;
             flex-direction: column;
+            padding-top: 72px;
         }
 
+        /* Messages Area */
         .messages-area {
             flex: 1;
             overflow-y: auto;
             padding: 24px;
-            scroll-behavior: smooth;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
-        .welcome-screen {
-            text-align: center;
-            padding: 80px 24px;
+        .messages-area::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .welcome-title {
-            font-size: 36px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            background: linear-gradient(135deg, #ffffff 0%, #a855f7 50%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .messages-area::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
         }
 
-        .welcome-subtitle {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 32px;
+        .messages-area::-webkit-scrollbar-thumb {
+            background: rgba(168, 85, 247, 0.3);
+            border-radius: 4px;
         }
 
-        .suggestions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            max-width: 800px;
-            margin: 0 auto;
+        .messages-area::-webkit-scrollbar-thumb:hover {
+            background: rgba(168, 85, 247, 0.5);
         }
 
-        .suggestion-chip {
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .suggestion-chip:hover {
-            background: rgba(168, 85, 247, 0.1);
-            border-color: rgba(168, 85, 247, 0.3);
-            transform: translateY(-2px);
-        }
-
-        /* Messages */
+        /* Message Bubbles */
         .message {
             display: flex;
             gap: 12px;
-            margin-bottom: 20px;
-            align-items: flex-start;
+            max-width: 80%;
+            animation: messageSlide 0.3s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .message.user {
+            align-self: flex-end;
             flex-direction: row-reverse;
         }
 
+        .message.assistant {
+            align-self: flex-start;
+        }
+
         .message-avatar {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 18px;
         }
 
         .message.user .message-avatar {
             background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            border: 2px solid rgba(168, 85, 247, 0.3);
         }
 
         .message.assistant .message-avatar {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(168, 85, 247, 0.2);
+            border: 2px solid rgba(168, 85, 247, 0.3);
         }
 
         .message-content {
-            max-width: 70%;
-            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
-            line-height: 1.5;
+            padding: 12px 16px;
+            backdrop-filter: blur(20px) saturate(150%);
         }
 
         .message.user .message-content {
-            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            background: rgba(168, 85, 247, 0.2);
+            border-color: rgba(168, 85, 247, 0.3);
         }
 
-        .message.assistant .message-content {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .message-text {
+            font-size: 15px;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.95);
+            white-space: pre-wrap;
         }
 
+        .message-time {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 6px;
+        }
+
+        /* Error message */
         .message.error .message-content {
             background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.5);
-            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
         }
 
         /* Typing Indicator */
         .typing-indicator {
             display: flex;
             gap: 4px;
-            padding: 12px;
+            padding: 12px 16px;
         }
 
         .typing-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            animation: typing 1.4s infinite;
+            background: rgba(168, 85, 247, 0.6);
+            animation: typingBounce 1.4s infinite ease-in-out;
         }
 
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
-            30% { transform: translateY(-10px); opacity: 1; }
+        @keyframes typingBounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
         }
 
         /* Input Area */
         .input-area {
-            position: sticky;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 20px 24px 24px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
+            position: relative;
+            padding: 16px 24px 24px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px) saturate(150%);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .input-container {
-            max-width: 800px;
-            margin: 0 auto;
+            position: relative;
             display: flex;
             gap: 12px;
             align-items: flex-end;
@@ -322,50 +331,204 @@
         .input-wrapper {
             flex: 1;
             position: relative;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 12px 16px;
         }
 
         .chat-input {
             width: 100%;
-            background: transparent;
-            border: none;
+            min-height: 52px;
+            max-height: 150px;
+            padding: 14px 48px 14px 16px;
+            border-radius: 26px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             color: #ffffff;
             font-size: 15px;
+            font-family: inherit;
             resize: none;
-            max-height: 120px;
             outline: none;
+            transition: all 0.3s ease;
+            line-height: 1.5;
         }
 
-        .send-btn {
-            width: 48px;
-            height: 48px;
+        .chat-input:focus {
+            border-color: #a855f7;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .input-actions {
+            position: absolute;
+            right: 8px;
+            bottom: 8px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .input-btn {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            border: none;
-            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-            color: #ffffff;
-            cursor: pointer;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .send-btn:hover:not(:disabled) {
-            transform: scale(1.1);
-            box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4);
+        .input-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .send-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(168, 85, 247, 0.4);
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6);
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
         }
 
         .send-btn:disabled {
-            opacity: 0.3;
+            opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
         }
 
+        /* Suggestions */
+        .suggestions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .suggestions::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .suggestions::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .suggestions::-webkit-scrollbar-thumb {
+            background: rgba(168, 85, 247, 0.3);
+            border-radius: 2px;
+        }
+
+        .suggestion-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+            gap: 32px;
+        }
+
+        .welcome-logo {
+            width: 180px;
+            height: 180px;
+            filter: drop-shadow(0 20px 50px rgba(168, 85, 247, 0.5));
+        }
+
+        .welcome-title {
+            font-family: 'Geist', sans-serif;
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            line-height: 1.2;
+        }
+
+        .welcome-title .greeting {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 32px;
+            font-weight: 400;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .welcome-title .username {
+            background: linear-gradient(135deg, #ffffff 0%, #a855f7 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+        }
+
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .message-content { max-width: 85%; }
-            .suggestions { grid-template-columns: 1fr; }
+            .header {
+                padding: 0 16px;
+            }
+            .brand-name-small {
+                font-size: 20px;
+            }
+            .messages-area {
+                padding: 16px;
+            }
+            .message {
+                max-width: 90%;
+            }
+            .input-area {
+                padding: 12px 16px 16px;
+            }
+            .welcome-logo {
+                width: 140px;
+                height: 140px;
+            }
+            .welcome-title {
+                font-size: 32px;
+            }
+            .welcome-title .greeting {
+                font-size: 24px;
+            }
+        }
+
+        ::selection {
+            background: rgba(168, 85, 247, 0.3);
+            color: #ffffff;
         }
     </style>
 </head>
@@ -379,45 +542,56 @@
     <!-- Header -->
     <div class="header">
         <div class="header-left">
-            <img src="zantara_logo_transparent.png" alt="ZANTARA" class="logo-small" onerror="this.style.display='none'">
-            <span class="brand-name-small">ZANTARA</span>
+            <img src="zantara/zantara_logo_transparent.png" alt="Zantara" class="logo-small" onerror="this.style.display='none'">
+            <h1 class="brand-name-small">ZANTARA</h1>
         </div>
         <div class="header-right">
-            <div class="header-btn" id="newChatBtn" title="New Chat">
-                <svg width="20" height="20" fill="white" viewBox="0 0 20 20">
-                    <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"/>
+            <button class="header-btn" id="newChatBtn" title="New Chat">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
                 </svg>
-            </div>
-            <div class="user-avatar" id="userAvatar" title="Profile">A</div>
+            </button>
+            <button class="header-btn" title="Settings">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                </svg>
+            </button>
+            <button class="header-btn" title="Logout" onclick="handleLogout()">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm11 4.414l-4.293 4.293a1 1 0 01-1.414 0L4 7.414 5.414 6l3.293 3.293L13.586 5 15 6.414z" clip-rule="evenodd"/>
+                    <path d="M11 0h1v4h-1V0zM17.778 2.222l.707.707-2.828 2.828-.707-.707 2.828-2.828z"/>
+                </svg>
+            </button>
+            <div class="user-avatar" id="userAvatar" title="Click to view profile" style="cursor: pointer;">A</div>
         </div>
     </div>
 
     <!-- Chat Container -->
     <div class="chat-container">
-        <div class="messages-area" id="messagesArea">
-            <!-- Welcome Screen -->
-            <div class="welcome-screen" id="welcomeScreen">
-                <h2 class="welcome-title">Hello, <span id="userName">Guest</span></h2>
-                <p class="welcome-subtitle">How can I help you today?</p>
-                <div class="suggestions" id="suggestions">
-                    <div class="suggestion-chip" onclick="sendSuggestion('Tell me about Bali Zero services')">
-                        💼 Bali Zero Services
-                    </div>
-                    <div class="suggestion-chip" onclick="sendSuggestion('Show me the team')">
-                        👥 Team Members
-                    </div>
-                    <div class="suggestion-chip" onclick="sendSuggestion('What are your pricing options?')">
-                        💰 Pricing Options
-                    </div>
-                    <div class="suggestion-chip" onclick="sendSuggestion('Tell me about KITAS requirements')">
-                        📋 KITAS Info
-                    </div>
-                </div>
-            </div>
+        <!-- Welcome Screen (shown when no messages) -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <img src="zantara/zantara_logo_transparent.png" alt="Zantara" class="welcome-logo" onerror="this.textContent='🌸'">
+
+            <h2 class="welcome-title">
+                <span class="greeting">WELCOME</span>
+                <span class="username" id="userName">AMANDA</span>
+            </h2>
+        </div>
+
+        <!-- Messages Area (hidden initially) -->
+        <div class="messages-area" id="messagesArea" style="display: none;">
+            <!-- Messages will be added here dynamically -->
         </div>
 
         <!-- Input Area -->
         <div class="input-area">
+            <div class="suggestions" id="suggestions">
+                <div class="suggestion-chip">Help with PT setup</div>
+                <div class="suggestion-chip">Team information</div>
+                <div class="suggestion-chip">Generate quote</div>
+                <div class="suggestion-chip">Contact details</div>
+            </div>
+
             <div class="input-container">
                 <div class="input-wrapper">
                     <textarea
@@ -426,6 +600,13 @@
                         placeholder="Message ZANTARA..."
                         rows="1"
                     ></textarea>
+                    <div class="input-actions">
+                        <button class="input-btn" title="Attach file">
+                            <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <button class="send-btn" id="sendBtn" disabled>
                     <svg width="24" height="24" fill="white" viewBox="0 0 20 20">
@@ -437,13 +618,14 @@
     </div>
 
     <script>
-        // Configuration - NUZANTARA Backend
+        // Configuration
         const CONFIG = {
-            BACKEND_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-                ? 'http://localhost:8080'
-                : 'https://zantara-v520-chatgpt-patch-himaadsxua-ew.a.run.app',
-            API_KEY: 'zantara-internal-dev-key-2025',
-            USE_RAG: true // Enable RAG via TypeScript proxy
+            // Backend URL - RAG BACKEND PRODUCTION
+            BACKEND_URL: 'https://zantara-rag-backend-1064094238013.europe-west1.run.app',
+            // Use Bali Zero endpoint
+            USE_BALI_ZERO: true,
+            MODEL: 'haiku', // 'haiku' or 'sonnet'
+            USER_NAME: 'AMANDA' // Customize based on logged user
         };
 
         // Global state
@@ -463,21 +645,21 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            // Check authentication
+            // Check if user is logged in
             const userEmail = localStorage.getItem('zantara-user-email');
             const userName = localStorage.getItem('zantara-user-name');
 
             if (!userEmail) {
+                // Redirect to login if not authenticated
                 window.location.href = 'login.html';
                 return;
             }
 
-            // Set user info
+            // Set user name from localStorage
             const displayName = userName || userEmail.split('@')[0].toUpperCase();
             document.getElementById('userName').textContent = displayName;
             document.getElementById('userAvatar').textContent = displayName.charAt(0);
 
-            // Check backend
             checkBackendHealth();
             setupEventListeners();
         });
@@ -487,13 +669,13 @@
             try {
                 const response = await fetch(`${CONFIG.BACKEND_URL}/health`, {
                     method: 'GET',
-                    signal: AbortSignal.timeout(5000)
+                    signal: AbortSignal.timeout(5000) // 5 second timeout
                 });
 
                 if (response.ok) {
                     const data = await response.json();
                     backendAvailable = true;
-                    updateConnectionStatus(true, `Connected v${data.version || '5.2.0'}`);
+                    updateConnectionStatus(true, `Connected (${data.version || 'v1.0'})`);
                     console.log('✅ Backend connected:', data);
                 } else {
                     throw new Error(`Health check failed: ${response.status}`);
@@ -502,13 +684,10 @@
                 backendAvailable = false;
                 updateConnectionStatus(false, 'Offline - Using fallback');
                 console.warn('⚠️ Backend unavailable:', error.message);
-
-                // Retry connection every 30 seconds
-                setTimeout(checkBackendHealth, 30000);
             }
         }
 
-        // Update connection status
+        // Update connection status indicator
         function updateConnectionStatus(connected, text) {
             connectionStatus.className = `connection-status ${connected ? 'connected' : 'disconnected'}`;
             connectionText.textContent = text;
@@ -519,51 +698,52 @@
             // Auto-resize textarea
             chatInput.addEventListener('input', function() {
                 this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+                this.style.height = Math.min(this.scrollHeight, 150) + 'px';
                 sendBtn.disabled = !this.value.trim();
             });
 
-            // Send on Enter (Shift+Enter for new line)
-            chatInput.addEventListener('keydown', function(e) {
+            // Send on Enter
+            chatInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    if (this.value.trim()) {
-                        sendMessage(this.value.trim());
-                    }
+                    sendMessage(chatInput.value);
                 }
             });
 
-            // Send button
-            sendBtn.addEventListener('click', function() {
-                const text = chatInput.value.trim();
-                if (text) sendMessage(text);
-            });
+            // Send button click
+            sendBtn.addEventListener('click', () => sendMessage(chatInput.value));
 
             // New chat button
-            newChatBtn.addEventListener('click', function() {
-                conversationHistory = [];
-                messagesArea.innerHTML = '';
-                welcomeScreen.style.display = 'block';
-                console.log('🔄 Conversation reset');
-            });
+            newChatBtn.addEventListener('click', newChat);
 
-            // User avatar - logout
-            document.getElementById('userAvatar').addEventListener('click', function() {
-                if (confirm('Logout from ZANTARA?')) {
-                    localStorage.clear();
-                    window.location.href = 'login.html';
-                }
+            // Suggestion chips
+            document.querySelectorAll('.suggestion-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const prompt = chip.textContent.trim();
+                    chatInput.value = prompt;
+                    sendBtn.disabled = false;
+                    sendMessage(prompt);
+                });
             });
         }
 
         // Send message
         async function sendMessage(text) {
-            // Hide welcome screen
+            if (!text.trim() || isTyping) return;
+
+            // Hide welcome screen, show messages
             welcomeScreen.style.display = 'none';
+            messagesArea.style.display = 'flex';
+            suggestions.style.display = 'none';
 
             // Add user message
             addMessage(text, 'user');
-            conversationHistory.push({ role: 'user', content: text });
+
+            // Add to conversation history
+            conversationHistory.push({
+                role: 'user',
+                content: text
+            });
 
             // Clear input
             chatInput.value = '';
@@ -579,76 +759,90 @@
                 const response = await getAIResponse(text);
                 typingMsg.remove();
                 addMessage(response, 'assistant');
-                conversationHistory.push({ role: 'assistant', content: response });
+
+                // Add to conversation history
+                conversationHistory.push({
+                    role: 'assistant',
+                    content: response
+                });
             } catch (error) {
                 typingMsg.remove();
                 addMessage(error.message, 'assistant', true);
-                console.error('❌ Error:', error);
+                console.error('❌ Error getting AI response:', error);
             } finally {
                 isTyping = false;
             }
         }
 
-        // Get AI response from NUZANTARA backend
+        // Get AI response from backend
         async function getAIResponse(message) {
-            if (!backendAvailable) {
-                return getFallbackResponse(message);
-            }
+            // If backend is available, use RAG backend
+            if (backendAvailable) {
+                try {
+                    // Use Bali Zero endpoint
+                    const endpoint = `${CONFIG.BACKEND_URL}/bali-zero/chat`;
 
-            try {
-                // Use NUZANTARA TypeScript backend with RAG proxy
-                const endpoint = `${CONFIG.BACKEND_URL}/call`;
-                const handlerKey = CONFIG.USE_RAG ? 'bali.zero.chat' : 'ai.chat';
+                    // Convert conversation history to backend format
+                    const formattedHistory = conversationHistory.map(msg => ({
+                        role: msg.role,
+                        content: msg.content
+                    }));
 
-                const requestBody = {
-                    key: handlerKey,
-                    params: CONFIG.USE_RAG ? {
-                        query: message,
-                        user_role: 'member',
-                        conversation_history: conversationHistory
-                    } : {
-                        prompt: message,
-                        conversationHistory: conversationHistory
+                    const requestBody = {
+                        query: message,  // RAG backend uses "query" not "message"
+                        conversation_history: formattedHistory,
+                        user_role: "member"
+                    };
+
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestBody),
+                        signal: AbortSignal.timeout(30000) // 30 second timeout
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.status} ${response.statusText}`);
                     }
-                };
 
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': CONFIG.API_KEY
-                    },
-                    body: JSON.stringify(requestBody),
-                    signal: AbortSignal.timeout(30000)
-                });
+                    const data = await response.json();
 
-                if (!response.ok) {
-                    throw new Error(`API error: ${response.status}`);
+                    // RAG backend returns: { success: true, response: "...", model_used: "haiku" }
+                    if (data.success && data.response) {
+                        console.log(`✅ Response from ${data.model_used || 'AI'}`);
+                        return data.response;
+                    } else {
+                        throw new Error('Invalid response format from API');
+                    }
+                } catch (error) {
+                    console.error('Backend API call failed:', error);
+                    backendAvailable = false;
+                    updateConnectionStatus(false, 'Connection lost');
+                    throw new Error('Mi dispiace, sto avendo difficoltà a connettermi al server. Riprova tra poco.');
                 }
-
-                const data = await response.json();
-
-                if (data.ok && data.data) {
-                    // Handle different response formats
-                    return data.data.response || data.data.message || data.data.text || JSON.stringify(data.data);
-                } else {
-                    throw new Error(data.error || 'Invalid response');
-                }
-            } catch (error) {
-                console.error('Backend call failed:', error);
-                backendAvailable = false;
-                updateConnectionStatus(false, 'Connection lost');
-                throw new Error('Unable to connect to ZANTARA. Using fallback response.');
+            } else {
+                // Fallback to simple responses
+                return getFallbackResponse(message);
             }
         }
 
-        // Fallback responses
+        // Fallback response when backend is unavailable
         function getFallbackResponse(input) {
+            const responses = {
+                'team': 'We have 23 talented team members across 7 departments at Bali Zero. Would you like to know more about a specific department?\n\n(Note: RAG backend is offline, this is a fallback response)',
+                'quote': 'I can help you generate a quote. Our PT PMA setup service starts at $2,500. What specific services are you interested in?\n\n(Note: RAG backend is offline)',
+                'contact': 'You can reach Bali Zero at info@balizero.com or visit our office in Seminyak, Bali. We\'re open Monday to Friday, 9 AM - 6 PM.\n\n(Note: RAG backend is offline)',
+                'service': 'Bali Zero offers comprehensive business setup services including PT PMA formation, visa assistance, tax consulting, and accounting services.\n\n(Note: RAG backend is offline)',
+                'default': 'Thank you for your message! I\'m ZANTARA, your AI assistant.\n\nNote: The RAG backend is currently offline. I\'m using fallback responses. Please check the connection status or try again later for AI-powered responses with knowledge base search.'
+            };
+
             const lower = input.toLowerCase();
-            if (lower.includes('team')) return 'We have 23 talented team members at Bali Zero. (Offline mode)';
-            if (lower.includes('pricing')) return 'PT PMA setup starts at $2,500. (Offline mode)';
-            if (lower.includes('contact')) return 'Email: info@balizero.com (Offline mode)';
-            return 'I\'m ZANTARA, your AI assistant. Backend is offline - please check connection.';
+            for (let key in responses) {
+                if (lower.includes(key)) return responses[key];
+            }
+            return responses.default;
         }
 
         // Add message to chat
@@ -658,18 +852,31 @@
 
             const avatar = document.createElement('div');
             avatar.className = 'message-avatar';
-            avatar.textContent = type === 'user'
-                ? document.getElementById('userAvatar').textContent
-                : '🌸';
+            avatar.textContent = type === 'user' ? CONFIG.USER_NAME.charAt(0) : '🌸';
 
             const content = document.createElement('div');
             content.className = 'message-content';
-            content.textContent = text;
 
+            const messageText = document.createElement('div');
+            messageText.className = 'message-text';
+            messageText.textContent = text;
+
+            const time = document.createElement('div');
+            time.className = 'message-time';
+            time.textContent = new Date().toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            content.appendChild(messageText);
+            content.appendChild(time);
             messageDiv.appendChild(avatar);
             messageDiv.appendChild(content);
+
             messagesArea.appendChild(messageDiv);
             messagesArea.scrollTop = messagesArea.scrollHeight;
+
+            return messageDiv;
         }
 
         // Add typing indicator
@@ -682,21 +889,63 @@
             avatar.textContent = '🌸';
 
             const content = document.createElement('div');
-            content.className = 'message-content typing-indicator';
-            content.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            content.className = 'message-content';
 
+            const typing = document.createElement('div');
+            typing.className = 'typing-indicator';
+            typing.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+
+            content.appendChild(typing);
             messageDiv.appendChild(avatar);
             messageDiv.appendChild(content);
+
             messagesArea.appendChild(messageDiv);
             messagesArea.scrollTop = messagesArea.scrollHeight;
 
             return messageDiv;
         }
 
-        // Send suggestion
-        function sendSuggestion(text) {
-            sendMessage(text);
+        // New chat
+        function newChat() {
+            if (confirm('Start a new conversation? Current chat will be cleared.')) {
+                messagesArea.innerHTML = '';
+                messagesArea.style.display = 'none';
+                welcomeScreen.style.display = 'flex';
+                suggestions.style.display = 'flex';
+                conversationHistory = [];
+                console.log('🔄 New chat started');
+            }
         }
+
+        // Retry connection every 30 seconds if offline
+        setInterval(() => {
+            if (!backendAvailable) {
+                console.log('🔄 Retrying backend connection...');
+                checkBackendHealth();
+            }
+        }, 30000);
+
+        // Logout handler
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('zantara-user-email');
+                localStorage.removeItem('zantara-user-name');
+                localStorage.removeItem('zantara-theme');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // User avatar click - show profile menu
+        document.addEventListener('DOMContentLoaded', function() {
+            const userAvatar = document.getElementById('userAvatar');
+            if (userAvatar) {
+                userAvatar.addEventListener('click', function() {
+                    const email = localStorage.getItem('zantara-user-email');
+                    const name = localStorage.getItem('zantara-user-name');
+                    alert(`👤 User Profile\n\nName: ${name}\nEmail: ${email}\n\nClick the logout button to sign out.`);
+                });
+            }
+        });
     </script>
 </body>
 </html>
