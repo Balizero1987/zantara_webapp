@@ -99,15 +99,41 @@
             'Content-Type': 'application/json',
             'x-user-id': userEmail
           },
-          body: JSON.stringify({
-            key: 'ai.chat',
-            params: {
-              prompt: text,
-              context: {
-                userEmail: userEmail,
-                userName: userEmail.split('@')[0]
-              }
+          // Try to detect if question is about team/pricing/services
+          let handlerKey = 'ai.chat';
+          let handlerParams = {
+            prompt: text,
+            userId: userEmail,
+            context: {
+              userEmail: userEmail,
+              userName: userEmail.split('@')[0]
             }
+          };
+
+          // Smart routing based on keywords
+          const lowerText = text.toLowerCase();
+          if (lowerText.match(/team|adit|amanda|anton|ari|surya|dewa/i)) {
+            // Fetch team info first, then answer
+            try {
+              const teamRes = await fetch(BFF_URL + '/call', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'x-user-id': userEmail},
+                body: JSON.stringify({key: 'contact.info', params: {}})
+              });
+              const teamData = await teamRes.json();
+              if (teamData.ok && teamData.data.team) {
+                handlerParams.context.teamInfo = teamData.data.team;
+              }
+            } catch (e) {
+              console.warn('Failed to fetch team info:', e);
+            }
+          } else if (lowerText.match(/prez|costo|price|kitas|d12|pt pma/i)) {
+            handlerParams.context.note = 'User asking about pricing - provide official Bali Zero rates';
+          }
+
+          body: JSON.stringify({
+            key: handlerKey,
+            params: handlerParams
           })
         });
 

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZANTARA - Collaborative Intelligence</title>
+    <meta name="description" content="Zantara: Your AI companion for collaborative intelligence">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(
+                ellipse at 50% 30%,
+                rgba(124, 58, 237, 0.08) 0%,
+                transparent 50%
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 32px 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            z-index: 100;
+        }
+
+        .time { letter-spacing: -0.02em; }
+
+        .logo-3d {
+            width: 360px;
+            height: 360px;
+            margin: 48px 0;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .logo-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .zan-image {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: visible;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zan-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 20px 40px rgba(168, 85, 247, 0.4))
+                    drop-shadow(0 10px 20px rgba(168, 85, 247, 0.3))
+                    drop-shadow(0 0 40px rgba(168, 85, 247, 0.2));
+            transition: filter 0.3s ease;
+        }
+
+        .logo-3d:hover .zan-image img {
+            filter: drop-shadow(0 25px 50px rgba(168, 85, 247, 0.6))
+                    drop-shadow(0 15px 30px rgba(168, 85, 247, 0.5))
+                    drop-shadow(0 0 60px rgba(168, 85, 247, 0.4));
+        }
+
+        .logo-3d:hover .logo-wrapper {
+            transform: rotateX(5deg) rotateY(5deg) scale(1.08);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brand-name {
+            font-family: 'Geist', sans-serif;
+            font-size: 72px;
+            font-weight: 900;
+            text-align: center;
+            letter-spacing: 0.05em;
+            background: linear-gradient(135deg, #ffffff 0%, #a855f7 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .powered-by {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .powered-by a {
+            color: #a855f7;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.05);
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .forgot-password {
+            font-size: 14px;
+            color: #a855f7;
+            text-decoration: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 12px;
+        }
+
+        .loading-spinner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(168, 85, 247, 0.2);
+            border-top-color: #a855f7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+            z-index: 1000;
+        }
+
+        .loading-spinner.show { display: block; }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #ef4444;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error-message.show { display: block; }
+
+        @media (max-width: 640px) {
+            .container { padding: 24px 20px; }
+            .brand-name { font-size: 48px; }
+            .logo-3d { width: 240px; height: 240px; }
+            .login-container { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar">
+        <span class="time" id="currentTime">9:41</span>
+        <div style="display: flex; gap: 6px;">
+            <span>📶</span>
+            <span>📡</span>
+            <span>🔋</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="logo-3d" id="logo3d">
+            <div class="logo-wrapper">
+                <div class="zan-image">
+                    <img src="zantara_logo_transparent.png"
+                         alt="Zantara - Lotus Flower"
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=font-size:120px>🌸</div>'">
+                </div>
+            </div>
+        </div>
+
+        <h1 class="brand-name">ZANTARA</h1>
+        <p class="powered-by">Powered by <a href="https://balizero.com" target="_blank">Bali Zero</a></p>
+
+        <div class="login-container">
+            <div class="error-message" id="errorMessage"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        class="form-input"
+                        placeholder="your@email.com"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        class="form-input"
+                        placeholder="Enter your password"
+                        required
+                    >
+                </div>
+
+                <div class="form-footer">
+                    <label class="remember-me">
+                        <input type="checkbox" id="remember" checked>
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="forgot-password" onclick="handleForgotPassword(event)">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">Sign In</button>
+                <button type="button" class="btn btn-secondary" onclick="handleDemoAccess(event)">Demo Access</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="loading-spinner" id="loading"></div>
+
+    <script>
+        // Configuration - NUZANTARA Backend
+        const CONFIG = {
+            // Local development
+            BACKEND_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                ? 'http://localhost:8080'
+                : 'https://zantara-v520-chatgpt-patch-himaadsxua-ew.a.run.app',
+            API_KEY: 'zantara-internal-dev-key-2025'
+        };
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent =
+                now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Logo easter egg - 7 clicks
+        let clicks = 0;
+        let timer;
+        const logo = document.getElementById('logo3d');
+        const logoWrapper = logo.querySelector('.logo-wrapper');
+
+        logo.addEventListener('click', () => {
+            clicks++;
+            clearTimeout(timer);
+            timer = setTimeout(() => clicks = 0, 2000);
+
+            if (clicks === 7) {
+                alert('🌸 The Lotus of Zantara blooms!\n\n"In collaboration, we find infinity." ∞');
+                clicks = 0;
+                logoWrapper.style.transform = 'rotateY(360deg) scale(1.2)';
+                logoWrapper.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)';
+                setTimeout(() => { logoWrapper.style.transform = ''; }, 1000);
+            }
+        });
+
+        // Show error message
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+            setTimeout(() => errorEl.classList.remove('show'), 5000);
+        }
+
+        // Login form handling
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+
+            // Validate
+            if (!email || !email.includes('@')) {
+                showError('Please enter a valid email address');
+                return;
+            }
+
+            if (!password || password.length < 3) {
+                showError('Password is required');
+                return;
+            }
+
+            // Show loading
+            submitBtn.disabled = true;
+            loading.classList.add('show');
+
+            try {
+                // Call NUZANTARA backend identity.resolve
+                const response = await fetch(`${CONFIG.BACKEND_URL}/call`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': CONFIG.API_KEY
+                    },
+                    body: JSON.stringify({
+                        key: 'identity.resolve',
+                        params: { email, password }
+                    }),
+                    signal: AbortSignal.timeout(10000)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.ok) {
+                    // Success - save auth data
+                    const userName = email.split('@')[0].toUpperCase();
+                    localStorage.setItem('zantara-user-email', email);
+                    localStorage.setItem('zantara-user-name', userName);
+                    localStorage.setItem('zantara-auth-token', data.data.token || 'demo-token');
+
+                    if (remember) {
+                        localStorage.setItem('zantara-remember', 'true');
+                    }
+
+                    console.log('✅ Login successful:', { email, userName });
+
+                    // Redirect to chat
+                    setTimeout(() => {
+                        window.location.href = 'chat.html';
+                    }, 500);
+                } else {
+                    throw new Error(data.error || 'Login failed');
+                }
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                showError(error.message || 'Unable to connect to server. Please try demo access.');
+                submitBtn.disabled = false;
+            } finally {
+                loading.classList.remove('show');
+            }
+        });
+
+        // Forgot password handler
+        function handleForgotPassword(event) {
+            event.preventDefault();
+            alert('🔐 Password Reset\n\nPlease contact your administrator at:\nadmin@balizero.com\n\nOr use the demo access below.');
+        }
+
+        // Demo access handler
+        function handleDemoAccess(event) {
+            event.preventDefault();
+
+            // Set demo credentials (no backend call)
+            localStorage.setItem('zantara-user-email', 'demo@zantara.com');
+            localStorage.setItem('zantara-user-name', 'DEMO');
+            localStorage.setItem('zantara-auth-token', 'demo-token');
+
+            console.log('✅ Demo access granted');
+
+            // Redirect to chat
+            window.location.href = 'chat.html';
+        }
+
+        // Check if already logged in
+        window.addEventListener('load', function() {
+            const userEmail = localStorage.getItem('zantara-user-email');
+            const rememberMe = localStorage.getItem('zantara-remember');
+
+            if (userEmail && rememberMe === 'true') {
+                // Auto-redirect if remember me is checked
+                document.getElementById('email').value = userEmail;
+                document.getElementById('remember').checked = true;
+            }
+        });
+    </script>
+</body>
+</html>
