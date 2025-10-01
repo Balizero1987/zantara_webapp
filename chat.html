@@ -920,8 +920,38 @@
             return responses.default;
         }
 
+        // Sanitize assistant output for public users (hide sensitive terminology)
+        function sanitizePublicText(text) {
+            try {
+                const replacements = [
+                    [/\besoteric\b/gi, 'advanced'],
+                    [/\besoterico\b/gi, 'avanzato'],
+                    [/\besoteriche\b/gi, 'avanzate'],
+                    [/\bmysticism\b/gi, 'tradition'],
+                    [/\bsacro\b/gi, 'tradizionale'],
+                    [/\bsacred\b/gi, 'traditional'],
+                    [/\binitiatic\b/gi, 'advanced'],
+                    [/\biniziatico\b/gi, 'avanzato'],
+                    [/\boccult\b/gi, 'classical'],
+                    [/\bocculto\b/gi, 'classico'],
+                    [/sub rosa/gi, 'private']
+                ];
+                let out = text;
+                for (const [re, repl] of replacements) out = out.replace(re, repl);
+                return out;
+            } catch(_) { return text; }
+        }
+
         // Add message to chat
         function addMessage(text, type, isError = false) {
+            let displayText = text;
+            try {
+                const level = recognizedProfile && recognizedProfile.profile ? (recognizedProfile.profile.sub_rosa_level || 0) : 0;
+                const recognized = recognizedProfile ? !!recognizedProfile.recognized : false;
+                if (type === 'assistant' && (!recognized || level < 2)) {
+                    displayText = sanitizePublicText(text);
+                }
+            } catch(_) { /* ignore */ }
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${type}${isError ? ' error' : ''}`;
 
@@ -934,7 +964,7 @@
 
             const messageText = document.createElement('div');
             messageText.className = 'message-text';
-            messageText.textContent = text;
+            messageText.textContent = displayText;
 
             const time = document.createElement('div');
             time.className = 'message-time';
