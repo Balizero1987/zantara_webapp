@@ -893,6 +893,18 @@
                         user_email: currentUserEmail || null
                     };
 
+                    // If the user asks identity and we already recognized the profile, reply locally for immediate personalization
+                    const m = message.trim().toLowerCase();
+                    if ((m === 'chi sono?' || m === 'chi sono' || m === 'who am i?' || m === 'who am i') && recognizedProfile && recognizedProfile.recognized && recognizedProfile.profile) {
+                        const p = recognizedProfile.profile;
+                        const isIt = (p.language || 'en').toLowerCase().startsWith('it');
+                        const name = p.ambaradam_name || p.name || 'Collaboratore';
+                        const level = typeof p.sub_rosa_level === 'number' ? p.sub_rosa_level : 0;
+                        return isIt
+                          ? `Ciao ${name}, sei riconosciuto come collaboratore Bali Zero (Sub Rosa L${level}).`
+                          : `Hello ${name}, you are recognized as a Bali Zero collaborator (Sub Rosa L${level}).`;
+                    }
+
                     const response = await fetch(endpoint, {
                         method: 'POST',
                         headers: {
@@ -911,6 +923,21 @@
                     // RAG backend returns: { success: true, response: "...", model_used: "...", sources: [...] }
                     if (data.success && data.response) {
                         console.log(`✅ Response from ${data.model_used || 'unknown model'}`, data.sources ? `with ${data.sources.length} sources` : '');
+                        // Client-side personalization prefix when recognized
+                        try {
+                            if (recognizedProfile && recognizedProfile.recognized && recognizedProfile.profile) {
+                                const p = recognizedProfile.profile;
+                                const isIt = (p.language || 'en').toLowerCase().startsWith('it');
+                                const name = p.ambaradam_name || p.name;
+                                const lower = data.response.trim().toLowerCase();
+                                const hasGreeting = /^(ciao|salve|hello|hi)/.test(lower);
+                                const hasName = name && data.response.slice(0, 100).toLowerCase().includes(name.toLowerCase());
+                                if (name && (!hasGreeting || !hasName)) {
+                                    const prefix = isIt ? `Ciao ${name}, ` : `Hello ${name}, `;
+                                    return prefix + data.response;
+                                }
+                            }
+                        } catch(_) { /* ignore */ }
                         return data.response;
                     } else {
                         throw new Error('Invalid response format from API');
