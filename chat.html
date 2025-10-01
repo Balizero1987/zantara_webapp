@@ -620,10 +620,10 @@
     <script>
         // Configuration
         const CONFIG = {
-            // Backend URL - RAG BACKEND PRODUCTION
+            // Backend URL - PRODUCTION RAG BACKEND
             BACKEND_URL: 'https://zantara-rag-backend-1064094238013.europe-west1.run.app',
-            // Use Bali Zero endpoint
-            USE_BALI_ZERO: true,
+            // Use new /chat endpoint
+            USE_BALI_ZERO: false,
             MODEL: 'haiku', // 'haiku' or 'sonnet'
             USER_NAME: 'AMANDA' // Customize based on logged user
         };
@@ -779,7 +779,7 @@
             // If backend is available, use RAG backend
             if (backendAvailable) {
                 try {
-                    // Use Bali Zero endpoint
+                    // Use /bali-zero/chat endpoint (RAG + LLM)
                     const endpoint = `${CONFIG.BACKEND_URL}/bali-zero/chat`;
 
                     // Convert conversation history to backend format
@@ -789,7 +789,7 @@
                     }));
 
                     const requestBody = {
-                        query: message,  // RAG backend uses "query" not "message"
+                        query: message,
                         conversation_history: formattedHistory,
                         user_role: "member"
                     };
@@ -809,9 +809,9 @@
 
                     const data = await response.json();
 
-                    // RAG backend returns: { success: true, response: "...", model_used: "haiku" }
+                    // RAG backend returns: { success: true, response: "...", model_used: "...", sources: [...] }
                     if (data.success && data.response) {
-                        console.log(`✅ Response from ${data.model_used || 'AI'}`);
+                        console.log(`✅ Response from ${data.model_used || 'unknown model'}`, data.sources ? `with ${data.sources.length} sources` : '');
                         return data.response;
                     } else {
                         throw new Error('Invalid response format from API');
