@@ -816,6 +816,16 @@
                     // Use /bali-zero/chat endpoint (RAG + LLM)
                     const endpoint = `${CONFIG.BACKEND_URL}/bali-zero/chat`;
 
+                    // If user typed an email, capture and persist it for identity
+                    try {
+                        const emailMatch = message.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}/);
+                        if (emailMatch && emailMatch[0]) {
+                            currentUserEmail = emailMatch[0].toLowerCase();
+                            try { localStorage.setItem('zantara-user-email', currentUserEmail); } catch(_) {}
+                            console.log('📧 Captured user email from chat:', currentUserEmail);
+                        }
+                    } catch(_) { /* ignore */ }
+
                     // Convert conversation history to backend format
                     const formattedHistory = conversationHistory.map(msg => ({
                         role: msg.role,
