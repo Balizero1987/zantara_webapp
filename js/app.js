@@ -1,4 +1,6 @@
 // ZANTARA Syncra-Inspired App (voice-first, streaming-aware)
+import DOMPurify from 'dompurify';
+
 class ZantaraApp {
   constructor() {
     this.isListening = false;
@@ -60,7 +62,7 @@ class ZantaraApp {
         // Create new streaming message
         const messageDiv = this.streamingUI.createStreamingMessage('assistant');
         const avatarHtml = '<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div>';
-        messageDiv.innerHTML = avatarHtml + messageDiv.innerHTML;
+        messageDiv.innerHTML = DOMPurify.sanitize(avatarHtml + messageDiv.innerHTML);
         container.appendChild(messageDiv);
         messageEl = messageDiv.querySelector('.message-content');
         container.scrollTop = container.scrollHeight;
@@ -301,11 +303,11 @@ class ZantaraApp {
   addMessage(sender, text, opts = { html: false }) {
     const container = document.querySelector('.messages-container'); if (!container) return;
     const div = document.createElement('div'); div.className = `message ${sender}`;
-    const content = opts.html ? String(text) : this.escape(text);
+    const content = opts.html ? DOMPurify.sanitize(String(text)) : this.escape(text);
     if (sender === 'assistant') {
-      div.innerHTML = `<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`;
+      div.innerHTML = DOMPurify.sanitize(`<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`);
     } else {
-      div.innerHTML = `<div class="message-bubble">${content}</div>`;
+      div.innerHTML = DOMPurify.sanitize(`<div class="message-bubble">${content}</div>`);
     }
 
     // Add click handler to copy message text
@@ -335,7 +337,7 @@ class ZantaraApp {
     this.hideTypingIndicator();
     const d = document.createElement('div');
     d.className = 'message assistant typing-message';
-    d.innerHTML = `
+    d.innerHTML = DOMPurify.sanitize(`
       <div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div>
       <div class="message-bubble">
         <div class="typing-indicator">
@@ -344,7 +346,7 @@ class ZantaraApp {
           <span class="typing-dot"></span>
         </div>
       </div>
-    `;
+    `);
     c.appendChild(d);
     c.scrollTop = c.scrollHeight;
   }
@@ -535,14 +537,14 @@ class ZantaraApp {
   renderStructured(category, title, body, lang='id') {
     // Build a structured card + chips and append as assistant message (HTML mode)
     const chips = this.langChips[lang] || this.langChips.en;
-    const chipsHtml = chips.map(([icon,label]) => `<button class="action-chip" data-label="${label}">${icon} ${label}</button>`).join('');
-    const html = `
+    const chipsHtml = chips.map(([icon,label]) => `<button class="action-chip" data-label="${this.escape(label)}">${this.escape(icon)} ${this.escape(label)}</button>`).join('');
+    const html = DOMPurify.sanitize(`
       <div class="zantara-response">
         <h3 class="response-title">${this.escape(title)}</h3>
         <p class="response-body">${this.escape(body)}</p>
-        <div class="action-chips" data-lang="${lang}" data-cat="${category}">${chipsHtml}</div>
+        <div class="action-chips" data-lang="${this.escape(lang)}" data-cat="${this.escape(category)}">${chipsHtml}</div>
       </div>
-    `;
+    `);
     const node = this.addMessage('assistant', html, { html: true });
     this.bindChips(node);
     return node;
@@ -725,9 +727,9 @@ class ZantaraApp {
     const visible = this.messages.slice(-visibleCount);
     for (const m of visible) {
       const div = document.createElement('div'); div.className = `message ${m.sender}`;
-      const content = m.html ? String(m.text) : this.escape(m.text);
-      if (m.sender === 'assistant') div.innerHTML = `<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`;
-      else div.innerHTML = `<div class="message-bubble">${content}</div>`;
+      const content = m.html ? DOMPurify.sanitize(String(m.text)) : this.escape(m.text);
+      if (m.sender === 'assistant') div.innerHTML = DOMPurify.sanitize(`<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`);
+      else div.innerHTML = DOMPurify.sanitize(`<div class="message-bubble">${content}</div>`);
 
       // Add click handler to copy message text
       const bubble = div.querySelector('.message-bubble');

@@ -4,6 +4,7 @@
  * Handles chat UI rendering and interactions.
  */
 
+import DOMPurify from 'dompurify';
 import { apiClient } from '../core/api-client.js';
 import { stateManager } from '../core/state-manager.js';
 
@@ -30,7 +31,7 @@ export class ChatComponent {
    * Render chat UI
    */
   render() {
-    this.container.innerHTML = `
+    this.container.innerHTML = DOMPurify.sanitize(`
       <div class="chat-messages" id="chatMessages">
         ${this._renderMessages()}
       </div>
@@ -48,7 +49,7 @@ export class ChatComponent {
           <span class="send-icon">➤</span>
         </button>
       </div>
-    `;
+    `);
 
     this.messagesContainer = document.getElementById('chatMessages');
     this.inputField = document.getElementById('chatInput');
@@ -158,7 +159,7 @@ export class ChatComponent {
    * Update messages display
    */
   _updateMessages() {
-    this.messagesContainer.innerHTML = this._renderMessages();
+    this.messagesContainer.innerHTML = DOMPurify.sanitize(this._renderMessages());
     this._scrollToBottom();
   }
 

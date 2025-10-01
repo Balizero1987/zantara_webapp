@@ -3,6 +3,8 @@
  * Provides UI toggle for enabling/disabling adaptive streaming
  */
 
+import DOMPurify from 'dompurify';
+
 class StreamingToggle {
     constructor() {
         this.STORAGE_KEY = 'zantara_streaming_enabled';
@@ -56,7 +58,7 @@ class StreamingToggle {
 
         const container = document.createElement('div');
         container.className = 'z-streaming-toggle-container';
-        container.innerHTML = `
+        container.innerHTML = DOMPurify.sanitize(`
             <div class="z-streaming-toggle">
                 <div class="toggle-info">
                     <span class="toggle-title">🔧 Dev Mode</span>
@@ -69,7 +71,7 @@ class StreamingToggle {
                     <span class="z-toggle-slider"></span>
                 </label>
             </div>
-        `;
+        `);
 
         const input = container.querySelector('#zantara-streaming-toggle');
         const status = container.querySelector('.toggle-status');
