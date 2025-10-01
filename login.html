@@ -633,13 +633,15 @@
 
         // Check if already logged in
         window.addEventListener('load', function() {
+            const emailInput = document.getElementById('email');
+            const rememberCheckbox = document.getElementById('remember');
             const userEmail = localStorage.getItem('zantara-user-email');
             const rememberMe = localStorage.getItem('zantara-remember');
 
             if (userEmail && rememberMe === 'true') {
-                // Pre-fill email
-                document.getElementById('email').value = userEmail;
-                document.getElementById('remember').checked = true;
+                // Pre-fill from saved session
+                emailInput.value = userEmail;
+                rememberCheckbox.checked = true;
 
                 // Show continue button
                 const continueBtn = document.createElement('button');
@@ -653,6 +655,9 @@
 
                 const form = document.getElementById('loginForm');
                 form.insertBefore(continueBtn, document.querySelector('.divider'));
+            } else {
+                // Default to Zero Master email for convenience
+                emailInput.value = 'zero@balizero.com';
             }
         });
 
