@@ -644,6 +644,7 @@
         let isTyping = false;
         let backendAvailable = false;
         let healthMonitorId = null;
+        let recognizedProfile = null;
 
         // DOM Elements
         const chatInput = document.getElementById('chatInput');
@@ -696,6 +697,21 @@
                 backendAvailable = true;
                 updateConnectionStatus(true, `Connected (${data.version || 'v1.0'})`);
                 console.log('✅ Backend connected:', data);
+                // Try to fetch collaborator profile if we have an email
+                if (currentUserEmail) {
+                    try {
+                        const prof = await fetch(`${CONFIG.BACKEND_URL}/admin/collaborators/${encodeURIComponent(currentUserEmail)}`);
+                        if (prof.ok) {
+                            const profData = await prof.json();
+                            recognizedProfile = profData;
+                            if (profData.recognized && profData.profile) {
+                                const level = profData.profile.sub_rosa_level;
+                                const name = profData.profile.ambaradam_name || profData.profile.name;
+                                updateConnectionStatus(true, `Connected (${data.version || 'v1.0'}) • ${name} L${level}`);
+                            }
+                        }
+                    } catch(_e) { /* ignore */ }
+                }
                 return true;
             } catch (error) {
                 if (attempt < HEALTH.maxRetries) {
@@ -717,6 +733,20 @@
             healthMonitorId = setInterval(() => {
                 if (!backendAvailable) {
                     checkBackendHealth();
+                } else if (currentUserEmail && (!recognizedProfile || !recognizedProfile.recognized)) {
+                    // Periodically re-assert identity if backend is up but profile not recognized yet
+                    try {
+                        const prof = await fetch(`${CONFIG.BACKEND_URL}/admin/collaborators/${encodeURIComponent(currentUserEmail)}`);
+                        if (prof.ok) {
+                            const profData = await prof.json();
+                            recognizedProfile = profData;
+                            if (profData.recognized && profData.profile) {
+                                const level = profData.profile.sub_rosa_level;
+                                const name = profData.profile.ambaradam_name || profData.profile.name;
+                                updateConnectionStatus(true, `Connected (v2.0.0-cloud) • ${name} L${level}`);
+                            }
+                        }
+                    } catch(_e) { /* ignore */ }
                 }
             }, HEALTH.pollIntervalMs);
         }
