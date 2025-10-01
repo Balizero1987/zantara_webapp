@@ -730,9 +730,9 @@
         // Periodic health monitor: when offline, recheck every pollIntervalMs
         function startHealthMonitor() {
             if (healthMonitorId) return; // avoid duplicates
-            healthMonitorId = setInterval(() => {
+            healthMonitorId = setInterval(async () => {
                 if (!backendAvailable) {
-                    checkBackendHealth();
+                    await checkBackendHealth();
                 } else if (currentUserEmail && (!recognizedProfile || !recognizedProfile.recognized)) {
                     // Periodically re-assert identity if backend is up but profile not recognized yet
                     try {
@@ -851,8 +851,32 @@
                         const emailMatch = message.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}/);
                         if (emailMatch && emailMatch[0]) {
                             currentUserEmail = emailMatch[0].toLowerCase();
-                            try { localStorage.setItem('zantara-user-email', currentUserEmail); } catch(_) {}
+                            // Persist email and derive display name
+                            try {
+                                localStorage.setItem('zantara-user-email', currentUserEmail);
+                                const derivedName = currentUserEmail.split('@')[0].toUpperCase();
+                                localStorage.setItem('zantara-user-name', derivedName);
+                                // Reflect immediately in UI
+                                document.getElementById('userName').textContent = derivedName;
+                                document.getElementById('userAvatar').textContent = derivedName.charAt(0);
+                            } catch(_) {}
                             console.log('📧 Captured user email from chat:', currentUserEmail);
+                            // Reset recognition and try to fetch profile
+                            recognizedProfile = null;
+                            if (backendAvailable) {
+                                try {
+                                    const prof = await fetch(`${CONFIG.BACKEND_URL}/admin/collaborators/${encodeURIComponent(currentUserEmail)}`);
+                                    if (prof.ok) {
+                                        const profData = await prof.json();
+                                        recognizedProfile = profData;
+                                        if (profData.recognized && profData.profile) {
+                                            const level = profData.profile.sub_rosa_level;
+                                            const name = profData.profile.ambaradam_name || profData.profile.name;
+                                            updateConnectionStatus(true, `Connected (v2.0.0-cloud) • ${name} L${level}`);
+                                        }
+                                    }
+                                } catch(_) { /* ignore */ }
+                            }
                         }
                     } catch(_) { /* ignore */ }
 
