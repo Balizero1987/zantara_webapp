@@ -6,7 +6,7 @@ const PORT = 3003;
 const USE_LOCAL = true; // Set to false for production API
 const TARGET_API = USE_LOCAL
   ? 'http://localhost:8080'
-  : 'https://zantara-v520-nuzantara-1064094238013.europe-west1.run.app';
+  : 'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app';
 
 const server = http.createServer((req, res) => {
     // Enable CORS
