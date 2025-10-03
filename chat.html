@@ -641,9 +641,9 @@
 
         // Health check configuration
         const HEALTH = {
-            timeoutMs: 15000,        // 15s timeout
+            timeoutMs: 35000,        // 35s timeout (allow cold start from GCS)
             maxRetries: 2,           // number of retries on failure
-            retryBaseDelay: 1000,    // initial backoff in ms
+            retryBaseDelay: 2000,    // initial backoff in ms
             pollIntervalMs: 60000    // periodic recheck when offline (60s)
         };
 
@@ -919,7 +919,7 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(requestBody),
-                        signal: AbortSignal.timeout(30000) // 30 second timeout
+                        signal: AbortSignal.timeout(45000) // 45s timeout (allow cold start)
                     });
 
                     if (!response.ok) {
