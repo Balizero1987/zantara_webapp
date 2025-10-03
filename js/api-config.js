@@ -7,7 +7,7 @@ const API_CONFIG = {
   // Proxy/BFF endpoints (server-side adds x-api-key, client sends x-user-id)
   proxy: {
     production: {
-      // UPDATED 2025-10-01: New NUZANTARA backend (no proxy needed, direct to backend)
+      // FIXED 2025-10-03 06:05: Corrected Cloud Run URL (was causing timeouts)
       base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://zantara-v520-nuzantara-1064094238013.europe-west1.run.app',
       call: '/call',
       ai: '/ai.chat',
