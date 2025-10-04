@@ -1,6 +1,6 @@
 {
-  "name": "zantara-webapp",
-  "version": "1.0.0",
+  "name": "@nuzantara/webapp",
+  "version": "5.2.0",
   "description": "ZANTARA Web Interface - Bali Zero AI Assistant",
   "main": "index.html",
   "scripts": {
