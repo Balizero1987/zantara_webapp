@@ -159,10 +159,11 @@ async function callZantaraAPI(endpoint, data, useProxy = true) {
     }
 
     const started = performance.now();
-    // Build headers: never send x-api-key from client; always include x-user-id if available
+    // Build headers: include webapp API key (temporary until backend auth bypass is deployed)
     const userId = (typeof window !== 'undefined') ? (localStorage.getItem('zantara-user-email') || '') : '';
     const headers = {
       ...API_CONFIG.headers,
+      'x-api-key': 'zantara-webapp-public-2025', // Temporary: limited external key
       ...(userId ? { 'x-user-id': userId } : {})
     };
 
