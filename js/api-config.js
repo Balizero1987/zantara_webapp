@@ -163,7 +163,7 @@ async function callZantaraAPI(endpoint, data, useProxy = true) {
     const userId = (typeof window !== 'undefined') ? (localStorage.getItem('zantara-user-email') || '') : '';
     const headers = {
       ...API_CONFIG.headers,
-      'x-api-key': 'zantara-webapp-public-2025', // Temporary: limited external key
+      'x-api-key': 'zantara-external-dev-key-2025', // Temporary: using default external key
       ...(userId ? { 'x-user-id': userId } : {})
     };
 
