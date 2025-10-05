@@ -7,8 +7,8 @@ const API_CONFIG = {
   // Proxy/BFF endpoints (server-side adds x-api-key, client sends x-user-id)
   proxy: {
     production: {
-      // CORRECTED 2025-10-03 06:30: Using actual deployed Cloud Run URL
-      base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app',
+      // CORRECTED 2025-10-05: Using ACTUAL deployed Cloud Run URL (fixed wrong ID)
+      base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://zantara-v520-nuzantara-1064094238013.europe-west1.run.app',
       call: '/call',
       ai: '/ai.chat',
       aiStream: '/ai.chat.stream',
@@ -19,7 +19,7 @@ const API_CONFIG = {
   },
   // Direct endpoints (Cloud Run) — used only when explicitly forced in dev
   production: {
-    base: 'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app',
+    base: 'https://zantara-v520-nuzantara-1064094238013.europe-west1.run.app',
     call: '/call',
     health: '/health'
   },
