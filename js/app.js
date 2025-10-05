@@ -477,20 +477,15 @@ class ZantaraApp {
         return this.renderAssistantReply(this.formatPricing(res));
       }
 
-      // Default to ai.chat (specify a safe default model)
+      // Default to webapp.chat (public endpoint, no API key required)
       let res;
       try {
-        const system = this.buildSystemPrompt({ ...profile, lang: msgLang });
-        res = await api.call('/call', { key: 'ai.chat', params: { prompt: text, model: 'gpt-4o-mini', system, target_language: msgLang } }, true);
+        res = await api.call('/call', { key: 'webapp.chat', params: { message: text } }, true);
       } catch (e) {
-        // Fallback if model not available
+        // Fallback error handling
         const msg = String(e && e.message || e || '');
-        if (/model .* does not exist|not\s+exist|unknown model|404/i.test(msg)) {
-          const system = this.buildSystemPrompt({ ...profile, lang: msgLang });
-          res = await api.call('/call', { key: 'ai.chat', params: { prompt: text, model: 'gpt-4o', system, target_language: msgLang } }, true);
-        } else {
-          throw e;
-        }
+        console.error('webapp.chat error:', msg);
+        throw e;
       }
       this.hideTypingIndicator();
       let out = this.extractReply(res) || 'OK.';
