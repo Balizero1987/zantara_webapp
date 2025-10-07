@@ -102,8 +102,19 @@ export class ChatComponent {
    */
   _formatMessage(content) {
     return content
+      // Headers (must come before bold to avoid conflicts)
+      .replace(/^### (.*?)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.*?)$/gm, '<h2>$1</h2>')
+      .replace(/^# (.*?)$/gm, '<h1>$1</h1>')
+      // Lists
+      .replace(/^- (.*?)$/gm, '<li>$1</li>')
+      .replace(/^(\d+)\. (.*?)$/gm, '<li>$2</li>')
+      // Bold and italic
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      // Code blocks
+      .replace(/`(.*?)`/g, '<code>$1</code>')
+      // Line breaks
       .replace(/\n/g, '<br>');
   }
 
