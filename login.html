@@ -3,665 +3,429 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZANTARA - Collaborative Intelligence</title>
-    <meta name="description" content="Zantara: Your AI companion for collaborative intelligence">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
+    <title>ZANTARA - Login</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #000000;
-            color: #ffffff;
-            overflow-x: hidden;
+        html, body {
+            background: #1e1e1e;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            height: 100%;
+            overflow: hidden;
+            transition: background 0.3s ease;
+        }
+
+        /* DAY MODE */
+        body.day-mode {
+            background: #ffffff;
+            color: #000;
+        }
+
+        /* RAINBOW BORDER ANIMATION */
+        @keyframes rainbow-border {
+            0%, 100% { border-color: #FFD700; }
+            25% { border-color: #FF0000; }
+            50% { border-color: #0000FF; }
+            75% { border-color: #00FF00; }
+        }
+
+        /* CONTAINER */
+        .login-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             min-height: 100vh;
+            padding: 20px;
             position: relative;
         }
 
-        body::before {
+        body.day-mode .login-wrapper::before {
             content: '';
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(
-                ellipse at 50% 30%,
-                rgba(124, 58, 237, 0.08) 0%,
-                transparent 50%
-            );
             pointer-events: none;
-            z-index: 0;
+            border: 2px solid;
+            animation: rainbow-border 8s linear infinite;
+            z-index: 5;
         }
 
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 32px 24px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .status-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 44px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 24px;
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: 600;
-            z-index: 100;
-        }
-
-        .time { letter-spacing: -0.02em; }
-
-        /* LOGO 3D EFFECT - FIORE DI LOTO VIOLA SCONTORNATO */
-        .logo-3d {
-            width: 360px;
-            height: 360px;
-            margin: 48px 0;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .logo-wrapper {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-        }
-
-        /* Logo container - solo il fiore, nessuna sfera */
-        .zan-image {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            overflow: visible;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .zan-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-            filter: drop-shadow(0 20px 40px rgba(168, 85, 247, 0.4))
-                    drop-shadow(0 10px 20px rgba(168, 85, 247, 0.3))
-                    drop-shadow(0 0 40px rgba(168, 85, 247, 0.2));
-            transition: filter 0.3s ease;
-        }
-
-        /* Enhanced glow on hover */
-        .logo-3d:hover .zan-image img {
-            filter: drop-shadow(0 25px 50px rgba(168, 85, 247, 0.6))
-                    drop-shadow(0 15px 30px rgba(168, 85, 247, 0.5))
-                    drop-shadow(0 0 60px rgba(168, 85, 247, 0.4));
-        }
-
-
-        /* Hover effect - 3D tilt */
-        .logo-3d:hover .logo-wrapper {
-            transform: rotateX(5deg) rotateY(5deg) scale(1.08);
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-
-        /* Badge */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
+        /* LOGIN CARD */
+        .login-card {
+            background: #252525;
+            border: 1px solid #3a3a3a;
             border-radius: 20px;
-            background: rgba(168, 85, 247, 0.15);
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            font-size: 14px;
-            font-weight: 500;
-            color: #a855f7;
-            margin-bottom: 24px;
-        }
-
-        .badge-icon {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #a855f7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-        }
-
-        /* Typography */
-        .brand-name {
-            font-family: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 64px;
-            font-weight: 900;
-            letter-spacing: 0.05em;
-            line-height: 1;
+            padding: 48px;
+            max-width: 480px;
+            width: 100%;
             text-align: center;
-            margin: 24px 0 12px 0;
-            background: linear-gradient(135deg, #ffffff 0%, #a855f7 50%, #ec4899 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            position: relative;
+            z-index: 10;
+        }
+
+        body.day-mode .login-card {
+            background: #ffffff;
+            border: 2px solid #e0e0e0;
+        }
+
+        /* LOGO */
+        .logo-center {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            display: block;
+            object-fit: contain;
+            filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.4))
+                    drop-shadow(0 0 80px rgba(255, 255, 255, 0.3))
+                    drop-shadow(0 0 120px rgba(255, 255, 255, 0.2));
+            animation: glow-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% {
+                filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.4))
+                        drop-shadow(0 0 80px rgba(255, 255, 255, 0.3))
+                        drop-shadow(0 0 120px rgba(255, 255, 255, 0.2));
+            }
+            50% {
+                filter: drop-shadow(0 0 60px rgba(255, 255, 255, 0.6))
+                        drop-shadow(0 0 100px rgba(255, 255, 255, 0.4))
+                        drop-shadow(0 0 140px rgba(255, 255, 255, 0.3));
+            }
+        }
+
+        body.day-mode .logo-center {
+            filter: drop-shadow(0 0 40px rgba(0, 0, 0, 0.15))
+                    drop-shadow(0 0 80px rgba(0, 0, 0, 0.1))
+                    drop-shadow(0 0 120px rgba(0, 0, 0, 0.05));
+            animation: glow-pulse-day 3s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse-day {
+            0%, 100% {
+                filter: drop-shadow(0 0 40px rgba(0, 0, 0, 0.15))
+                        drop-shadow(0 0 80px rgba(0, 0, 0, 0.1))
+                        drop-shadow(0 0 120px rgba(0, 0, 0, 0.05));
+            }
+            50% {
+                filter: drop-shadow(0 0 60px rgba(0, 0, 0, 0.2))
+                        drop-shadow(0 0 100px rgba(0, 0, 0, 0.15))
+                        drop-shadow(0 0 140px rgba(0, 0, 0, 0.1));
+            }
+        }
+
+        /* TITLE */
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        body.day-mode h1 {
+            color: #000;
         }
 
         .powered-by {
             font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
             font-weight: 400;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.5);
-            margin-bottom: 48px;
-            letter-spacing: 0.02em;
+            margin-bottom: 40px;
         }
 
-        .powered-by a {
-            color: #a855f7;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s ease;
+        body.day-mode .powered-by {
+            color: rgba(0, 0, 0, 0.6);
         }
 
-        .powered-by a:hover {
-            color: #ec4899;
-        }
-
-        /* Login Form */
-        .login-container {
-            width: 100%;
-            max-width: 400px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 32px;
-            backdrop-filter: blur(20px) saturate(150%);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-
+        /* FORM */
         .form-group {
             margin-bottom: 20px;
+            text-align: left;
         }
 
         .form-label {
             display: block;
             font-size: 14px;
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.9);
             margin-bottom: 8px;
-            letter-spacing: 0.01em;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        body.day-mode .form-label {
+            color: rgba(0, 0, 0, 0.9);
         }
 
         .form-input {
             width: 100%;
             padding: 14px 16px;
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.05);
-            color: #ffffff;
+            border: 1px solid #3a3a3a;
+            background: #2a2a2a;
+            color: #fff;
             font-size: 16px;
             font-family: inherit;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
             outline: none;
         }
 
         .form-input:focus {
-            border-color: #a855f7;
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+            border-color: #4a4a4a;
+            background: #3a3a3a;
+        }
+
+        body.day-mode .form-input {
+            background: #f8f8f8;
+            border-color: #d0d0d0;
+            color: #000;
+        }
+
+        body.day-mode .form-input:focus {
+            border-color: #b0b0b0;
+            background: #f0f0f0;
         }
 
         .form-input::placeholder {
             color: rgba(255, 255, 255, 0.4);
         }
 
-        .form-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            font-size: 14px;
+        body.day-mode .form-input::placeholder {
+            color: rgba(0, 0, 0, 0.4);
         }
 
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: rgba(255, 255, 255, 0.7);
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .remember-me input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: #a855f7;
-        }
-
-        .forgot-password {
-            color: #a855f7;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s ease;
-        }
-
-        .forgot-password:hover {
-            color: #ec4899;
-        }
-
-        /* Buttons */
-        .btn {
+        /* BUTTON */
+        .btn-primary {
             width: 100%;
-            padding: 16px 32px;
-            border-radius: 100px;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: #3a3a3a;
+            color: #fff;
             font-size: 16px;
             font-weight: 600;
-            text-align: center;
-            text-decoration: none;
-            letter-spacing: 0.01em;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            border: none;
-            font-family: inherit;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-            color: #ffffff;
-            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            box-shadow: 0 6px 30px rgba(168, 85, 247, 0.6);
-            transform: translateY(-2px);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 24px 0;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 14px;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .signup-link {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .signup-link a {
-            color: #a855f7;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s ease;
-        }
-
-        .signup-link a:hover {
-            color: #ec4899;
-        }
-
-        /* Quick access chips */
-        .quick-access {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .quick-chip {
-            padding: 6px 14px;
-            background: rgba(168, 85, 247, 0.15);
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            border-radius: 20px;
-            font-size: 13px;
-            color: #a855f7;
             cursor: pointer;
             transition: all 0.2s;
-            font-weight: 500;
+            margin-top: 24px;
         }
 
-        .quick-chip:hover {
-            background: rgba(168, 85, 247, 0.3);
-            border-color: #a855f7;
-            transform: scale(1.05);
+        .btn-primary:hover {
+            background: #4a4a4a;
         }
 
-        /* Loading spinner */
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 16px;
+        body.day-mode .btn-primary {
+            background: #000;
+            color: #fff;
         }
 
-        .loading.show {
-            display: block;
+        body.day-mode .btn-primary:hover {
+            background: #2a2a2a;
         }
 
-        .spinner {
-            display: inline-block;
+        /* THEME TOGGLE */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #3a3a3a;
+            border: 1px solid #4a4a4a;
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+            z-index: 100;
+        }
+
+        .theme-toggle:hover {
+            background: #4a4a4a;
+        }
+
+        body.day-mode .theme-toggle {
+            background: #f0f0f0;
+            border-color: #d0d0d0;
+            color: #000;
+        }
+
+        /* INTEGRATIONS BAR */
+        .integrations-bar {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #3a3a3a;
+        }
+
+        body.day-mode .integrations-bar {
+            border-top-color: #e0e0e0;
+        }
+
+        .integrations-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 12px;
+        }
+
+        body.day-mode .integrations-label {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .integration-groups {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .integration-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+        }
+
+        body.day-mode .integration-group {
+            background: #f8f8f8;
+            border-color: #d0d0d0;
+        }
+
+        .integration-group-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-right: 4px;
+            min-width: 50px;
+        }
+
+        body.day-mode .integration-group-label {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .integration-logo {
             width: 20px;
             height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-top-color: #a855f7;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            object-fit: contain;
+            opacity: 0.8;
+            transition: opacity 0.2s, transform 0.2s;
+            cursor: pointer;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            .container {
-                padding: 24px 20px;
-            }
-            .title {
-                font-size: 42px;
-            }
-            .subtitle {
-                font-size: 16px;
-            }
-            .logo-3d {
-                width: 240px;
-                height: 240px;
-            }
-            .brand-name {
-                font-size: 48px;
-            }
-            .login-container {
-                padding: 24px;
-            }
-        }
-
-        .btn:focus, .form-input:focus {
-            outline: 2px solid #a855f7;
-            outline-offset: 2px;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-
-        ::selection {
-            background: rgba(168, 85, 247, 0.3);
-            color: #ffffff;
+        .integration-logo:hover {
+            opacity: 1;
+            transform: scale(1.1);
         }
     </style>
 </head>
 <body>
-    <div class="status-bar">
-        <span class="time" id="currentTime">9:41</span>
-        <div style="display: flex; gap: 6px;">
-            <span>📶</span>
-            <span>📡</span>
-            <span>🔋</span>
-        </div>
-    </div>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <span id="themeIcon">🌙</span>
+        <span id="themeText">Night</span>
+    </button>
 
-    <div class="container">
-        <!-- LOGO 3D - FIORE DI LOTO VIOLA -->
-        <div class="logo-3d" id="logo3d">
-            <div class="logo-wrapper">
-                <div class="zan-image">
-                    <img src="zantara_logo_transparent.png"
-                         alt="Zantara - Lotus Flower"
-                         onerror="this.style.display='none'">
-                </div>
-            </div>
-        </div>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <img src="../../assets/logoscon.png" class="logo-center" alt="ZANTARA Logo">
 
-        <h1 class="brand-name">ZANTARA</h1>
+            <h1>Welcome to Zantara</h1>
+            <p class="powered-by">powered by Zero AI</p>
 
-        <p class="powered-by">
-            Powered by <a href="https://balizero.com" target="_blank">Bali Zero</a>
-        </p>
-
-        <!-- LOGIN FORM -->
-        <div class="login-container">
             <form id="loginForm">
                 <div class="form-group">
                     <label class="form-label" for="email">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        class="form-input"
-                        placeholder="your@email.com"
-                        required
-                    >
+                    <input type="email" id="email" class="form-input" placeholder="your@email.com" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label" for="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        class="form-input"
-                        placeholder="Enter your password"
-                    >
+                    <input type="password" id="password" class="form-input" placeholder="Enter your password">
                 </div>
 
-                <div class="form-footer">
-                    <label class="remember-me">
-                        <input type="checkbox" id="remember" checked>
-                        <span>Remember me</span>
-                    </label>
-                    <a href="#" class="forgot-password" onclick="handleForgotPassword(event)">Forgot password?</a>
-                </div>
-
-                <button type="submit" class="btn btn-primary" id="submitBtn">Sign In</button>
-
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                </div>
-
-                <div class="divider">or</div>
-
-                <div class="signup-link">
-                    Don't have an account? <a href="#" onclick="handleDemoAccess(event)">Try Demo Access</a>
-                </div>
+                <button type="submit" class="btn-primary">Sign In</button>
             </form>
+
+            <!-- INTEGRATIONS BAR -->
+            <div class="integrations-bar">
+                <div class="integrations-label">Integrated Services</div>
+                <div class="integration-groups">
+                    <!-- Google Workspace -->
+                    <div class="integration-group">
+                        <span class="integration-group-label">Google:</span>
+                        <img src="../../assets/logo-google-drive.png" class="integration-logo" alt="Drive" title="Google Drive">
+                        <img src="../../assets/logo-gmail.png" class="integration-logo" alt="Gmail" title="Gmail">
+                        <img src="../../assets/logo-google-calendar.png" class="integration-logo" alt="Calendar" title="Google Calendar">
+                        <img src="../../assets/logo-google-docs.png" class="integration-logo" alt="Docs" title="Google Docs">
+                        <img src="../../assets/logo-google-sheets.png" class="integration-logo" alt="Sheets" title="Google Sheets">
+                        <img src="../../assets/logo-google-slides.png" class="integration-logo" alt="Slides" title="Google Slides">
+                        <img src="../../assets/logo-google-maps.png" class="integration-logo" alt="Maps" title="Google Maps">
+                        <img src="../../assets/logo-google-analytics.png" class="integration-logo" alt="Analytics" title="Google Analytics">
+                    </div>
+
+                    <!-- Meta -->
+                    <div class="integration-group">
+                        <span class="integration-group-label">Meta:</span>
+                        <img src="../../assets/logo-whatsapp.png" class="integration-logo" alt="WhatsApp" title="WhatsApp">
+                        <img src="../../assets/logo-instagram.png" class="integration-logo" alt="Instagram" title="Instagram">
+                        <img src="../../assets/logo-facebook.png" class="integration-logo" alt="Facebook" title="Facebook">
+                    </div>
+
+                    <!-- AI Services -->
+                    <div class="integration-group">
+                        <span class="integration-group-label">AI:</span>
+                        <img src="../../assets/logo-openai.png" class="integration-logo" alt="OpenAI" title="OpenAI">
+                        <img src="../../assets/logo-claude.png" class="integration-logo" alt="Claude" title="Claude">
+                        <img src="../../assets/logo-gemini.png" class="integration-logo" alt="Gemini" title="Gemini">
+                        <img src="../../assets/logo-perplexity.png" class="integration-logo" alt="Perplexity" title="Perplexity">
+                        <img src="../../assets/logo-llama.png" class="integration-logo" alt="Llama" title="Meta Llama">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Update current time
-        function updateTime() {
-            const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
-        }
-        updateTime();
-        setInterval(updateTime, 60000);
+        // Theme toggle
+        let isDark = true;
 
-        const logo = document.getElementById('logo3d');
-        const logoWrapper = logo.querySelector('.logo-wrapper');
+        function toggleTheme() {
+            isDark = !isDark;
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+            const text = document.getElementById('themeText');
 
-        // 3D tilt effect on mouse move
-        logo.addEventListener('mousemove', (e) => {
-            const rect = logo.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-
-            const rotateX = (y - centerY) / 10;
-            const rotateY = (centerX - x) / 10;
-
-            logoWrapper.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        });
-
-        // Reset on mouse leave
-        logo.addEventListener('mouseleave', () => {
-            logoWrapper.style.transform = '';
-            logoWrapper.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-            setTimeout(() => {
-                logoWrapper.style.transition = '';
-            }, 500);
-        });
-
-        // Easter egg - 7 clicks
-        let clicks = 0;
-        let timer;
-
-        logo.addEventListener('click', () => {
-            clicks++;
-            clearTimeout(timer);
-            timer = setTimeout(() => clicks = 0, 2000);
-
-            if (clicks === 7) {
-                alert('🌸 The Lotus of Zantara blooms!\n\n"In collaboration, we find infinity." ∞');
-                clicks = 0;
-                logoWrapper.style.transform = 'rotateY(360deg) scale(1.2)';
-                logoWrapper.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)';
-                setTimeout(() => {
-                    logoWrapper.style.transform = '';
-                }, 1000);
+            if (isDark) {
+                body.classList.remove('day-mode');
+                icon.textContent = '🌙';
+                text.textContent = 'Night';
+            } else {
+                body.classList.add('day-mode');
+                icon.textContent = '☀️';
+                text.textContent = 'Day';
             }
-        });
-
-        // Set email from quick chip
-        function setEmail(email) {
-            document.getElementById('email').value = email;
-            document.getElementById('email').focus();
         }
 
         // Login form handling
-        const loginForm = document.getElementById('loginForm');
-        loginForm.addEventListener('submit', (e) => {
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
-
             const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const remember = document.getElementById('remember').checked;
-            const submitBtn = document.getElementById('submitBtn');
-            const loading = document.getElementById('loading');
 
-            // Validate email
-            if (!email || !email.includes('@')) {
-                alert('Please enter a valid email address');
-                return;
-            }
-
-            // Show loading
-            submitBtn.disabled = true;
-            loading.classList.add('show');
-
-            // Save user data to localStorage
-            const userName = email.split('@')[0].toUpperCase();
+            // Save to localStorage
             localStorage.setItem('zantara-user-email', email);
-            localStorage.setItem('zantara-user-name', userName);
-
-            if (remember) {
-                localStorage.setItem('zantara-remember', 'true');
-            }
-
-            console.log('Login successful:', { email, userName, remember });
-
-            // Redirect to chat after 1 second
-            setTimeout(() => {
-                window.location.href = 'chat.html';
-            }, 1000);
-        });
-
-        // Forgot password handler
-        function handleForgotPassword(event) {
-            event.preventDefault();
-            alert('🔐 Password Reset\n\nPlease contact your administrator at:\nadmin@balizero.com\n\nOr use the demo access below.');
-        }
-
-        // Demo access handler
-        function handleDemoAccess(event) {
-            event.preventDefault();
-
-            // Set demo credentials
-            localStorage.setItem('zantara-user-email', 'demo@zantara.com');
-            localStorage.setItem('zantara-user-name', 'DEMO');
+            localStorage.setItem('zantara-user-name', email.split('@')[0].toUpperCase());
 
             // Redirect to chat
             window.location.href = 'chat.html';
-        }
-
-        // Check if already logged in
-        window.addEventListener('load', function() {
-            const emailInput = document.getElementById('email');
-            const rememberCheckbox = document.getElementById('remember');
-            const userEmail = localStorage.getItem('zantara-user-email');
-            const rememberMe = localStorage.getItem('zantara-remember');
-
-            if (userEmail && rememberMe === 'true') {
-                // Pre-fill from saved session
-                emailInput.value = userEmail;
-                rememberCheckbox.checked = true;
-
-                // Show continue button
-                const continueBtn = document.createElement('button');
-                continueBtn.type = 'button';
-                continueBtn.className = 'btn btn-primary';
-                continueBtn.style.marginTop = '16px';
-                continueBtn.textContent = `Continue as ${userEmail}`;
-                continueBtn.onclick = () => {
-                    window.location.href = 'chat.html';
-                };
-
-                const form = document.getElementById('loginForm');
-                form.insertBefore(continueBtn, document.querySelector('.divider'));
-            } else {
-                // Default to Zero Master email for convenience
-                emailInput.value = 'zero@balizero.com';
-            }
         });
 
-        // Auto-focus email input
+        // Auto-focus email
         document.getElementById('email').focus();
     </script>
 </body>
