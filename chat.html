@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ZANTARA - Official</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <script src="js/api-config.js"></script>
   <style>
     * {
       margin: 0;
@@ -438,6 +439,34 @@
       user-select: none;
     }
 
+    /* MESSAGE STYLES */
+    .user-message {
+      color: #fff;
+    }
+
+    body.day-mode .user-message {
+      color: #000;
+      background: #e8e8e8 !important;
+    }
+
+    .ai-message {
+      color: #fff;
+    }
+
+    body.day-mode .ai-message {
+      color: #000;
+      background: #f5f5f5 !important;
+    }
+
+    .error-message {
+      color: #ff6b6b !important;
+    }
+
+    body.day-mode .error-message {
+      color: #d63031 !important;
+      background: #ffe0e0 !important;
+    }
+
     .input-area {
       padding: 16px;
       display: flex;
@@ -702,7 +731,7 @@
   <div class="app">
     <header class="header">
       <div class="header-left">
-        <img src="../../assets/logoscon.png" class="logo" alt="ZANTARA">
+        <img src="assets/logoscon.png" class="logo" alt="ZANTARA">
         <button class="sidebar-toggle" id="leftToggle">☰</button>
       </div>
 
@@ -749,7 +778,7 @@
       <div class="chat-wrapper">
         <div class="messages">
           <div class="welcome">
-            <img src="../../assets/logoscon.png" class="logo-center" alt="ZANTARA Logo">
+            <img src="assets/logoscon.png" class="logo-center" alt="ZANTARA Logo">
             <h2>Welcome to Zantara</h2>
             <p class="powered-by">powered by Zero AI</p>
           </div>
@@ -760,32 +789,32 @@
           <!-- Google Workspace -->
           <div class="integration-group">
             <span class="integration-group-label">Google:</span>
-            <img src="../../assets/logo-google-drive.png" class="integration-logo" alt="Drive" title="Google Drive">
-            <img src="../../assets/logo-gmail.png" class="integration-logo" alt="Gmail" title="Gmail">
-            <img src="../../assets/logo-google-calendar.png" class="integration-logo" alt="Calendar" title="Google Calendar">
-            <img src="../../assets/logo-google-docs.png" class="integration-logo" alt="Docs" title="Google Docs">
-            <img src="../../assets/logo-google-sheets.png" class="integration-logo" alt="Sheets" title="Google Sheets">
-            <img src="../../assets/logo-google-slides.png" class="integration-logo" alt="Slides" title="Google Slides">
-            <img src="../../assets/logo-google-maps.png" class="integration-logo" alt="Maps" title="Google Maps">
-            <img src="../../assets/logo-google-analytics.png" class="integration-logo" alt="Analytics" title="Google Analytics">
+            <img src="assets/logo-google-drive.png" class="integration-logo" alt="Drive" title="Google Drive">
+            <img src="assets/logo-gmail.png" class="integration-logo" alt="Gmail" title="Gmail">
+            <img src="assets/logo-google-calendar.png" class="integration-logo" alt="Calendar" title="Google Calendar">
+            <img src="assets/logo-google-docs.png" class="integration-logo" alt="Docs" title="Google Docs">
+            <img src="assets/logo-google-sheets.png" class="integration-logo" alt="Sheets" title="Google Sheets">
+            <img src="assets/logo-google-slides.png" class="integration-logo" alt="Slides" title="Google Slides">
+            <img src="assets/logo-google-maps.png" class="integration-logo" alt="Maps" title="Google Maps">
+            <img src="assets/logo-google-analytics.png" class="integration-logo" alt="Analytics" title="Google Analytics">
           </div>
 
           <!-- Meta -->
           <div class="integration-group">
             <span class="integration-group-label">Meta:</span>
-            <img src="../../assets/logo-whatsapp.png" class="integration-logo" alt="WhatsApp" title="WhatsApp">
-            <img src="../../assets/logo-instagram.png" class="integration-logo" alt="Instagram" title="Instagram">
-            <img src="../../assets/logo-facebook.png" class="integration-logo" alt="Facebook" title="Facebook">
+            <img src="assets/logo-whatsapp.png" class="integration-logo" alt="WhatsApp" title="WhatsApp">
+            <img src="assets/logo-instagram.png" class="integration-logo" alt="Instagram" title="Instagram">
+            <img src="assets/logo-facebook.png" class="integration-logo" alt="Facebook" title="Facebook">
           </div>
 
           <!-- AI Services -->
           <div class="integration-group">
             <span class="integration-group-label">AI:</span>
-            <img src="../../assets/logo-openai.png" class="integration-logo" alt="OpenAI" title="OpenAI">
-            <img src="../../assets/logo-claude.png" class="integration-logo" alt="Claude" title="Claude">
-            <img src="../../assets/logo-gemini.png" class="integration-logo" alt="Gemini" title="Gemini">
-            <img src="../../assets/logo-perplexity.png" class="integration-logo" alt="Perplexity" title="Perplexity">
-            <img src="../../assets/logo-llama.png" class="integration-logo" alt="Llama" title="Meta Llama">
+            <img src="assets/logo-openai.png" class="integration-logo" alt="OpenAI" title="OpenAI">
+            <img src="assets/logo-claude.png" class="integration-logo" alt="Claude" title="Claude">
+            <img src="assets/logo-gemini.png" class="integration-logo" alt="Gemini" title="Gemini">
+            <img src="assets/logo-perplexity.png" class="integration-logo" alt="Perplexity" title="Perplexity">
+            <img src="assets/logo-llama.png" class="integration-logo" alt="Llama" title="Meta Llama">
           </div>
         </div>
 
@@ -919,7 +948,7 @@
         // Clear welcome message
         messagesDiv.innerHTML = `
           <div class="welcome">
-            <img src="../../assets/logoscon.png" class="logo-center" alt="ZANTARA Logo">
+            <img src="assets/logoscon.png" class="logo-center" alt="ZANTARA Logo">
             <h2>${title}</h2>
             <p class="powered-by">Chat history loaded</p>
           </div>
@@ -950,7 +979,7 @@
     const attachBtn = document.querySelectorAll('.btn')[0]; // 📎 button
 
     // Send message
-    function sendMessage() {
+    async function sendMessage() {
       const message = inputField.value.trim();
       if (!message) return;
 
@@ -964,6 +993,7 @@
 
       // Add user message
       const userMsg = document.createElement('div');
+      userMsg.className = 'user-message';
       userMsg.style.cssText = 'padding: 12px; margin-bottom: 8px; background: #2a2a2a; border-radius: 12px; text-align: right;';
       userMsg.textContent = message;
       messagesDiv.appendChild(userMsg);
@@ -974,14 +1004,48 @@
       // Scroll to bottom
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-      // Simulate AI response
-      setTimeout(() => {
+      // Add loading indicator
+      const loadingMsg = document.createElement('div');
+      loadingMsg.className = 'ai-message';
+      loadingMsg.style.cssText = 'padding: 12px; margin-bottom: 8px; background: #3a3a3a; border-radius: 12px; opacity: 0.6;';
+      loadingMsg.textContent = '⏳ Zantara is thinking...';
+      loadingMsg.id = 'loading-msg';
+      messagesDiv.appendChild(loadingMsg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+      try {
+        // Call ZANTARA AI API
+        const response = await window.ZANTARA_API.call('/call', {
+          key: 'ai.chat',
+          params: { prompt: message }
+        }, true);
+
+        // Remove loading indicator
+        const loading = document.getElementById('loading-msg');
+        if (loading) loading.remove();
+
+        // Add AI response
         const aiMsg = document.createElement('div');
+        aiMsg.className = 'ai-message';
         aiMsg.style.cssText = 'padding: 12px; margin-bottom: 8px; background: #3a3a3a; border-radius: 12px;';
-        aiMsg.textContent = 'Message received! Zantara AI is processing your request...';
+        aiMsg.textContent = response.reply || response.message || response.text || 'Response received from Zantara AI.';
         messagesDiv.appendChild(aiMsg);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      }, 1000);
+      } catch (error) {
+        console.error('AI chat error:', error);
+
+        // Remove loading indicator
+        const loading = document.getElementById('loading-msg');
+        if (loading) loading.remove();
+
+        // Show error message
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'ai-message error-message';
+        errorMsg.style.cssText = 'padding: 12px; margin-bottom: 8px; background: #3a2a2a; border: 1px solid #f00; border-radius: 12px; color: #ff6b6b;';
+        errorMsg.textContent = '❌ Error: ' + (error.message || 'Failed to get response from Zantara AI');
+        messagesDiv.appendChild(errorMsg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
     }
 
     // Send on button click
