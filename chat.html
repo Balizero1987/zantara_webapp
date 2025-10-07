@@ -1028,7 +1028,11 @@
         const aiMsg = document.createElement('div');
         aiMsg.className = 'ai-message';
         aiMsg.style.cssText = 'padding: 12px; margin-bottom: 8px; background: #3a3a3a; border-radius: 12px;';
-        aiMsg.textContent = response.reply || response.message || response.text || 'Response received from Zantara AI.';
+
+        // Extract response from API (supports multiple formats)
+        const aiResponse = response?.data?.response || response?.reply || response?.message || response?.text || 'Response received from Zantara AI.';
+        aiMsg.textContent = aiResponse;
+
         messagesDiv.appendChild(aiMsg);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
       } catch (error) {
