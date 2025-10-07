@@ -1014,10 +1014,16 @@
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
       try {
-        // Call ZANTARA AI API
+        // Get user session
+        const userEmail = localStorage.getItem('zantara-user-email') || 'guest';
+
+        // Call ZANTARA AI API with session
         const response = await window.ZANTARA_API.call('/call', {
           key: 'ai.chat',
-          params: { prompt: message }
+          params: {
+            prompt: message,
+            sessionId: userEmail
+          }
         }, true);
 
         // Remove loading indicator
@@ -1075,6 +1081,48 @@
         }
       };
       input.click();
+    });
+    // Check if user is logged in and initialize session
+    document.addEventListener('DOMContentLoaded', () => {
+      const userEmail = localStorage.getItem('zantara-user-email');
+      const userName = localStorage.getItem('zantara-user-name');
+      const hasIntroduced = sessionStorage.getItem('zantara-introduced');
+
+      // If logged in but hasn't introduced yet, send automatic introduction
+      if (userEmail && !hasIntroduced) {
+        // Extract first name from email
+        const firstName = userEmail.split('@')[0].toLowerCase();
+
+        // Send introduction message automatically
+        setTimeout(async () => {
+          const introMessage = `Ciao, sono ${firstName}`;
+
+          try {
+            const response = await window.ZANTARA_API.call('/call', {
+              key: 'ai.chat',
+              params: {
+                prompt: introMessage,
+                sessionId: userEmail
+              }
+            }, true);
+
+            // Mark as introduced
+            sessionStorage.setItem('zantara-introduced', 'true');
+
+            console.log('✅ User introduced to ZANTARA:', firstName);
+          } catch (error) {
+            console.warn('Failed to send introduction:', error);
+          }
+        }, 1000);
+      }
+
+      // Redirect to login if not logged in
+      if (!userEmail && window.location.pathname.includes('chat.html')) {
+        console.log('No user found, redirecting to login...');
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 2000);
+      }
     });
   </script>
 </body>
