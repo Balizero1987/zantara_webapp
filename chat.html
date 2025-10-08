@@ -787,56 +787,169 @@
 
     /* MOBILE OPTIMIZATION */
     @media (max-width: 968px) {
+      /* Hide Syncra effects on mobile for performance */
+      .orb, .lightning, .particles { display: none !important; }
+
+      /* Header compatto */
       .chat-history, .articles { z-index: 999; }
-      .header { height: 56px; padding: 8px 12px; }
+      .header { height: 56px; padding: 8px 12px; gap: 8px; }
+      .header-left, .header-right { gap: 6px; }
       .logo { width: 32px; height: 32px; }
       .title { font-size: 16px; }
-      .theme-toggle { font-size: 13px; padding: 6px 12px; gap: 4px; }
-      .sidebar-toggle { width: 36px; height: 36px; font-size: 18px; }
+
+      /* Bottoni header - più grandi per touch */
+      .theme-toggle { font-size: 13px; padding: 8px 14px; gap: 6px; }
+      .login-btn, .user-btn { padding: 8px 14px; }
+      .sidebar-toggle { width: 40px; height: 40px; font-size: 20px; }
+
+      /* Dropdown posizionamento mobile */
+      .user-dropdown {
+        right: 12px;
+        top: 58px;
+        min-width: 160px;
+      }
+
+      /* Main area */
       .main { height: calc(100vh - 56px); }
+
+      /* Welcome screen */
       .logo-center { width: 80px; height: 80px; }
       .welcome h2 { font-size: 20px; }
       .powered-by { font-size: 12px; }
+
+      /* Messages area */
       .messages { padding: 12px; }
-      .integrations-bar { padding: 12px; gap: 8px; }
-      .integration-group { flex-wrap: wrap; padding: 6px 10px; }
-      .integration-group-label { font-size: 10px; min-width: 45px; }
-      .integration-logo { width: 18px; height: 18px; }
-      .input-area { padding: 12px; gap: 8px; }
-      .input { font-size: 15px; padding: 10px 12px; }
-      .btn { width: 38px; height: 38px; font-size: 18px; }
+      .user-message, .ai-message { font-size: 15px; line-height: 1.5; }
+
+      /* Integration bar - più compatto */
+      .integrations-bar {
+        padding: 10px;
+        gap: 6px;
+        max-height: 100px;
+        overflow-y: auto;
+      }
+      .integration-group {
+        flex-wrap: wrap;
+        padding: 5px 8px;
+        gap: 4px;
+      }
+      .integration-group-label { font-size: 9px; min-width: 40px; }
+      .integration-logo { width: 16px; height: 16px; }
+
+      /* Input area - touch friendly */
+      .input-area { padding: 14px 12px; gap: 10px; }
+      .input {
+        font-size: 16px; /* Prevent iOS zoom */
+        padding: 12px 14px;
+        min-height: 44px; /* iOS recommended */
+      }
+      .btn {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+
+      /* Sidebars */
       .articles, .chat-history { width: 280px; }
       .filters { gap: 6px; flex-wrap: wrap; }
-      .filter { font-size: 11px; padding: 6px 10px; }
+      .filter { font-size: 11px; padding: 8px 12px; min-height: 36px; }
       .history-item { padding: 10px; }
       .history-title { font-size: 13px; }
-      .user-message, .ai-message { font-size: 15px; }
     }
 
     @media (max-width: 480px) {
-      .header { padding: 8px 10px; }
-      .logo { width: 28px; height: 28px; }
-      .title { font-size: 14px; }
-      .theme-toggle span:last-child { display: none; }
-      .login-btn span:last-child, .user-btn span:last-child { display: none; }
-      .login-btn, .user-btn { padding: 6px 12px; margin-right: 4px; }
-      .sidebar-toggle { width: 32px; height: 32px; font-size: 16px; }
+      /* Header ultra-compatto */
+      .header { padding: 6px 8px; height: 52px; }
+      .logo { width: 26px; height: 26px; }
+      .title { font-size: 13px; }
+
+      /* Solo icone su phone */
+      .theme-toggle span:last-child,
+      .login-btn span:last-child,
+      .user-btn span:last-child { display: none; }
+
+      .theme-toggle { padding: 8px; min-width: 40px; }
+      .login-btn, .user-btn { padding: 8px; min-width: 40px; }
+      .sidebar-toggle { width: 40px; height: 40px; font-size: 18px; }
+
+      /* Dropdown full width on small screens */
+      .user-dropdown {
+        right: 8px;
+        left: 8px;
+        top: 54px;
+        min-width: auto;
+      }
+
+      /* Full width sidebars */
       .chat-history, .articles { width: 100%; max-width: 100vw; }
-      .integrations-bar { padding: 10px; }
-      .integration-group { padding: 5px 8px; }
-      .integration-logo { width: 16px; height: 16px; }
-      .integration-group-label { font-size: 9px; min-width: 40px; }
-      .input-area { padding: 10px; gap: 6px; }
-      .btn { width: 36px; height: 36px; font-size: 16px; }
-      .input { font-size: 14px; padding: 9px 10px; }
+
+      /* Integration bar nascosta di default, swipeable */
+      .integrations-bar {
+        padding: 8px;
+        max-height: 80px;
+        gap: 4px;
+      }
+      .integration-group { padding: 4px 6px; gap: 3px; }
+      .integration-logo { width: 14px; height: 14px; }
+      .integration-group-label { font-size: 8px; min-width: 35px; }
+
+      /* Input area ottimizzato */
+      .input-area { padding: 12px 10px; gap: 8px; }
+      .btn { width: 44px; height: 44px; font-size: 18px; }
+      .input {
+        font-size: 16px;
+        padding: 12px;
+        min-height: 44px;
+      }
+
+      /* Messages più leggibili */
+      .messages { padding: 10px; }
+      .user-message, .ai-message {
+        font-size: 14px;
+        padding: 10px;
+        max-width: 90%;
+      }
+
+      /* Welcome screen compatto */
+      .welcome { padding: 20px 10px; }
+      .logo-center { width: 70px; height: 70px; }
+      .welcome h2 { font-size: 18px; }
+
+      /* Filters più piccoli */
+      .filter { font-size: 10px; padding: 6px 10px; }
     }
 
     @media (max-width: 968px) and (orientation: landscape) {
+      /* Landscape: massimizza spazio verticale */
       .main { height: calc(100vh - 48px); }
-      .header { height: 48px; }
+      .header { height: 48px; padding: 6px 10px; }
       .messages { padding: 8px; }
-      .welcome { padding: 20px; }
-      .logo-center { width: 60px; height: 60px; }
+      .welcome { padding: 15px 20px; }
+      .logo-center { width: 50px; height: 50px; }
+      .welcome h2 { font-size: 16px; }
+
+      /* Nascondi integration bar in landscape */
+      .integrations-bar { display: none; }
+
+      /* Input più compatto */
+      .input-area { padding: 10px; }
+      .btn { width: 40px; height: 40px; }
+    }
+
+    /* Very small screens */
+    @media (max-width: 360px) {
+      .header { padding: 4px 6px; }
+      .header-left, .header-right { gap: 4px; }
+      .logo { width: 24px; height: 24px; }
+      .theme-toggle, .login-btn, .user-btn, .sidebar-toggle {
+        padding: 6px;
+        min-width: 36px;
+        height: 36px;
+        font-size: 16px;
+      }
+      .input { font-size: 15px; padding: 10px; }
+      .btn { width: 40px; height: 40px; }
     }
   </style>
 </head>
