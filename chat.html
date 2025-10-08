@@ -842,8 +842,8 @@
       /* Main area */
       .main { height: calc(100vh - 56px); }
 
-      /* Welcome screen */
-      .logo-center { width: 80px; height: 80px; }
+      /* Welcome screen - KEEP LOGO BIG ON MOBILE */
+      .logo-center { width: 240px; height: 240px; }
       .welcome h2 { font-size: 20px; }
       .powered-by { font-size: 12px; }
 
@@ -941,9 +941,9 @@
         max-width: 90%;
       }
 
-      /* Welcome screen compatto */
+      /* Welcome screen compatto - STILL BIG LOGO */
       .welcome { padding: 20px 10px; }
-      .logo-center { width: 70px; height: 70px; }
+      .logo-center { width: 220px; height: 220px; }
       .welcome h2 { font-size: 18px; }
 
       /* Filters più piccoli */
@@ -951,12 +951,12 @@
     }
 
     @media (max-width: 968px) and (orientation: landscape) {
-      /* Landscape: massimizza spazio verticale */
+      /* Landscape: massimizza spazio verticale - LOGO STILL BIG */
       .main { height: calc(100vh - 48px); }
       .header { height: 48px; padding: 6px 10px; }
       .messages { padding: 8px; }
       .welcome { padding: 15px 20px; }
-      .logo-center { width: 50px; height: 50px; }
+      .logo-center { width: 180px; height: 180px; }
       .welcome h2 { font-size: 16px; }
 
       /* Nascondi integration bar in landscape */
