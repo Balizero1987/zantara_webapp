@@ -690,6 +690,58 @@
     body.day-mode ::-webkit-scrollbar-thumb {
       background: #c0c0c0;
     }
+
+    /* MOBILE OPTIMIZATION */
+    @media (max-width: 968px) {
+      .chat-history, .articles { z-index: 999; }
+      .header { height: 56px; padding: 8px 12px; }
+      .logo { width: 32px; height: 32px; }
+      .title { font-size: 16px; }
+      .theme-toggle { font-size: 13px; padding: 6px 12px; gap: 4px; }
+      .sidebar-toggle { width: 36px; height: 36px; font-size: 18px; }
+      .main { height: calc(100vh - 56px); }
+      .logo-center { width: 80px; height: 80px; }
+      .welcome h2 { font-size: 20px; }
+      .powered-by { font-size: 12px; }
+      .messages { padding: 12px; }
+      .integrations-bar { padding: 12px; gap: 8px; }
+      .integration-group { flex-wrap: wrap; padding: 6px 10px; }
+      .integration-group-label { font-size: 10px; min-width: 45px; }
+      .integration-logo { width: 18px; height: 18px; }
+      .input-area { padding: 12px; gap: 8px; }
+      .input { font-size: 15px; padding: 10px 12px; }
+      .btn { width: 38px; height: 38px; font-size: 18px; }
+      .articles, .chat-history { width: 280px; }
+      .filters { gap: 6px; flex-wrap: wrap; }
+      .filter { font-size: 11px; padding: 6px 10px; }
+      .history-item { padding: 10px; }
+      .history-title { font-size: 13px; }
+      .user-message, .ai-message { font-size: 15px; }
+    }
+
+    @media (max-width: 480px) {
+      .header { padding: 8px 10px; }
+      .logo { width: 28px; height: 28px; }
+      .title { font-size: 14px; }
+      .theme-toggle span:last-child { display: none; }
+      .sidebar-toggle { width: 32px; height: 32px; font-size: 16px; }
+      .chat-history, .articles { width: 100%; max-width: 100vw; }
+      .integrations-bar { padding: 10px; }
+      .integration-group { padding: 5px 8px; }
+      .integration-logo { width: 16px; height: 16px; }
+      .integration-group-label { font-size: 9px; min-width: 40px; }
+      .input-area { padding: 10px; gap: 6px; }
+      .btn { width: 36px; height: 36px; font-size: 16px; }
+      .input { font-size: 14px; padding: 9px 10px; }
+    }
+
+    @media (max-width: 968px) and (orientation: landscape) {
+      .main { height: calc(100vh - 48px); }
+      .header { height: 48px; }
+      .messages { padding: 8px; }
+      .welcome { padding: 20px; }
+      .logo-center { width: 60px; height: 60px; }
+    }
   </style>
 </head>
 <body>
