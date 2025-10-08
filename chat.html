@@ -170,6 +170,41 @@
       color: #000;
     }
 
+    .login-btn, .user-btn {
+      background: #3a3a3a;
+      border: 1px solid #4a4a4a;
+      border-radius: 20px;
+      padding: 8px 16px;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      transition: all 0.2s;
+      margin-right: 8px;
+    }
+
+    .login-btn:hover, .user-btn:hover {
+      background: #4a4a4a;
+    }
+
+    body.day-mode .login-btn, body.day-mode .user-btn {
+      background: #f0f0f0;
+      border-color: #d0d0d0;
+      color: #000;
+    }
+
+    .user-btn {
+      background: #2a4a2a;
+      border-color: #3a5a3a;
+    }
+
+    body.day-mode .user-btn {
+      background: #e8f5e8;
+      border-color: #c0e0c0;
+    }
+
     /* MAIN LAYOUT */
     .main {
       display: grid;
@@ -724,6 +759,8 @@
       .logo { width: 28px; height: 28px; }
       .title { font-size: 14px; }
       .theme-toggle span:last-child { display: none; }
+      .login-btn span:last-child, .user-btn span:last-child { display: none; }
+      .login-btn, .user-btn { padding: 6px 12px; margin-right: 4px; }
       .sidebar-toggle { width: 32px; height: 32px; font-size: 16px; }
       .chat-history, .articles { width: 100%; max-width: 100vw; }
       .integrations-bar { padding: 10px; }
@@ -792,6 +829,14 @@
       </div>
 
       <div class="header-right">
+        <button class="user-btn" id="userBtn" style="display:none;">
+          <span id="userIcon">👤</span>
+          <span id="userName"></span>
+        </button>
+        <button class="login-btn" id="loginBtn" onclick="window.location.href='login.html'">
+          <span>🔑</span>
+          <span>Login</span>
+        </button>
         <button class="sidebar-toggle" id="rightToggle">☰</button>
         <button class="theme-toggle">
           <span>🌙</span>
@@ -968,10 +1013,31 @@
     function updateChatWrapperMargin() {
       const leftOpen = chatHistory.classList.contains('open');
       const rightOpen = articles.classList.contains('open');
+      const isMobile = window.innerWidth <= 968;
 
-      chatWrapper.style.marginLeft = leftOpen ? '280px' : '0';
-      chatWrapper.style.marginRight = rightOpen ? '280px' : '0';
+      if (!isMobile) {
+        chatWrapper.style.marginLeft = leftOpen ? '280px' : '0';
+        chatWrapper.style.marginRight = rightOpen ? '280px' : '0';
+      } else {
+        // On mobile, sidebars overlay - no margin needed
+        chatWrapper.style.marginLeft = '0';
+        chatWrapper.style.marginRight = '0';
+      }
     }
+
+    // Close sidebars when clicking on chat area (mobile only)
+    chatWrapper.addEventListener('click', () => {
+      if (window.innerWidth <= 968) {
+        if (chatHistory.classList.contains('open')) {
+          chatHistory.classList.remove('open');
+          leftToggle.textContent = '☰';
+        }
+        if (articles.classList.contains('open')) {
+          articles.classList.remove('open');
+          rightToggle.textContent = '☰';
+        }
+      }
+    });
 
     // Theme toggle functionality
     const themeToggle = document.querySelector('.theme-toggle');
@@ -1140,6 +1206,32 @@
       const userName = localStorage.getItem('zantara-user-name');
       const hasIntroduced = sessionStorage.getItem('zantara-introduced');
 
+      // Update UI based on login status
+      const loginBtn = document.getElementById('loginBtn');
+      const userBtn = document.getElementById('userBtn');
+      const userNameSpan = document.getElementById('userName');
+
+      if (userEmail) {
+        // User is logged in - show user button, hide login
+        loginBtn.style.display = 'none';
+        userBtn.style.display = 'flex';
+        userNameSpan.textContent = userName || userEmail.split('@')[0];
+
+        // Add logout functionality
+        userBtn.onclick = () => {
+          if (confirm('Vuoi fare logout?')) {
+            localStorage.removeItem('zantara-user-email');
+            localStorage.removeItem('zantara-user-name');
+            sessionStorage.removeItem('zantara-introduced');
+            window.location.reload();
+          }
+        };
+      } else {
+        // Not logged in - show login button, hide user
+        loginBtn.style.display = 'flex';
+        userBtn.style.display = 'none';
+      }
+
       // If logged in but hasn't introduced yet, send automatic introduction
       if (userEmail && !hasIntroduced) {
         // Extract first name from email
@@ -1168,13 +1260,8 @@
         }, 1000);
       }
 
-      // Redirect to login if not logged in
-      if (!userEmail && window.location.pathname.includes('chat.html')) {
-        console.log('No user found, redirecting to login...');
-        setTimeout(() => {
-          window.location.href = 'login.html';
-        }, 2000);
-      }
+      // No auto-redirect - user can use chat without login
+      // Login button is always visible in header
     });
   </script>
 </body>
