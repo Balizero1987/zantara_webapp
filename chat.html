@@ -401,7 +401,11 @@
     .messages {
       flex: 1;
       overflow-y: auto;
+      overflow-x: hidden;
       padding: 20px;
+      scroll-behavior: smooth;
+      display: flex;
+      flex-direction: column;
     }
 
     .welcome {
@@ -1238,6 +1242,22 @@
       }
     });
 
+    // Helper function to scroll messages to bottom
+    function scrollToBottom() {
+      const messagesDiv = document.querySelector('.messages');
+      if (!messagesDiv) return;
+
+      // Use requestAnimationFrame to ensure DOM is updated
+      requestAnimationFrame(() => {
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      });
+
+      // Double-check after a short delay for images/elements that take time to render
+      setTimeout(() => {
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }, 100);
+    }
+
     // Theme toggle functionality
     const themeToggle = document.querySelector('.theme-toggle');
     let isDark = true;
@@ -1319,7 +1339,7 @@
       inputField.value = '';
 
       // Scroll to bottom
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      scrollToBottom();
 
       // Add loading indicator
       const loadingMsg = document.createElement('div');
@@ -1328,7 +1348,7 @@
       loadingMsg.textContent = '⏳ Zantara is thinking...';
       loadingMsg.id = 'loading-msg';
       messagesDiv.appendChild(loadingMsg);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      scrollToBottom();
 
       try {
         // Get user session
@@ -1357,7 +1377,7 @@
         aiMsg.textContent = aiResponse;
 
         messagesDiv.appendChild(aiMsg);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        scrollToBottom();
       } catch (error) {
         console.error('AI chat error:', error);
 
@@ -1371,7 +1391,7 @@
         errorMsg.style.cssText = 'padding: 12px; margin-bottom: 8px; background: #3a2a2a; border: 1px solid #f00; border-radius: 12px; color: #ff6b6b;';
         errorMsg.textContent = '❌ Error: ' + (error.message || 'Failed to get response from Zantara AI');
         messagesDiv.appendChild(errorMsg);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        scrollToBottom();
       }
     }
 
@@ -1489,7 +1509,7 @@
               welcomeMsg.style.cssText = 'padding: 16px; margin-bottom: 12px; background: #2a4a2a; border-radius: 12px; border: 2px solid #3a5a3a; text-align: center; font-weight: 500;';
               welcomeMsg.textContent = response.data.response;
               messagesDiv.appendChild(welcomeMsg);
-              messagesDiv.scrollTop = messagesDiv.scrollHeight;
+              scrollToBottom();
 
               console.log('✅ User recognized and welcomed:', firstName);
             } else {
