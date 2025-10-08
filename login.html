@@ -445,6 +445,9 @@
             localStorage.setItem('zantara-user-email', email);
             localStorage.setItem('zantara-user-name', email.split('@')[0].toUpperCase());
 
+            // CRITICAL: Reset introduction flag on NEW login
+            sessionStorage.removeItem('zantara-introduced');
+
             // Redirect to chat
             window.location.href = 'chat.html';
         });
