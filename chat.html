@@ -205,6 +205,65 @@
       border-color: #c0e0c0;
     }
 
+    /* USER DROPDOWN MENU */
+    .user-dropdown {
+      position: absolute;
+      top: 60px;
+      right: 80px;
+      background: #2a2a2a;
+      border: 1px solid #4a4a4a;
+      border-radius: 12px;
+      padding: 8px;
+      min-width: 180px;
+      display: none;
+      z-index: 9999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    body.day-mode .user-dropdown {
+      background: #fff;
+      border-color: #d0d0d0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .user-dropdown.show {
+      display: block;
+    }
+
+    .user-dropdown-item {
+      padding: 10px 14px;
+      cursor: pointer;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      transition: background 0.2s;
+      color: #fff;
+    }
+
+    body.day-mode .user-dropdown-item {
+      color: #000;
+    }
+
+    .user-dropdown-item:hover {
+      background: #3a3a3a;
+    }
+
+    body.day-mode .user-dropdown-item:hover {
+      background: #f0f0f0;
+    }
+
+    .user-dropdown-divider {
+      height: 1px;
+      background: #3a3a3a;
+      margin: 6px 0;
+    }
+
+    body.day-mode .user-dropdown-divider {
+      background: #e0e0e0;
+    }
+
     /* MAIN LAYOUT */
     .main {
       display: grid;
@@ -845,6 +904,19 @@
       </div>
     </header>
 
+    <!-- USER DROPDOWN MENU -->
+    <div class="user-dropdown" id="userDropdown">
+      <div class="user-dropdown-item" id="profileBtn">
+        <span>👤</span>
+        <span>Profile</span>
+      </div>
+      <div class="user-dropdown-divider"></div>
+      <div class="user-dropdown-item" id="logoutBtn">
+        <span>🚪</span>
+        <span>Logout</span>
+      </div>
+    </div>
+
     <main class="main">
       <!-- LEFT: CHAT HISTORY -->
       <aside class="chat-history" id="chatHistory">
@@ -1001,12 +1073,26 @@
     leftToggle.addEventListener('click', () => {
       chatHistory.classList.toggle('open');
       leftToggle.textContent = chatHistory.classList.contains('open') ? '✕' : '☰';
+
+      // On mobile, close other sidebar when opening this one
+      if (window.innerWidth <= 968 && chatHistory.classList.contains('open')) {
+        articles.classList.remove('open');
+        rightToggle.textContent = '☰';
+      }
+
       updateChatWrapperMargin();
     });
 
     rightToggle.addEventListener('click', () => {
       articles.classList.toggle('open');
       rightToggle.textContent = articles.classList.contains('open') ? '✕' : '☰';
+
+      // On mobile, close other sidebar when opening this one
+      if (window.innerWidth <= 968 && articles.classList.contains('open')) {
+        chatHistory.classList.remove('open');
+        leftToggle.textContent = '☰';
+      }
+
       updateChatWrapperMargin();
     });
 
@@ -1215,10 +1301,31 @@
         // User is logged in - show user button, hide login
         loginBtn.style.display = 'none';
         userBtn.style.display = 'flex';
-        userNameSpan.textContent = userName || userEmail.split('@')[0];
+        userNameSpan.textContent = userName || userEmail.split('@')[0].toUpperCase();
 
-        // Add logout functionality
-        userBtn.onclick = () => {
+        // Toggle dropdown menu
+        const userDropdown = document.getElementById('userDropdown');
+        userBtn.onclick = (e) => {
+          e.stopPropagation();
+          userDropdown.classList.toggle('show');
+        };
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!userBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+            userDropdown.classList.remove('show');
+          }
+        });
+
+        // Profile button (placeholder)
+        document.getElementById('profileBtn').onclick = () => {
+          userDropdown.classList.remove('show');
+          alert(`👤 Profilo: ${userEmail}\n\n(Funzionalità in arrivo)`);
+        };
+
+        // Logout button
+        document.getElementById('logoutBtn').onclick = () => {
+          userDropdown.classList.remove('show');
           if (confirm('Vuoi fare logout?')) {
             localStorage.removeItem('zantara-user-email');
             localStorage.removeItem('zantara-user-name');
