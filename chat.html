@@ -1493,28 +1493,33 @@
             // Mark as introduced
             sessionStorage.setItem('zantara-introduced', 'true');
 
-            // Show welcome message in chat if recognized
-            if (response?.data?.recognized && response?.data?.response) {
-              const messagesDiv = document.querySelector('.messages');
+            // ALWAYS show welcome message
+            const messagesDiv = document.querySelector('.messages');
 
-              // Clear welcome screen
-              const welcome = messagesDiv.querySelector('.welcome');
-              if (welcome) {
-                messagesDiv.innerHTML = '';
-              }
+            // Clear welcome screen
+            const welcome = messagesDiv.querySelector('.welcome');
+            if (welcome) {
+              messagesDiv.innerHTML = '';
+            }
 
-              // Add system welcome message
-              const welcomeMsg = document.createElement('div');
-              welcomeMsg.className = 'ai-message';
+            // Add system welcome message
+            const welcomeMsg = document.createElement('div');
+            welcomeMsg.className = 'ai-message';
+
+            if (response?.data?.recognized) {
+              // Recognized user - green box
               welcomeMsg.style.cssText = 'padding: 16px; margin-bottom: 12px; background: #2a4a2a; border-radius: 12px; border: 2px solid #3a5a3a; text-align: center; font-weight: 500;';
               welcomeMsg.textContent = response.data.response;
-              messagesDiv.appendChild(welcomeMsg);
-              scrollToBottom();
-
               console.log('✅ User recognized and welcomed:', firstName);
             } else {
+              // Not recognized - show intro message anyway
+              welcomeMsg.style.cssText = 'padding: 16px; margin-bottom: 12px; background: #3a3a3a; border-radius: 12px; text-align: center; font-weight: 500;';
+              welcomeMsg.textContent = `Benvenuto ${userName || firstName}! ${response?.data?.response || 'Inizia a chattare con ZANTARA.'}`;
               console.log('✅ User introduced to ZANTARA:', firstName);
             }
+
+            messagesDiv.appendChild(welcomeMsg);
+            scrollToBottom();
           } catch (error) {
             console.warn('Failed to send introduction:', error);
           }
