@@ -159,11 +159,11 @@ async function callZantaraAPI(endpoint, data, useProxy = true) {
     }
 
     const started = performance.now();
-    // Build headers: include webapp API key (temporary until backend auth bypass is deployed)
+    // Build headers: NO API key needed (backend whitelists zantara.balizero.com origin)
     const userId = (typeof window !== 'undefined') ? (localStorage.getItem('zantara-user-email') || '') : '';
     const headers = {
       ...API_CONFIG.headers,
-      'x-api-key': 'zantara-external-dev-key-2025', // Temporary: using default external key
+      // No x-api-key needed - backend auth.ts:17-24 bypasses API key for webapp origin
       ...(userId ? { 'x-user-id': userId } : {})
     };
 
