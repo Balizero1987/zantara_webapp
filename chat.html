@@ -1380,12 +1380,13 @@
         // Get user session
         const userEmail = localStorage.getItem('zantara-user-email') || 'guest';
 
-        // Call ZANTARA AI API with session
+        // Call ZANTARA AI API with session (RAG + Tool Use enabled)
         const response = await window.ZANTARA_API.call('/call', {
-          key: 'ai.chat',
+          key: 'bali.zero.chat',
           params: {
-            prompt: message,
-            sessionId: userEmail
+            query: message,
+            user_email: userEmail,  // For user recognition
+            user_role: 'member'
           }
         }, true);
 
@@ -1509,10 +1510,11 @@
 
           try {
             const response = await window.ZANTARA_API.call('/call', {
-              key: 'ai.chat',
+              key: 'bali.zero.chat',
               params: {
-                prompt: introMessage,
-                sessionId: userEmail
+                query: introMessage,
+                user_email: userEmail,  // For user recognition
+                user_role: 'member'
               }
             }, true);
 
