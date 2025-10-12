@@ -2,11 +2,15 @@
  * Chat Component
  *
  * Handles chat UI rendering and interactions.
+ * Now supports both legacy API and new Gateway.
  */
 
 import DOMPurify from 'dompurify';
 import { apiClient } from '../core/api-client.js';
+import { gatewayClient } from '../core/gateway-client.js';
 import { stateManager } from '../core/state-manager.js';
+import { config } from '../config.js';
+import { jwtService } from '../auth/jwt-service.js';
 
 export class ChatComponent {
   constructor(container) {
@@ -14,6 +18,8 @@ export class ChatComponent {
     this.messagesContainer = null;
     this.inputField = null;
     this.sendButton = null;
+    this.useGateway = config.features.useGateway;
+    this.gatewayInitialized = false;
 
     this._setupEventListeners();
   }
@@ -21,10 +27,55 @@ export class ChatComponent {
   /**
    * Initialize component
    */
-  init() {
+  async init() {
     this.render();
     this._subscribeToState();
     this._scrollToBottom();
+
+    // Initialize gateway if enabled
+    if (this.useGateway) {
+      await this._initializeGateway();
+    }
+  }
+
+  /**
+   * Initialize gateway session
+   * @private
+   */
+  async _initializeGateway() {
+    try {
+      // Try to restore existing session
+      if (gatewayClient.restoreSession()) {
+        console.log('✅ Gateway session restored');
+        this.gatewayInitialized = true;
+        this._showSystemMessage('Gateway session restored');
+        return;
+      }
+
+      // Bootstrap new session
+      const user = jwtService.getUser();
+      const userEmail = user?.email || 'guest@zantara.io';
+
+      await gatewayClient.bootstrap(userEmail);
+      this.gatewayInitialized = true;
+
+      console.log('✅ Gateway session initialized');
+      this._showSystemMessage('Connected via Gateway API');
+
+    } catch (error) {
+      console.error('❌ Gateway initialization failed:', error);
+      this._showSystemMessage('Gateway unavailable, using legacy API');
+      this.useGateway = false;
+    }
+  }
+
+  /**
+   * Show system message
+   * @private
+   */
+  _showSystemMessage(text) {
+    // Optional: show system messages in UI
+    console.log(`[SYSTEM] ${text}`);
   }
 
   /**
@@ -66,10 +117,15 @@ export class ChatComponent {
     const messages = stateManager.state.messages;
 
     if (messages.length === 0) {
+      const apiMode = this.useGateway ? 'Gateway' : 'Legacy';
       return `
         <div class="empty-state">
           <h2>Welcome to ZANTARA</h2>
           <p>Start a conversation to get assistance with your needs.</p>
+          <small style="color: #888; margin-top: 10px; display: block;">
+            API Mode: ${apiMode}
+            ${this.useGateway ? '✨' : ''}
+          </small>
         </div>
       `;
     }
@@ -86,11 +142,29 @@ export class ChatComponent {
       ? '<svg class="user-icon"><!-- User icon --></svg>'
       : '<img src="public/images/zantara-logo.jpeg" alt="ZANTARA" class="assistant-avatar">';
 
+    // Show sources if available (gateway response)
+    const sourcesHtml = message.sources && message.sources.length > 0
+      ? `<div class="message-sources">
+          <details>
+            <summary>📚 ${message.sources.length} sources</summary>
+            <ul>
+              ${message.sources.map(s => `
+                <li>
+                  <strong>${s.title || 'Document'}</strong>
+                  <span class="source-score">Score: ${(s.score || 0).toFixed(2)}</span>
+                </li>
+              `).join('')}
+            </ul>
+          </details>
+        </div>`
+      : '';
+
     return `
       <div class="message ${isUser ? 'user-message' : 'assistant-message'}">
         <div class="message-avatar">${avatar}</div>
         <div class="message-content">
           <div class="message-text">${this._formatMessage(message.content)}</div>
+          ${sourcesHtml}
           <div class="message-timestamp">${this._formatTime(message.timestamp)}</div>
         </div>
       </div>
@@ -195,26 +269,96 @@ export class ChatComponent {
     stateManager.setTyping(true);
 
     try {
-      // Call API
-      const response = await apiClient.call('ai.chat', {
-        message: text,
-        history: stateManager.state.messages.slice(-10),
-      });
-
-      // Add assistant response
-      stateManager.addMessage({
-        role: 'assistant',
-        content: response.result || response.message || 'No response',
-      });
+      if (this.useGateway && this.gatewayInitialized) {
+        await this._sendViaGateway(text);
+      } else {
+        await this._sendViaLegacy(text);
+      }
     } catch (error) {
       console.error('Chat error:', error);
       stateManager.addMessage({
         role: 'assistant',
-        content: `Error: ${error.message}`,
+        content: `❌ Error: ${error.message}`,
       });
     } finally {
       stateManager.setTyping(false);
     }
+  }
+
+  /**
+   * Send message via gateway
+   * @private
+   */
+  async _sendViaGateway(text) {
+    const history = stateManager.state.messages
+      .slice(-10)
+      .map(m => ({ role: m.role, content: m.content }));
+
+    const result = await gatewayClient.sendChat(text, history);
+
+    if (!result.ok) {
+      throw new Error(result.message || 'Gateway request failed');
+    }
+
+    // Process patches
+    this._applyPatches(result.patches || []);
+  }
+
+  /**
+   * Apply gateway patches to state
+   * @private
+   */
+  _applyPatches(patches) {
+    let assistantMessage = null;
+    let sources = null;
+
+    patches.forEach(patch => {
+      switch (patch.op) {
+        case 'append':
+          if (patch.target === 'timeline' && patch.data.role === 'assistant') {
+            assistantMessage = patch.data.content;
+          }
+          break;
+
+        case 'set':
+          if (patch.target === 'sources') {
+            sources = patch.data;
+          }
+          break;
+
+        case 'notify':
+          console.log(`[${patch.level}] ${patch.message}`);
+          break;
+      }
+    });
+
+    // Add assistant message with sources
+    if (assistantMessage) {
+      stateManager.addMessage({
+        role: 'assistant',
+        content: assistantMessage,
+        sources: sources || [],
+      });
+    }
+  }
+
+  /**
+   * Send message via legacy API
+   * @private
+   */
+  async _sendViaLegacy(text) {
+    const history = stateManager.state.messages.slice(-10);
+
+    const response = await apiClient.call('ai.chat', {
+      message: text,
+      history: history,
+    });
+
+    // Add assistant response
+    stateManager.addMessage({
+      role: 'assistant',
+      content: response.result || response.message || 'No response',
+    });
   }
 
   /**
@@ -248,12 +392,11 @@ export class ChatComponent {
   }
 
   /**
-   * Destroy component
+   * Toggle API mode (for testing)
    */
-  destroy() {
-    // Cleanup event listeners
-    this.container.innerHTML = '';
+  toggleGateway() {
+    this.useGateway = !this.useGateway;
+    localStorage.setItem('feature_gateway', this.useGateway.toString());
+    location.reload();
   }
 }
-
-export default ChatComponent;
