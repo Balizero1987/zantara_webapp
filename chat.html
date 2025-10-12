@@ -490,11 +490,13 @@
       overflow-y: auto;
       overflow-x: hidden;
       padding: 20px;
-      padding-bottom: 100px;
+      padding-bottom: 150px;
       scroll-behavior: smooth;
       display: flex;
       flex-direction: column;
       min-height: 0;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
 
     .welcome {
@@ -645,6 +647,9 @@
     /* MESSAGE STYLES */
     .user-message {
       color: #fff;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
     }
 
     body.day-mode .user-message {
@@ -654,6 +659,9 @@
 
     .ai-message {
       color: #fff;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
     }
 
     body.day-mode .ai-message {
