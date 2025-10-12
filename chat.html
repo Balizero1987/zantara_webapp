@@ -6,6 +6,91 @@
   <title>ZANTARA - Official</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <script src="js/api-config.js"></script>
+  <script>
+    // Gateway API Client (inline for chat.html)
+    // Feature flag: localStorage.setItem('use_gateway', 'true') to enable
+    const GatewayAPI = (() => {
+      let session = null;
+      const GATEWAY_BASE = 'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app';
+
+      async function bootstrap(user = 'guest') {
+        try {
+          const resp = await fetch(`${GATEWAY_BASE}/app/bootstrap`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user, origin: 'webapp' })
+          });
+          if (!resp.ok) throw new Error(`Bootstrap failed: ${resp.status}`);
+          const data = await resp.json();
+          if (data.ok) {
+            session = {
+              sessionId: data.data.sessionId,
+              csrfToken: data.data.csrfToken,
+              flags: data.data.flags || {}
+            };
+            console.log('✅ Gateway session initialized:', session.sessionId);
+            return session;
+          }
+          throw new Error('Bootstrap response not ok');
+        } catch (err) {
+          console.warn('Gateway bootstrap failed, falling back to legacy API:', err);
+          return null;
+        }
+      }
+
+      async function sendEvent(action, payload, meta = {}) {
+        if (!session) {
+          throw new Error('Gateway session not initialized');
+        }
+
+        const idempotencyKey = `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+
+        try {
+          const resp = await fetch(`${GATEWAY_BASE}/app/event`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-csrf-token': session.csrfToken
+            },
+            body: JSON.stringify({
+              sessionId: session.sessionId,
+              action,
+              idempotencyKey,
+              payload,
+              meta
+            })
+          });
+
+          if (!resp.ok) throw new Error(`Event failed: ${resp.status}`);
+          const data = await resp.json();
+          return data;
+        } catch (err) {
+          console.error('Gateway event error:', err);
+          throw err;
+        }
+      }
+
+      async function sendChat(query, conversationHistory = []) {
+        return await sendEvent('chat_send', {
+          query,
+          conversation_history: conversationHistory
+        }, {
+          channel: 'webapp',
+          user: localStorage.getItem('zantara-user-email') || 'guest'
+        });
+      }
+
+      function isEnabled() {
+        try {
+          return localStorage.getItem('use_gateway') === 'true';
+        } catch {
+          return false;
+        }
+      }
+
+      return { bootstrap, sendEvent, sendChat, isEnabled, getSession: () => session };
+    })();
+  </script>
   <style>
     * {
       margin: 0;
@@ -1273,15 +1358,22 @@
       const messagesDiv = document.querySelector('.messages');
       if (!messagesDiv) return;
 
+      // Immediate scroll
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
       // Use requestAnimationFrame to ensure DOM is updated
       requestAnimationFrame(() => {
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
       });
 
-      // Double-check after a short delay for images/elements that take time to render
+      // Double-check after delays for images/elements that take time to render
       setTimeout(() => {
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      }, 100);
+      }, 50);
+
+      setTimeout(() => {
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }, 200);
     }
 
     // Theme toggle functionality
@@ -1380,15 +1472,50 @@
         // Get user session
         const userEmail = localStorage.getItem('zantara-user-email') || 'guest';
 
-        // Call ZANTARA AI API with session (RAG + Tool Use enabled)
-        const response = await window.ZANTARA_API.call('/call', {
-          key: 'bali.zero.chat',
-          params: {
-            query: message,
-            user_email: userEmail,  // For user recognition
-            user_role: 'member'
+        let response;
+        let aiResponse;
+
+        // Check if gateway is enabled
+        if (GatewayAPI.isEnabled() && GatewayAPI.getSession()) {
+          // Use Gateway API
+          const history = Array.from(messagesDiv.querySelectorAll('.user-message, .ai-message'))
+            .filter(el => !el.id || el.id !== 'loading-msg')
+            .slice(-10)
+            .map(el => ({
+              role: el.classList.contains('user-message') ? 'user' : 'assistant',
+              content: el.textContent
+            }));
+
+          response = await GatewayAPI.sendChat(message, history);
+
+          // Handle patch-based response
+          if (response.ok && response.patches) {
+            aiResponse = '';
+            response.patches.forEach(patch => {
+              if (patch.op === 'append' && patch.target === 'timeline' && patch.data?.role === 'assistant') {
+                aiResponse = patch.data.content;
+              } else if (patch.op === 'set' && patch.target === 'response') {
+                aiResponse = patch.data;
+              }
+            });
+            if (!aiResponse) aiResponse = 'Response received from Zantara AI (Gateway).';
+          } else {
+            aiResponse = response?.message || 'Response received from Zantara AI (Gateway).';
           }
-        }, true);
+        } else {
+          // Use Legacy API
+          response = await window.ZANTARA_API.call('/call', {
+            key: 'bali.zero.chat',
+            params: {
+              query: message,
+              user_email: userEmail,
+              user_role: 'member'
+            }
+          }, true);
+
+          // Extract response from API (supports multiple formats)
+          aiResponse = response?.data?.response || response?.reply || response?.message || response?.text || 'Response received from Zantara AI.';
+        }
 
         // Remove loading indicator
         const loading = document.getElementById('loading-msg');
@@ -1398,9 +1525,6 @@
         const aiMsg = document.createElement('div');
         aiMsg.className = 'ai-message';
         aiMsg.style.cssText = 'padding: 12px; margin-bottom: 8px; background: #3a3a3a; border-radius: 12px;';
-
-        // Extract response from API (supports multiple formats)
-        const aiResponse = response?.data?.response || response?.reply || response?.message || response?.text || 'Response received from Zantara AI.';
         aiMsg.textContent = aiResponse;
 
         messagesDiv.appendChild(aiMsg);
@@ -1447,10 +1571,16 @@
       input.click();
     });
     // Check if user is logged in and initialize session
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       const userEmail = localStorage.getItem('zantara-user-email');
       const userName = localStorage.getItem('zantara-user-name');
       const hasIntroduced = sessionStorage.getItem('zantara-introduced');
+
+      // Initialize Gateway API session if enabled
+      if (GatewayAPI.isEnabled()) {
+        console.log('🚀 Gateway mode enabled - bootstrapping session...');
+        await GatewayAPI.bootstrap(userEmail || 'guest');
+      }
 
       // Update UI based on login status
       const loginBtn = document.getElementById('loginBtn');
