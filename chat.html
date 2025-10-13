@@ -560,20 +560,36 @@
     /* MESSAGE STYLES */
     .user-message {
       color: #fff;
+      background: #2f7bd6 !important; /* ChatGPT blue */
+      padding: 10px 14px;
+      border-radius: 18px;
+      margin-bottom: 8px;
+      margin-left: auto;
+      max-width: fit-content;
+      word-wrap: break-word;
+      align-self: flex-end;
     }
 
     body.day-mode .user-message {
-      color: #000;
-      background: #e8e8e8 !important;
+      color: #fff;
+      background: #2f7bd6 !important;
     }
 
     .ai-message {
       color: #fff;
+      margin-bottom: 12px;
+      margin-right: auto;
+      max-width: 85%;
+      word-wrap: break-word;
+      align-self: flex-start;
+      background: none;
+      padding: 0;
+      border-radius: 0;
     }
 
     body.day-mode .ai-message {
       color: #000;
-      background: #f5f5f5 !important;
+      background: none !important;
     }
 
     .error-message {
@@ -630,6 +646,58 @@
     .btn:hover {
       color: rgba(232, 64, 255, 1);
       text-shadow: 0 0 20px rgba(232, 64, 255, 0.8);
+    }
+
+    /* MODE SELECTOR - ChatGPT Style */
+    .mode-selector {
+      display: flex;
+      gap: 0;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 2px;
+      margin: 0 8px;
+    }
+
+    .mode-btn {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .mode-btn.active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .mode-btn:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    body.day-mode .mode-selector {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    body.day-mode .mode-btn {
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    body.day-mode .mode-btn.active {
+      background: rgba(0, 0, 0, 0.1);
+      color: #000;
+    }
+
+    body.day-mode .mode-btn:hover:not(.active) {
+      background: rgba(0, 0, 0, 0.06);
+      color: rgba(0, 0, 0, 0.8);
     }
 
     /* RIGHT SIDEBAR */
@@ -1134,6 +1202,11 @@
           <button class="btn">📎</button>
           <input type="text" class="input" placeholder="Type a message...">
           <button class="btn">🎤</button>
+          <!-- Mode Selector - ChatGPT Style -->
+          <div class="mode-selector">
+            <button class="mode-btn active" data-mode="ngobrol">Ngobrol</button>
+            <button class="mode-btn" data-mode="mendalam">Mendalam</button>
+          </div>
           <button class="btn">➤</button>
         </div>
       </div>
@@ -1336,9 +1409,27 @@
       });
     });
 
+    // ZANTARA Mode Management - ChatGPT Style
+    let currentMode = 'ngobrol'; // Default mode
+
+    // Mode selector functionality
+    const modeButtons = document.querySelectorAll('.mode-btn');
+
+    modeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Remove active from all buttons
+        modeButtons.forEach(b => b.classList.remove('active'));
+        // Add active to clicked button
+        btn.classList.add('active');
+        // Update current mode
+        currentMode = btn.dataset.mode;
+        console.log(`💭 Mode: ${currentMode === 'ngobrol' ? 'Ngobrol (casual chat)' : 'Mendalam (deep thinking)'}`);
+      });
+    });
+
     // Input buttons functionality
     const inputField = document.querySelector('.input');
-    const sendBtn = document.querySelectorAll('.btn')[2]; // ➤ button
+    const sendBtn = document.querySelectorAll('.btn')[3]; // ➤ button (now index 3 because of mode selector)
     const attachBtn = document.querySelectorAll('.btn')[0]; // 📎 button
 
     // Send message
@@ -1357,7 +1448,6 @@
       // Add user message
       const userMsg = document.createElement('div');
       userMsg.className = 'user-message';
-      userMsg.style.cssText = 'padding: 12px; margin-bottom: 8px; background: #2a2a2a; border-radius: 12px; text-align: right;';
       userMsg.textContent = message;
       messagesDiv.appendChild(userMsg);
 
@@ -1369,9 +1459,9 @@
 
       // Add loading indicator
       const loadingMsg = document.createElement('div');
-      loadingMsg.className = 'ai-message';
-      loadingMsg.style.cssText = 'padding: 12px; margin-bottom: 8px; background: #3a3a3a; border-radius: 12px; opacity: 0.6;';
+      loadingMsg.className = 'ai-message loading';
       loadingMsg.textContent = '⏳ Zantara is thinking...';
+      loadingMsg.style.opacity = '0.6';
       loadingMsg.id = 'loading-msg';
       messagesDiv.appendChild(loadingMsg);
       scrollToBottom();
@@ -1397,7 +1487,6 @@
         // Add AI response
         const aiMsg = document.createElement('div');
         aiMsg.className = 'ai-message';
-        aiMsg.style.cssText = 'padding: 12px; margin-bottom: 8px; background: #3a3a3a; border-radius: 12px;';
 
         // Extract response from API (supports multiple formats)
         const aiResponse = response?.data?.response || response?.reply || response?.message || response?.text || 'Response received from Zantara AI.';
@@ -1415,7 +1504,6 @@
         // Show error message
         const errorMsg = document.createElement('div');
         errorMsg.className = 'ai-message error-message';
-        errorMsg.style.cssText = 'padding: 12px; margin-bottom: 8px; background: #3a2a2a; border: 1px solid #f00; border-radius: 12px; color: #ff6b6b;';
         errorMsg.textContent = '❌ Error: ' + (error.message || 'Failed to get response from Zantara AI');
         messagesDiv.appendChild(errorMsg);
         scrollToBottom();
