@@ -531,7 +531,7 @@
 
                 <div class="config-section">
                     <h3>⚙️ Configuration</h3>
-                    <input type="text" class="config-input" id="apiBase" placeholder="API Base URL" value="http://localhost:8080">
+                    <input type="text" class="config-input" id="apiBase" placeholder="API Base URL" value="https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app">
                     <input type="text" class="config-input" id="apiKey" placeholder="API Key" value="zantara-internal-dev-key-2025">
                     <button class="tool-btn" onclick="saveConfig()">💾 Save Config</button>
                     <button class="tool-btn" onclick="testConnection()">🔌 Test Connection</button>
@@ -542,7 +542,7 @@
 
     <script>
         const PRIVATE_TOKEN = 'devai-zantara-2025-private-access';
-        let API_BASE = localStorage.getItem('devai_api_base') || 'http://localhost:8080';
+        let API_BASE = localStorage.getItem('devai_api_base') || 'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app';
         let API_KEY = localStorage.getItem('devai_api_key') || 'zantara-internal-dev-key-2025';
 
         // Initialize config inputs
