@@ -610,17 +610,21 @@
             document.getElementById('sendBtn').disabled = true;
 
             try {
-                const response = await fetch(`${API_BASE}/api/devai.chat`, {
+                const response = await fetch(`${API_BASE}/call`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`
+                        'x-api-key': API_KEY
                     },
-                    body: JSON.stringify({ message })
+                    body: JSON.stringify({ 
+                        handler: 'devai.chat',
+                        params: { message }
+                    })
                 });
 
                 const data = await response.json();
-                addMessage('assistant', data.response || data.answer || 'Risposta ricevuta');
+                const answer = data.data?.answer || data.answer || data.response || 'Risposta ricevuta';
+                addMessage('assistant', answer);
             } catch (error) {
                 addMessage('system', `❌ Errore: ${error.message}`);
             } finally {
@@ -654,17 +658,21 @@
         async function testConnection() {
             addMessage('system', '🔌 Test connessione...');
             try {
-                const response = await fetch(`${API_BASE}/api/devai.chat`, {
+                const response = await fetch(`${API_BASE}/call`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`
+                        'x-api-key': API_KEY
                     },
-                    body: JSON.stringify({ message: 'Test', max_tokens: 10 })
+                    body: JSON.stringify({ 
+                        handler: 'devai.chat',
+                        params: { message: 'Test', max_tokens: 10 }
+                    })
                 });
 
                 if (response.ok) {
-                    addMessage('system', '✅ Connessione riuscita!');
+                    const data = await response.json();
+                    addMessage('system', '✅ Connessione riuscita! DevAI risponde: ' + (data.data?.answer || 'OK'));
                 } else {
                     addMessage('system', '⚠️ Connessione fallita: ' + response.status);
                 }
