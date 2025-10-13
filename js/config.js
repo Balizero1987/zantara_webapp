@@ -11,10 +11,6 @@ export const config = {
     // Updated to point to new RAG backend with mock auth (2025-10-02)
     baseUrl: import.meta.env?.VITE_API_BASE_URL || 'https://zantara-rag-backend-1064094238013.europe-west1.run.app',
     proxyUrl: import.meta.env?.VITE_PROXY_URL || 'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app',
-
-    // Gateway endpoints (new - 2025-10-12)
-    gatewayUrl: import.meta.env?.VITE_GATEWAY_URL || 'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app',
-
     timeout: 30000,
     retryAttempts: 3,
     retryDelay: 1000,
@@ -34,16 +30,6 @@ export const config = {
     voice: import.meta.env?.VITE_ENABLE_VOICE !== 'false',
     virtualization: import.meta.env?.VITE_ENABLE_VIRTUALIZATION !== 'false',
     analytics: true,
-
-    // Gateway feature flag (default: false for gradual rollout)
-    // Enable with: localStorage.setItem('feature_gateway', 'true')
-    useGateway: (() => {
-      try {
-        return localStorage.getItem('feature_gateway') === 'true';
-      } catch {
-        return false;
-      }
-    })(),
   },
 
   // Session Configuration
@@ -58,5 +44,11 @@ export const config = {
   isProduction: import.meta.env?.VITE_APP_ENV === 'production',
 };
 
-// Don't freeze config to allow runtime feature flag checks
+// Freeze config to prevent modifications
+Object.freeze(config);
+Object.freeze(config.api);
+Object.freeze(config.auth);
+Object.freeze(config.features);
+Object.freeze(config.session);
+
 export default config;

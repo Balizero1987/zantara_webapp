@@ -3,162 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZANTARA - AI Assistant</title>
+    <title>BALI ZERO AI - Welcome</title>
     <link rel="icon" type="image/jpeg" href="public/images/zantara-logo.jpeg">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#9B59B6">
-    <meta name="description" content="ZANTARA AI Assistant - Intelligent Business Assistant for Bali. Visa services, company setup, and business guidance.">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="BALI ZERO AI - Intelligent Business Assistant powered by ZANTARA. Access visa services, company setup, and tax solutions through AI-powered chat.">
+    <meta name="keywords" content="ZANTARA, Bali Zero, AI Assistant, Visa Services, Company Setup, Tax Services, Indonesia Business">
+
+    <!-- Redirect to Login -->
+    <meta http-equiv="refresh" content="0; url=login.html">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             background: linear-gradient(135deg, #1a0033 0%, #2D1B69 50%, #6B46C1 100%);
             color: white;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: system-ui, -apple-system, sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 20px;
+            margin: 0;
         }
-
-        .container {
+        .loading {
             text-align: center;
-            max-width: 600px;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 60px 40px;
         }
-
-        .logo {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 30px;
-            border-radius: 50%;
-            box-shadow: 0 0 60px rgba(155, 89, 182, 0.6);
-        }
-
-        h1 {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            background: linear-gradient(45deg, #ffffff, #a78bfa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        p {
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 40px;
-            line-height: 1.6;
-        }
-
-        .button {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            border: none;
-            border-radius: 12px;
-            padding: 18px 48px;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
-        }
-
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 30px rgba(99, 102, 241, 0.6);
-        }
-
-        .features {
-            margin-top: 40px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            text-align: left;
-        }
-
-        .feature {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .feature-icon {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-
-        .feature-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #a78bfa;
-        }
-
-        .feature-desc {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .status {
-            margin-top: 30px;
-            padding: 12px;
-            background: rgba(16, 185, 129, 0.2);
-            border: 1px solid rgba(16, 185, 129, 0.5);
-            border-radius: 8px;
-            color: #10b981;
-            font-size: 14px;
-        }
+        /* Cache bust fallback */
     </style>
+    <script>
+      // JS fallback to ensure no cached older page is shown
+      (function(){
+        try {
+          var q = new URLSearchParams(location.search);
+          // If already has a version param, skip to prevent loops
+          if (!q.has('v')) {
+            var v = 'prod11';
+            location.replace('login.html');
+          }
+        } catch(_) {
+          location.href = 'login.html';
+        }
+      })();
+    </script>
 </head>
 <body>
-    <div class="container">
-        <img src="zantara_logo_transparent.png" alt="ZANTARA" class="logo" onerror="this.style.display='none'">
-
-        <h1>ZANTARA</h1>
-        <p>
-            Your intelligent AI assistant for business in Bali.
-            <br>
-            Visa services, company setup, KBLI validation, and more.
-        </p>
-
-        <a href="chat.html" class="button">
-            🚀 Start Chat
-        </a>
-
-        <div class="features">
-            <div class="feature">
-                <div class="feature-icon">🤖</div>
-                <div class="feature-title">AI Powered</div>
-                <div class="feature-desc">RAG backend with 14K+ documents</div>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🏢</div>
-                <div class="feature-title">Business Setup</div>
-                <div class="feature-desc">KBLI validation & company formation</div>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">✈️</div>
-                <div class="feature-title">Visa Services</div>
-                <div class="feature-desc">KITAS, work permits & more</div>
-            </div>
-        </div>
-
-        <div class="status">
-            ✅ Backend v5.2.0 | Gateway API Ready
-        </div>
+    <div class="loading">
+        <h2>BALI ZERO AI</h2>
+        <p>Loading...</p>
     </div>
 </body>
 </html>
+<!-- Deployed: 2025-10-13 09:15:21 UTC -->
+<!-- Source: https://github.com/Balizero1987/nuzantara/commit/9a690a72253f62fc12fce54f5010a0573fce83a3 -->

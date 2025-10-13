@@ -477,19 +477,24 @@ class ZantaraApp {
         return this.renderAssistantReply(this.formatPricing(res));
       }
 
-      // Default to ai.chat (specify a safe default model)
+      // FIX: Use ZANTARA provider instead of hardcoded model
       let res;
       try {
         const system = this.buildSystemPrompt({ ...profile, lang: msgLang });
-        res = await api.call('/call', { key: 'ai.chat', params: { prompt: text, model: 'gpt-4o-mini', system, target_language: msgLang } }, true);
+        // FIX: Use ZANTARA provider with auto-routing
+        res = await api.call('/call', { key: 'ai.chat', params: { message: text, provider: 'zantara', system, target_language: msgLang } }, true);
       } catch (e) {
-        // Fallback if model not available
+        // FIX: Better fallback handling
         const msg = String(e && e.message || e || '');
-        if (/model .* does not exist|not\s+exist|unknown model|404/i.test(msg)) {
+        console.warn('ZANTARA failed, trying fallback:', msg);
+        
+        try {
           const system = this.buildSystemPrompt({ ...profile, lang: msgLang });
-          res = await api.call('/call', { key: 'ai.chat', params: { prompt: text, model: 'gpt-4o', system, target_language: msgLang } }, true);
-        } else {
-          throw e;
+          // Fallback to GPT-4o-mini if ZANTARA completely fails
+          res = await api.call('/call', { key: 'ai.chat', params: { message: text, provider: 'openai', model: 'gpt-4o-mini', system, target_language: msgLang } }, true);
+        } catch (fallbackError) {
+          console.error('All AI providers failed:', fallbackError);
+          throw new Error('AI service temporarily unavailable. Please try again.');
         }
       }
       this.hideTypingIndicator();
