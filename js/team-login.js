@@ -15,12 +15,16 @@ class TeamLoginSystem {
    */
   async getTeamMembers() {
     try {
-      const response = await fetch(`${this.apiBase}/team.members`, {
-        method: 'GET',
+      const response = await fetch(`${this.apiBase}/call`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': this.apiKey
-        }
+        },
+        body: JSON.stringify({
+          key: 'team.members',
+          params: {}
+        })
       });
 
       if (!response.ok) {
