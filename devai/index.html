@@ -623,7 +623,21 @@
                 });
 
                 const data = await response.json();
-                const answer = data.data?.answer || data.answer || data.response || 'Risposta ricevuta';
+                console.log('DevAI Response:', data);
+                
+                let answer = 'Nessuna risposta';
+                if (data.ok && data.data) {
+                    answer = data.data.answer || data.data.response || data.data.message || JSON.stringify(data.data);
+                } else if (data.answer) {
+                    answer = data.answer;
+                } else if (data.response) {
+                    answer = data.response;
+                } else if (data.error) {
+                    answer = `❌ Errore: ${data.error}`;
+                } else {
+                    answer = `Risposta ricevuta ma formato sconosciuto: ${JSON.stringify(data).substring(0, 200)}`;
+                }
+                
                 addMessage('assistant', answer);
             } catch (error) {
                 addMessage('system', `❌ Errore: ${error.message}`);
