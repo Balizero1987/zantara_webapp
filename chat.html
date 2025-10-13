@@ -445,72 +445,85 @@
       color: rgba(0, 0, 0, 0.6);
     }
 
-    .logo-center {
+    /* Logo wrapper for circular glow */
+    .logo-wrapper {
+      position: relative;
       width: 300px;
       height: 300px;
       margin: 0 auto;
-      display: block;
-      object-fit: contain;
-      border-radius: 50%;
-      filter: drop-shadow(0 0 60px rgba(255, 255, 255, 0.6))
-              drop-shadow(0 0 100px rgba(255, 255, 255, 0.5))
-              drop-shadow(0 0 150px rgba(255, 255, 255, 0.4))
-              drop-shadow(0 0 200px rgba(255, 255, 255, 0.3));
-      animation: logo-hero 2s ease-in-out infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    @keyframes logo-hero {
+    .logo-wrapper::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      box-shadow: 0 0 60px 30px rgba(255, 255, 255, 0.4),
+                  0 0 100px 50px rgba(255, 255, 255, 0.3),
+                  0 0 150px 70px rgba(255, 255, 255, 0.2),
+                  0 0 200px 90px rgba(255, 255, 255, 0.1);
+      animation: glow-pulse 2s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .logo-center {
+      width: 300px;
+      height: 300px;
+      display: block;
+      object-fit: contain;
+      position: relative;
+      z-index: 1;
+      animation: logo-scale 2s ease-in-out infinite;
+    }
+
+    @keyframes logo-scale {
       0%, 100% {
         transform: scale(1);
-        filter: drop-shadow(0 0 60px rgba(255, 255, 255, 0.6))
-                drop-shadow(0 0 100px rgba(255, 255, 255, 0.5))
-                drop-shadow(0 0 150px rgba(255, 255, 255, 0.4))
-                drop-shadow(0 0 200px rgba(255, 255, 255, 0.3));
       }
       50% {
         transform: scale(1.05);
-        filter: drop-shadow(0 0 80px rgba(255, 255, 255, 0.8))
-                drop-shadow(0 0 120px rgba(255, 255, 255, 0.6))
-                drop-shadow(0 0 170px rgba(255, 255, 255, 0.5))
-                drop-shadow(0 0 220px rgba(255, 255, 255, 0.4));
       }
     }
 
     @keyframes glow-pulse {
       0%, 100% {
-        filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.4))
-                drop-shadow(0 0 80px rgba(255, 255, 255, 0.3))
-                drop-shadow(0 0 120px rgba(255, 255, 255, 0.2))
-                drop-shadow(0 0 160px rgba(255, 255, 255, 0.15));
+        box-shadow: 0 0 60px 30px rgba(255, 255, 255, 0.4),
+                    0 0 100px 50px rgba(255, 255, 255, 0.3),
+                    0 0 150px 70px rgba(255, 255, 255, 0.2),
+                    0 0 200px 90px rgba(255, 255, 255, 0.1);
       }
       50% {
-        filter: drop-shadow(0 0 60px rgba(255, 255, 255, 0.6))
-                drop-shadow(0 0 100px rgba(255, 255, 255, 0.4))
-                drop-shadow(0 0 140px rgba(255, 255, 255, 0.3))
-                drop-shadow(0 0 180px rgba(255, 255, 255, 0.2));
+        box-shadow: 0 0 80px 40px rgba(255, 255, 255, 0.6),
+                    0 0 120px 60px rgba(255, 255, 255, 0.4),
+                    0 0 170px 80px rgba(255, 255, 255, 0.3),
+                    0 0 220px 100px rgba(255, 255, 255, 0.15);
       }
     }
 
-    body.day-mode .logo-center {
-      filter: drop-shadow(0 0 40px rgba(0, 0, 0, 0.12))
-              drop-shadow(0 0 80px rgba(0, 0, 0, 0.08))
-              drop-shadow(0 0 120px rgba(0, 0, 0, 0.05))
-              drop-shadow(0 0 160px rgba(0, 0, 0, 0.03));
+    body.day-mode .logo-wrapper::before {
+      box-shadow: 0 0 50px 25px rgba(0, 0, 0, 0.08),
+                  0 0 90px 45px rgba(0, 0, 0, 0.05),
+                  0 0 130px 65px rgba(0, 0, 0, 0.03),
+                  0 0 170px 85px rgba(0, 0, 0, 0.02);
       animation: glow-pulse-day 3s ease-in-out infinite;
     }
 
     @keyframes glow-pulse-day {
       0%, 100% {
-        filter: drop-shadow(0 0 40px rgba(0, 0, 0, 0.12))
-                drop-shadow(0 0 80px rgba(0, 0, 0, 0.08))
-                drop-shadow(0 0 120px rgba(0, 0, 0, 0.05))
-                drop-shadow(0 0 160px rgba(0, 0, 0, 0.03));
+        box-shadow: 0 0 50px 25px rgba(0, 0, 0, 0.08),
+                    0 0 90px 45px rgba(0, 0, 0, 0.05),
+                    0 0 130px 65px rgba(0, 0, 0, 0.03),
+                    0 0 170px 85px rgba(0, 0, 0, 0.02);
       }
       50% {
-        filter: drop-shadow(0 0 50px rgba(0, 0, 0, 0.15))
-                drop-shadow(0 0 90px rgba(0, 0, 0, 0.1))
-                drop-shadow(0 0 130px rgba(0, 0, 0, 0.06))
-                drop-shadow(0 0 170px rgba(0, 0, 0, 0.04));
+        box-shadow: 0 0 60px 30px rgba(0, 0, 0, 0.1),
+                    0 0 100px 50px rgba(0, 0, 0, 0.06),
+                    0 0 140px 70px rgba(0, 0, 0, 0.04),
+                    0 0 180px 90px rgba(0, 0, 0, 0.03);
       }
     }
 
@@ -1167,7 +1180,9 @@
       <div class="chat-wrapper">
         <div class="messages">
           <div class="welcome">
-            <img src="assets/logoscon.png" class="logo-center" alt="ZANTARA Logo">
+            <div class="logo-wrapper">
+              <img src="assets/logoscon.png" class="logo-center" alt="ZANTARA Logo">
+            </div>
             <h2>Welcome to Zantara</h2>
             <p class="powered-by">powered by Zero AI</p>
           </div>
@@ -1393,7 +1408,9 @@
         // Clear welcome message
         messagesDiv.innerHTML = `
           <div class="welcome">
-            <img src="assets/logoscon.png" class="logo-center" alt="ZANTARA Logo">
+            <div class="logo-wrapper">
+              <img src="assets/logoscon.png" class="logo-center" alt="ZANTARA Logo">
+            </div>
             <h2>${title}</h2>
             <p class="powered-by">Chat history loaded</p>
           </div>
