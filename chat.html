@@ -1462,8 +1462,10 @@
 
     // Input buttons functionality
     const inputField = document.querySelector('.input');
-    const sendBtn = document.querySelectorAll('.btn')[3]; // ➤ button (now index 3 because of mode selector)
-    const attachBtn = document.querySelectorAll('.btn')[0]; // 📎 button
+    const allBtns = document.querySelectorAll('.input-area .btn');
+    const attachBtn = allBtns[0]; // 📎 button
+    const micBtn = allBtns[1]; // 🎤 button
+    const sendBtn = allBtns[2]; // ➤ button
 
     // Send message
     async function sendMessage() {
