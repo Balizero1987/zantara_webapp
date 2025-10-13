@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔐 DevAI Private Section - ZANTARA</title>
+    <title>DevAI - ZANTARA Developer Assistant</title>
+    <link rel="icon" type="image/jpeg" href="../public/images/zantara-logo.jpeg">
     <style>
         * {
             margin: 0;
@@ -11,239 +12,680 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        html, body {
+            background: #1e1e1e;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+
+        /* DAY MODE */
+        body.day-mode {
+            background: #ffffff;
+            color: #000;
+        }
+
+        /* RAINBOW BORDER ANIMATION */
+        @keyframes rainbow-border {
+            0%, 100% { border-color: #FFD700; }
+            25% { border-color: #FF0000; }
+            50% { border-color: #0000FF; }
+            75% { border-color: #00FF00; }
+        }
+
+        /* AUTH SCREEN */
+        .auth-screen {
             display: flex;
             align-items: center;
             justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        .auth-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+        .auth-card {
+            background: #252525;
+            border: 1px solid #3a3a3a;
             border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 48px;
+            max-width: 480px;
+            width: 100%;
             text-align: center;
-            max-width: 400px;
-            width: 90%;
+        }
+
+        body.day-mode .auth-card {
+            background: #ffffff;
+            border: 2px solid #e0e0e0;
         }
 
         .logo {
-            font-size: 3rem;
-            margin-bottom: 20px;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            display: block;
+            border-radius: 50%;
+            filter: drop-shadow(0 0 40px rgba(107, 70, 193, 0.4));
         }
 
-        h1 {
-            color: #2d3748;
-            margin-bottom: 10px;
-            font-size: 1.8rem;
+        .auth-card h1 {
+            font-size: 28px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #6B46C1, #9B59B6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .subtitle {
-            color: #718096;
-            margin-bottom: 30px;
-            font-size: 0.9rem;
+        .auth-card .subtitle {
+            color: #999;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        body.day-mode .auth-card .subtitle {
+            color: #666;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             text-align: left;
         }
 
-        label {
+        .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #4a5568;
+            color: #999;
+            font-size: 14px;
             font-weight: 500;
         }
 
-        input[type="password"] {
+        body.day-mode .form-group label {
+            color: #666;
+        }
+
+        .form-group input {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            padding: 14px 16px;
+            background: #1e1e1e;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            transition: all 0.2s;
         }
 
-        input[type="password"]:focus {
+        body.day-mode .form-group input {
+            background: #f8f8f8;
+            border-color: #d0d0d0;
+            color: #000;
+        }
+
+        .form-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #6B46C1;
         }
 
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #6B46C1, #9B59B6);
             border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
+            border-radius: 12px;
+            color: white;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s;
-            width: 100%;
         }
 
-        .btn:hover {
+        .btn-primary:hover {
             transform: translateY(-2px);
         }
 
-        .error {
-            color: #e53e3e;
-            margin-top: 10px;
-            font-size: 0.9rem;
-        }
-
-        .success {
-            color: #38a169;
-            margin-top: 10px;
-            font-size: 0.9rem;
-        }
-
-        .devai-interface {
-            display: none;
-            width: 100%;
-            height: 100vh;
-            background: #f7fafc;
-        }
-
-        .devai-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .devai-content {
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .devai-iframe {
-            width: 100%;
-            height: 80vh;
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .logout-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 16px;
             font-size: 14px;
         }
 
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        /* MAIN APP */
+        .app {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .app.active {
+            display: flex;
+        }
+
+        /* HEADER */
+        .header {
+            background: #2a2a2a;
+            border-bottom: 1px solid #3a3a3a;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        body.day-mode .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 2px solid;
+            animation: rainbow-border 8s linear infinite;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-logo {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .theme-toggle, .logout-btn {
+            background: #3a3a3a;
+            border: 1px solid #4a4a4a;
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover, .logout-btn:hover {
+            background: #4a4a4a;
+        }
+
+        body.day-mode .theme-toggle, body.day-mode .logout-btn {
+            background: #f0f0f0;
+            border-color: #d0d0d0;
+            color: #000;
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* CHAT AREA */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 16px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .message-bubble.user {
+            background: #6B46C1;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-bubble.assistant {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        body.day-mode .message-bubble.assistant {
+            background: #f8f8f8;
+            border-color: #d0d0d0;
+        }
+
+        .message-bubble.system {
+            background: #3a3a3a;
+            border: 1px solid #4a4a4a;
+            align-self: center;
+            font-size: 13px;
+            color: #999;
+        }
+
+        body.day-mode .message-bubble.system {
+            background: #f0f0f0;
+            border-color: #d0d0d0;
+            color: #666;
+        }
+
+        /* INPUT AREA */
+        .input-area {
+            padding: 24px;
+            background: #252525;
+            border-top: 1px solid #3a3a3a;
+        }
+
+        body.day-mode .input-area {
+            background: #f8f8f8;
+            border-top-color: #d0d0d0;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: #1e1e1e;
+            border: 1px solid #3a3a3a;
+            border-radius: 24px;
+            color: #fff;
+            font-size: 15px;
+            resize: none;
+            min-height: 48px;
+            max-height: 150px;
+        }
+
+        body.day-mode .message-input {
+            background: #ffffff;
+            border-color: #d0d0d0;
+            color: #000;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: #6B46C1;
+        }
+
+        .send-btn {
+            padding: 0 20px;
+            background: linear-gradient(135deg, #6B46C1, #9B59B6);
+            border: none;
+            border-radius: 24px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* TOOLS PANEL */
+        .tools-panel {
+            width: 300px;
+            background: #252525;
+            border-left: 1px solid #3a3a3a;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        body.day-mode .tools-panel {
+            background: #f8f8f8;
+            border-left-color: #d0d0d0;
+        }
+
+        .tools-panel h3 {
+            margin-bottom: 16px;
+            font-size: 16px;
+            color: #999;
+        }
+
+        body.day-mode .tools-panel h3 {
+            color: #666;
+        }
+
+        .tool-btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .tool-btn:hover {
+            background: #3a3a3a;
+            border-color: #6B46C1;
+        }
+
+        body.day-mode .tool-btn {
+            background: #ffffff;
+            border-color: #d0d0d0;
+            color: #000;
+        }
+
+        body.day-mode .tool-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .config-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #3a3a3a;
+        }
+
+        body.day-mode .config-section {
+            border-top-color: #d0d0d0;
+        }
+
+        .config-input {
+            width: 100%;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: #1e1e1e;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+        }
+
+        body.day-mode .config-input {
+            background: #ffffff;
+            border-color: #d0d0d0;
+            color: #000;
+        }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 768px) {
+            .tools-panel {
+                display: none;
+            }
+
+            .message-bubble {
+                max-width: 85%;
+            }
+
+            .auth-card {
+                padding: 32px 24px;
+            }
+        }
+
+        /* LOADING */
+        .loading {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6B46C1;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <div id="authContainer" class="auth-container">
-        <div class="logo">🤖</div>
-        <h1>DevAI Private Access</h1>
-        <p class="subtitle">Sezione riservata per sviluppo AI</p>
-        
-        <form id="authForm">
-            <div class="form-group">
-                <label for="accessToken">Access Token:</label>
-                <input type="password" id="accessToken" placeholder="Inserisci il token di accesso" required>
-            </div>
-            <button type="submit" class="btn">🔐 Accedi a DevAI</button>
-        </form>
-        
-        <div id="errorMessage" class="error" style="display: none;"></div>
-        <div id="successMessage" class="success" style="display: none;"></div>
+    <!-- AUTH SCREEN -->
+    <div id="authScreen" class="auth-screen">
+        <div class="auth-card">
+            <img src="../public/images/zantara-logo.jpeg" alt="DevAI" class="logo">
+            <h1>🤖 DevAI</h1>
+            <p class="subtitle">AI Developer Assistant - Accesso Riservato</p>
+            
+            <form id="authForm">
+                <div class="form-group">
+                    <label>Access Token</label>
+                    <input type="password" id="accessToken" placeholder="Inserisci il token di accesso" required>
+                </div>
+                <button type="submit" class="btn-primary">🔐 Accedi</button>
+            </form>
+            
+            <div id="authMessage"></div>
+        </div>
     </div>
 
-    <div id="devaiInterface" class="devai-interface">
-        <div class="devai-header">
-            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
-            <h1>🤖 DevAI Private Section</h1>
-            <p>AI Developer Assistant - Accesso Riservato</p>
+    <!-- MAIN APP -->
+    <div id="mainApp" class="app">
+        <div class="header">
+            <div class="header-left">
+                <img src="../public/images/zantara-logo.jpeg" alt="DevAI" class="header-logo">
+                <span class="header-title">DevAI - Developer Assistant</span>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="themeIcon">☀️</span>
+                </button>
+                <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+            </div>
         </div>
-        <div class="devai-content">
-            <iframe id="devaiFrame" class="devai-iframe" src=""></iframe>
+
+        <div class="main">
+            <div class="chat-area">
+                <div id="messages" class="messages"></div>
+                <div class="input-area">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="messageInput" 
+                            class="message-input" 
+                            placeholder="Scrivi un messaggio a DevAI..."
+                            rows="1"
+                        ></textarea>
+                        <button id="sendBtn" class="send-btn" onclick="sendMessage()">Invia</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tools-panel">
+                <h3>🔧 Development Tools</h3>
+                <button class="tool-btn" onclick="useTool('analyze')">📊 Analyze Code</button>
+                <button class="tool-btn" onclick="useTool('fix')">🔧 Fix Bugs</button>
+                <button class="tool-btn" onclick="useTool('review')">👁️ Code Review</button>
+                <button class="tool-btn" onclick="useTool('explain')">💡 Explain Code</button>
+                <button class="tool-btn" onclick="useTool('tests')">🧪 Generate Tests</button>
+                <button class="tool-btn" onclick="useTool('refactor')">♻️ Refactor</button>
+
+                <div class="config-section">
+                    <h3>⚙️ Configuration</h3>
+                    <input type="text" class="config-input" id="apiBase" placeholder="API Base URL" value="http://localhost:8080">
+                    <input type="text" class="config-input" id="apiKey" placeholder="API Key" value="zantara-internal-dev-key-2025">
+                    <button class="tool-btn" onclick="saveConfig()">💾 Save Config</button>
+                    <button class="tool-btn" onclick="testConnection()">🔌 Test Connection</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Token di accesso privato (cambia questo per sicurezza)
-        const PRIVATE_ACCESS_TOKEN = 'devai-zantara-2025-private-access';
-        
-        // URL dell'interfaccia DevAI
-        const DEVAI_INTERFACE_URL = 'https://api.balizero.com/devai-interface.html';
-        const DEVAI_LOCAL_URL = 'http://localhost:8080/devai-interface.html';
+        const PRIVATE_TOKEN = 'devai-zantara-2025-private-access';
+        let API_BASE = localStorage.getItem('devai_api_base') || 'http://localhost:8080';
+        let API_KEY = localStorage.getItem('devai_api_key') || 'zantara-internal-dev-key-2025';
 
-        document.getElementById('authForm').addEventListener('submit', function(e) {
+        // Initialize config inputs
+        document.getElementById('apiBase').value = API_BASE;
+        document.getElementById('apiKey').value = API_KEY;
+
+        // Auth
+        document.getElementById('authForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            
             const token = document.getElementById('accessToken').value;
-            const errorDiv = document.getElementById('errorMessage');
-            const successDiv = document.getElementById('successMessage');
+            const messageDiv = document.getElementById('authMessage');
             
-            // Reset messages
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
-            
-            if (token === PRIVATE_ACCESS_TOKEN) {
-                // Accesso autorizzato
-                successDiv.textContent = '✅ Accesso autorizzato! Caricamento DevAI...';
-                successDiv.style.display = 'block';
-                
-                // Nascondi form di autenticazione
-                document.getElementById('authContainer').style.display = 'none';
-                
-                // Mostra interfaccia DevAI
-                document.getElementById('devaiInterface').style.display = 'block';
-                
-                // Carica interfaccia DevAI (prova prima produzione, poi locale)
-                loadDevAIInterface();
-                
+            if (token === PRIVATE_TOKEN) {
+                messageDiv.innerHTML = '<div class="message success">✅ Accesso autorizzato! Caricamento...</div>';
+                setTimeout(() => {
+                    document.getElementById('authScreen').style.display = 'none';
+                    document.getElementById('mainApp').classList.add('active');
+                    addMessage('system', '🤖 DevAI pronto! Come posso aiutarti con il codice?');
+                }, 500);
             } else {
-                errorDiv.textContent = '❌ Token di accesso non valido';
-                errorDiv.style.display = 'block';
+                messageDiv.innerHTML = '<div class="message error">❌ Token non valido</div>';
             }
         });
 
-        function loadDevAIInterface() {
-            const iframe = document.getElementById('devaiFrame');
-            
-            // Prova prima l'URL di produzione
-            iframe.src = DEVAI_INTERFACE_URL;
-            
-            // Se fallisce, prova locale
-            iframe.onerror = function() {
-                console.log('Produzione non disponibile, provo locale...');
-                iframe.src = DEVAI_LOCAL_URL;
-            };
+        // Theme toggle
+        function toggleTheme() {
+            document.body.classList.toggle('day-mode');
+            const icon = document.getElementById('themeIcon');
+            icon.textContent = document.body.classList.contains('day-mode') ? '🌙' : '☀️';
+            localStorage.setItem('devai_theme', document.body.classList.contains('day-mode') ? 'day' : 'night');
         }
 
+        // Load saved theme
+        if (localStorage.getItem('devai_theme') === 'day') {
+            toggleTheme();
+        }
+
+        // Logout
         function logout() {
-            // Reset dell'interfaccia
-            document.getElementById('authContainer').style.display = 'block';
-            document.getElementById('devaiInterface').style.display = 'none';
+            document.getElementById('mainApp').classList.remove('active');
+            document.getElementById('authScreen').style.display = 'flex';
             document.getElementById('accessToken').value = '';
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'none';
-            
-            // Pulisci iframe
-            document.getElementById('devaiFrame').src = '';
+            document.getElementById('authMessage').innerHTML = '';
+            document.getElementById('messages').innerHTML = '';
         }
 
-        // Auto-focus sul campo token
-        document.getElementById('accessToken').focus();
+        // Messages
+        function addMessage(type, content) {
+            const messagesDiv = document.getElementById('messages');
+            const bubble = document.createElement('div');
+            bubble.className = `message-bubble ${type}`;
+            bubble.textContent = content;
+            messagesDiv.appendChild(bubble);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage('user', message);
+            input.value = '';
+            document.getElementById('sendBtn').disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/devai.chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+                addMessage('assistant', data.response || data.answer || 'Risposta ricevuta');
+            } catch (error) {
+                addMessage('system', `❌ Errore: ${error.message}`);
+            } finally {
+                document.getElementById('sendBtn').disabled = false;
+            }
+        }
+
+        // Tool usage
+        function useTool(tool) {
+            const actions = {
+                'analyze': '📊 Analizza questo codice',
+                'fix': '🔧 Correggi i bug in questo codice',
+                'review': '👁️ Fai una code review di questo codice',
+                'explain': '💡 Spiega questo codice',
+                'tests': '🧪 Genera test per questo codice',
+                'refactor': '♻️ Refactorizza questo codice'
+            };
+            document.getElementById('messageInput').value = actions[tool];
+            document.getElementById('messageInput').focus();
+        }
+
+        // Config
+        function saveConfig() {
+            API_BASE = document.getElementById('apiBase').value;
+            API_KEY = document.getElementById('apiKey').value;
+            localStorage.setItem('devai_api_base', API_BASE);
+            localStorage.setItem('devai_api_key', API_KEY);
+            addMessage('system', '✅ Configurazione salvata!');
+        }
+
+        async function testConnection() {
+            addMessage('system', '🔌 Test connessione...');
+            try {
+                const response = await fetch(`${API_BASE}/api/devai.chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({ message: 'Test', max_tokens: 10 })
+                });
+
+                if (response.ok) {
+                    addMessage('system', '✅ Connessione riuscita!');
+                } else {
+                    addMessage('system', '⚠️ Connessione fallita: ' + response.status);
+                }
+            } catch (error) {
+                addMessage('system', '❌ Errore: ' + error.message);
+            }
+        }
+
+        // Enter to send
+        document.getElementById('messageInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Auto-resize textarea
+        document.getElementById('messageInput').addEventListener('input', (e) => {
+            e.target.style.height = 'auto';
+            e.target.style.height = Math.min(e.target.scrollHeight, 150) + 'px';
+        });
     </script>
 </body>
 </html>
