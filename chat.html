@@ -492,7 +492,14 @@
         // User is logged in - show user button, hide login
         loginBtn.style.display = 'none';
         userBtn.style.display = 'flex';
-        userNameSpan.textContent = userName || userEmail.split('@')[0].toUpperCase();
+
+        // Initialize badge system with avatar upload support
+        if (window.IndonesianBadges && window.IndonesianBadges.updateUserHeader) {
+          window.IndonesianBadges.updateUserHeader();
+        } else {
+          // Fallback if badge system not loaded
+          userNameSpan.textContent = userName || userEmail.split('@')[0].toUpperCase();
+        }
 
         // Toggle dropdown menu
         const userDropdown = document.getElementById('userDropdown');
