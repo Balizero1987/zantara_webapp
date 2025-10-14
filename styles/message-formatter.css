@@ -1,0 +1,296 @@
+/**
+ * ZANTARA Message Formatter Styles
+ * Styles for structured messages and CTA components
+ * Created: 2025-10-14
+ */
+
+/* ============================================
+   STRUCTURED RESPONSE STYLES - PROFESSIONAL
+   ============================================ */
+
+.structured-response {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-header {
+  font-weight: 600;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 11px;
+}
+
+body.day-mode .section-header {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.section-content {
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+body.day-mode .section-content {
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.section-content strong {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+body.day-mode .section-content strong {
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.section-content em {
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.section-content ul {
+  margin: 12px 0;
+  padding-left: 20px;
+}
+
+.section-content li {
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+/* Regular response (non-structured) */
+.regular-response {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.response-paragraph {
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  margin: 0;
+}
+
+body.day-mode .response-paragraph {
+  color: rgba(0, 0, 0, 0.85);
+}
+
+/* ============================================
+   CTA COMPONENT STYLES - PROFESSIONAL
+   ============================================ */
+
+.message-cta {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.day-mode .message-cta {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+.cta-divider {
+  display: none;
+}
+
+.cta-text {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 10px;
+  font-weight: 400;
+}
+
+body.day-mode .cta-text {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+}
+
+.cta-button:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.day-mode .cta-button {
+  border-color: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.65);
+}
+
+body.day-mode .cta-button:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.03);
+  color: rgba(0, 0, 0, 0.85);
+}
+
+/* WhatsApp button - subtle */
+.cta-whatsapp {
+  border-color: rgba(37, 211, 102, 0.15);
+  color: rgba(37, 211, 102, 0.8);
+}
+
+.cta-whatsapp:hover {
+  border-color: rgba(37, 211, 102, 0.3);
+  background: rgba(37, 211, 102, 0.05);
+  color: rgba(37, 211, 102, 1);
+}
+
+body.day-mode .cta-whatsapp {
+  border-color: rgba(37, 211, 102, 0.2);
+  color: rgba(25, 135, 84, 0.85);
+}
+
+body.day-mode .cta-whatsapp:hover {
+  border-color: rgba(37, 211, 102, 0.35);
+  background: rgba(37, 211, 102, 0.05);
+  color: rgba(25, 135, 84, 1);
+}
+
+/* Email button - subtle */
+.cta-email {
+  border-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.cta-email:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.day-mode .cta-email {
+  border-color: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.65);
+}
+
+body.day-mode .cta-email:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.03);
+  color: rgba(0, 0, 0, 0.85);
+}
+
+/* CTA Icons */
+.cta-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.cta-phone {
+  font-family: 'Geist Mono', 'SF Mono', monospace;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .cta-buttons {
+    flex-direction: column;
+  }
+  
+  .cta-button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .cta-phone {
+    display: none;
+  }
+  
+  .section-header {
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+  
+  .section-content,
+  .response-paragraph {
+    font-size: 13px;
+  }
+}
+
+/* ============================================
+   ENHANCED MESSAGE BUBBLES - MINIMAL & CLEAN
+   ============================================ */
+
+.message.assistant .message-bubble {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  transition: none;
+}
+
+.message.assistant .message-bubble:hover {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+body.day-mode .message.assistant .message-bubble {
+  background: transparent;
+  border: none;
+}
+
+body.day-mode .message.assistant .message-bubble:hover {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.message.user .message-bubble {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow: none;
+}
+
+body.day-mode .message.user .message-bubble {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.9);
+  box-shadow: none;
+}
+
+/* ============================================
+   ANIMATIONS - REMOVED FOR PROFESSIONAL LOOK
+   ============================================ */
+
+.message {
+  animation: none;
+}
+
+.cta-button {
+  animation: none;
+}
+

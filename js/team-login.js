@@ -1,19 +1,20 @@
 /**
- * Team Login System for Bali Zero Collaborators
- * Integrates with ZANTARA authentication system
+ * 🔐 Secure Team Login System - Client Side
+ * Version 2.0 - PIN-based authentication with JWT
  */
 
-class TeamLoginSystem {
+class SecureTeamLogin {
   constructor() {
     this.apiBase = 'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app';
     this.apiKey = 'zantara-internal-dev-key-2025';
-    this.currentSession = null;
+    this.currentUser = null;
+    this.token = null;
   }
 
   /**
-   * Get all team members for login form
+   * 🔐 Login with email + PIN
    */
-  async getTeamMembers() {
+  async login(email, pin) {
     try {
       const response = await fetch(`${this.apiBase}/call`, {
         method: 'POST',
@@ -22,39 +23,10 @@ class TeamLoginSystem {
           'x-api-key': this.apiKey
         },
         body: JSON.stringify({
-          key: 'team.members',
-          params: {}
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.ok ? data.data : [];
-    } catch (error) {
-      console.error('Error fetching team members:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Login team member
-   */
-  async loginTeamMember(name, email) {
-    try {
-      const response = await fetch(`${this.apiBase}/call`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': this.apiKey
-        },
-        body: JSON.stringify({
-          key: 'team.login',
+          key: 'team.login.secure',
           params: {
-            name: name,
-            email: email
+            email: email,
+            pin: pin
           }
         })
       });
@@ -64,20 +36,26 @@ class TeamLoginSystem {
       }
 
       const data = await response.json();
-      
-      if (data.ok) {
-        this.currentSession = data.data;
-        
-        // Save session to localStorage
-        localStorage.setItem('zantara-session', JSON.stringify(this.currentSession));
-        localStorage.setItem('zantara-user-name', this.currentSession.user.name);
-        localStorage.setItem('zantara-user-role', this.currentSession.user.role);
-        localStorage.setItem('zantara-user-department', this.currentSession.user.department);
-        
+
+      if (data.ok && data.data.success) {
+        // Store JWT token and user data
+        this.token = data.data.token;
+        this.currentUser = data.data.user;
+
+        // Save to localStorage (secure token storage)
+        localStorage.setItem('zantara-auth-token', this.token);
+        localStorage.setItem('zantara-user', JSON.stringify(this.currentUser));
+        localStorage.setItem('zantara-permissions', JSON.stringify(data.data.permissions));
+
+        // Legacy compatibility
+        localStorage.setItem('zantara-user-name', this.currentUser.name);
+        localStorage.setItem('zantara-user-role', this.currentUser.role);
+        localStorage.setItem('zantara-user-department', this.currentUser.department);
+
         return {
           success: true,
-          session: this.currentSession,
-          message: this.currentSession.personalizedResponse
+          user: this.currentUser,
+          message: data.data.message
         };
       } else {
         return {
@@ -89,54 +67,42 @@ class TeamLoginSystem {
       console.error('Login error:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message || 'Network error. Please try again.'
       };
     }
   }
 
   /**
-   * Logout current session
+   * 🔓 Logout
    */
-  async logout() {
-    if (this.currentSession) {
-      try {
-        await fetch(`${this.apiBase}/call`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': this.apiKey
-          },
-          body: JSON.stringify({
-            key: 'team.logout',
-            params: {
-              sessionId: this.currentSession.sessionId
-            }
-          })
-        });
-      } catch (error) {
-        console.error('Logout error:', error);
-      }
-    }
-
-    // Clear session data
-    this.currentSession = null;
-    localStorage.removeItem('zantara-session');
+  logout() {
+    // Clear all session data
+    this.token = null;
+    this.currentUser = null;
+    localStorage.removeItem('zantara-auth-token');
+    localStorage.removeItem('zantara-user');
+    localStorage.removeItem('zantara-permissions');
     localStorage.removeItem('zantara-user-name');
     localStorage.removeItem('zantara-user-role');
     localStorage.removeItem('zantara-user-department');
+    localStorage.removeItem('zantara-session');
   }
 
   /**
-   * Check if user is logged in
+   * ✅ Check if user is logged in
    */
   isLoggedIn() {
-    const session = localStorage.getItem('zantara-session');
-    if (session) {
+    const token = localStorage.getItem('zantara-auth-token');
+    const user = localStorage.getItem('zantara-user');
+
+    if (token && user) {
       try {
-        this.currentSession = JSON.parse(session);
+        this.token = token;
+        this.currentUser = JSON.parse(user);
         return true;
       } catch (error) {
-        console.error('Error parsing session:', error);
+        console.error('Error parsing user data:', error);
+        this.logout(); // Clear corrupted data
         return false;
       }
     }
@@ -144,140 +110,266 @@ class TeamLoginSystem {
   }
 
   /**
-   * Get current user info
+   * 👤 Get current user
    */
   getCurrentUser() {
-    if (this.currentSession) {
-      return this.currentSession.user;
+    if (this.currentUser) {
+      return this.currentUser;
     }
+
+    const user = localStorage.getItem('zantara-user');
+    if (user) {
+      try {
+        this.currentUser = JSON.parse(user);
+        return this.currentUser;
+      } catch (error) {
+        return null;
+      }
+    }
+
     return null;
   }
 
   /**
-   * Check user permissions
+   * 🔑 Get authentication token
    */
-  hasPermission(permission) {
-    if (!this.currentSession) return false;
-    return this.currentSession.permissions.includes(permission) || 
-           this.currentSession.permissions.includes('all');
+  getToken() {
+    return this.token || localStorage.getItem('zantara-auth-token');
   }
 
   /**
-   * Initialize team login form
+   * 🛡️ Check user permission
    */
-  async initializeLoginForm() {
-    const teamMembers = await this.getTeamMembers();
-    const selectElement = document.getElementById('teamMemberSelect');
-    
-    if (selectElement && teamMembers.length > 0) {
-      // Clear existing options
-      selectElement.innerHTML = '<option value="">Seleziona un membro del team...</option>';
-      
-      // Add team members
-      teamMembers.forEach(member => {
-        const option = document.createElement('option');
-        option.value = member.name;
-        option.textContent = `${member.name} - ${member.role} (${member.department})`;
-        option.dataset.email = member.email;
-        option.dataset.role = member.role;
-        option.dataset.department = member.department;
-        selectElement.appendChild(option);
-      });
+  hasPermission(permission) {
+    const permissions = localStorage.getItem('zantara-permissions');
+    if (!permissions) return false;
+
+    try {
+      const perms = JSON.parse(permissions);
+      return perms.includes(permission) || perms.includes('all');
+    } catch (error) {
+      return false;
     }
   }
 
   /**
-   * Handle login form submission
+   * 📝 Show message to user
    */
-  async handleLogin(event) {
-    event.preventDefault();
-    
-    const selectElement = document.getElementById('teamMemberSelect');
-    const selectedOption = selectElement.selectedOptions[0];
-    
-    if (!selectedOption || !selectedOption.value) {
-      this.showError('Seleziona un membro del team');
+  showMessage(message, type = 'info') {
+    const messageDiv = document.getElementById('loginMessage');
+    if (!messageDiv) return;
+
+    messageDiv.className = `message ${type}`;
+
+    // Add badge if success (feature #2)
+    if (type === 'success' && this.currentUser && this.currentUser.badge) {
+      messageDiv.innerHTML = `${this.currentUser.badge} ${message}`;
+    } else {
+      messageDiv.textContent = message;
+    }
+
+    messageDiv.style.display = 'block';
+
+    // Auto-hide after 5 seconds (except for errors)
+    if (type !== 'error') {
+      setTimeout(() => {
+        messageDiv.style.display = 'none';
+      }, 5000);
+    }
+  }
+
+  /**
+   * 🔢 Update PIN visual indicator (feature #1)
+   */
+  updatePinIndicator(pinLength) {
+    const dots = document.querySelectorAll('.pin-dot');
+    if (!dots || dots.length === 0) return;
+
+    dots.forEach((dot, index) => {
+      dot.classList.remove('filled', 'complete');
+
+      if (index < pinLength) {
+        dot.classList.add('filled');
+
+        // All 6 dots filled = complete (green)
+        if (pinLength === 6) {
+          dot.classList.add('complete');
+        }
+      }
+    });
+  }
+
+  /**
+   * ⚠️ Show remaining attempts warning (feature #3)
+   */
+  showAttemptsWarning(remainingAttempts) {
+    const warningDiv = document.getElementById('attemptsWarning');
+    if (!warningDiv) return;
+
+    if (remainingAttempts === null || remainingAttempts === undefined) {
+      warningDiv.style.display = 'none';
       return;
     }
 
-    const name = selectedOption.value;
-    const email = selectedOption.dataset.email;
-    const role = selectedOption.dataset.role;
-    const department = selectedOption.dataset.department;
+    if (remainingAttempts <= 0) {
+      warningDiv.innerHTML = '🔒 Account bloccato per 5 minuti. Troppi tentativi falliti.';
+    } else if (remainingAttempts === 1) {
+      warningDiv.innerHTML = `⚠️ PIN non valido. <strong>Ultimo tentativo</strong> prima del blocco!`;
+    } else {
+      warningDiv.innerHTML = `❌ PIN non valido. ${remainingAttempts} tentativi rimasti prima del blocco.`;
+    }
 
-    // Show loading
-    this.showLoading(true);
+    warningDiv.style.display = 'block';
 
-    try {
-      const result = await this.loginTeamMember(name, email);
-      
-      if (result.success) {
-        this.showSuccess(result.message);
-        
-        // Redirect to chat after successful login
-        setTimeout(() => {
-          window.location.href = 'chat.html';
-        }, 2000);
-      } else {
-        this.showError(result.error || 'Login failed');
+    // Trigger shake animation
+    warningDiv.style.animation = 'none';
+    setTimeout(() => {
+      warningDiv.style.animation = 'shake 0.5s ease';
+    }, 10);
+  }
+
+  /**
+   * 🔄 Show loading state
+   */
+  setLoading(isLoading) {
+    const submitBtn = document.getElementById('teamLoginBtn');
+    if (!submitBtn) return;
+
+    if (isLoading) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Accesso in corso...';
+      submitBtn.style.opacity = '0.7';
+    } else {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Accedi al Team';
+      submitBtn.style.opacity = '1';
+    }
+  }
+
+  /**
+   * 🎯 Initialize login form
+   */
+  initializeForm() {
+    const form = document.getElementById('teamLoginForm');
+    if (!form) {
+      console.warn('Team login form not found');
+      return;
+    }
+
+    const pinInput = document.getElementById('teamPin');
+
+    // Feature #1: Real-time PIN visual indicator
+    if (pinInput) {
+      pinInput.addEventListener('input', (e) => {
+        const pinLength = e.target.value.length;
+        this.updatePinIndicator(pinLength);
+      });
+
+      // Clear indicator when field is cleared
+      pinInput.addEventListener('focus', () => {
+        this.showAttemptsWarning(null); // Hide warning on new attempt
+      });
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const emailInput = document.getElementById('teamEmail');
+      const pinInput = document.getElementById('teamPin');
+
+      if (!emailInput || !pinInput) {
+        this.showMessage('Form elements not found', 'error');
+        return;
       }
-    } catch (error) {
-      this.showError('Errore di connessione: ' + error.message);
-    } finally {
-      this.showLoading(false);
-    }
-  }
 
-  /**
-   * Show loading state
-   */
-  showLoading(show) {
-    const submitBtn = document.getElementById('loginSubmit');
-    if (submitBtn) {
-      submitBtn.disabled = show;
-      submitBtn.textContent = show ? 'Accesso in corso...' : 'Accedi';
-    }
-  }
+      const email = emailInput.value.trim();
+      const pin = pinInput.value.trim();
 
-  /**
-   * Show success message
-   */
-  showSuccess(message) {
-    const messageDiv = document.getElementById('loginMessage');
-    if (messageDiv) {
-      messageDiv.className = 'message success';
-      messageDiv.textContent = message;
-      messageDiv.style.display = 'block';
-    }
-  }
+      // Validation
+      if (!email || !pin) {
+        this.showMessage('Email e PIN sono obbligatori', 'error');
+        return;
+      }
 
-  /**
-   * Show error message
-   */
-  showError(message) {
-    const messageDiv = document.getElementById('loginMessage');
-    if (messageDiv) {
-      messageDiv.className = 'message error';
-      messageDiv.textContent = message;
-      messageDiv.style.display = 'block';
+      if (!/^\d{6}$/.test(pin)) {
+        this.showMessage('Il PIN deve essere di esattamente 6 cifre', 'error');
+        return;
+      }
+
+      // Attempt login
+      this.setLoading(true);
+
+      try {
+        const result = await this.login(email, pin);
+
+        if (result.success) {
+          // Feature #2: Show badge in success message
+          this.showMessage(result.message || 'Accesso riuscito! Reindirizzamento...', 'success');
+
+          // Clear form
+          pinInput.value = '';
+          this.updatePinIndicator(0);
+
+          // Redirect to chat
+          setTimeout(() => {
+            window.location.href = 'chat.html';
+          }, 1500);
+        } else {
+          // Feature #3: Parse remaining attempts from error message
+          const remainingMatch = result.error.match(/(\d+)\s+attempt/i);
+          const remainingAttempts = remainingMatch ? parseInt(remainingMatch[1]) : null;
+
+          if (remainingAttempts !== null) {
+            this.showAttemptsWarning(remainingAttempts);
+          } else if (result.error.includes('locked') || result.error.includes('bloccato')) {
+            this.showAttemptsWarning(0);
+          } else {
+            this.showMessage(result.error || 'Credenziali non valide', 'error');
+          }
+
+          // Clear PIN and reset indicator
+          pinInput.value = '';
+          this.updatePinIndicator(0);
+          pinInput.focus();
+        }
+      } catch (error) {
+        this.showMessage('Errore di connessione. Riprova.', 'error');
+      } finally {
+        this.setLoading(false);
+      }
+    });
+
+    // Auto-focus email field when team login is shown
+    const teamSection = document.getElementById('teamLoginSection');
+    if (teamSection) {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+            if (teamSection.style.display !== 'none') {
+              const emailInput = document.getElementById('teamEmail');
+              if (emailInput) emailInput.focus();
+            }
+          }
+        });
+      });
+
+      observer.observe(teamSection, { attributes: true });
     }
   }
 }
 
-// Initialize team login system
-const teamLogin = new TeamLoginSystem();
+// Initialize
+const teamLogin = new SecureTeamLogin();
 
 // Auto-initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  teamLogin.initializeLoginForm();
-  
-  // Add event listener to login form
-  const loginForm = document.getElementById('loginForm');
-  if (loginForm) {
-    loginForm.addEventListener('submit', (e) => teamLogin.handleLogin(e));
-  }
-});
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    teamLogin.initializeForm();
+  });
+} else {
+  teamLogin.initializeForm();
+}
 
 // Export for global access
-window.TeamLoginSystem = TeamLoginSystem;
+window.SecureTeamLogin = SecureTeamLogin;
 window.teamLogin = teamLogin;

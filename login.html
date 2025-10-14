@@ -256,6 +256,88 @@
             color: rgba(0, 0, 0, 0.4);
         }
 
+        small {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        body.day-mode small {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        /* PIN VISUAL INDICATOR */
+        .pin-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        body.day-mode .pin-indicator {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .pin-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3a3a3a;
+            border: 2px solid #4a4a4a;
+            transition: all 0.3s ease;
+        }
+
+        body.day-mode .pin-dot {
+            background: #e0e0e0;
+            border-color: #c0c0c0;
+        }
+
+        .pin-dot.filled {
+            background: #6B46C1;
+            border-color: #6B46C1;
+            transform: scale(1.2);
+            box-shadow: 0 0 12px rgba(107, 70, 193, 0.6);
+        }
+
+        .pin-dot.complete {
+            background: #10B981;
+            border-color: #10B981;
+            box-shadow: 0 0 16px rgba(16, 185, 129, 0.8);
+            animation: pulse-green 0.6s ease;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { transform: scale(1.2); }
+            50% { transform: scale(1.4); }
+        }
+
+        /* ATTEMPTS INDICATOR */
+        .attempts-warning {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #EF4444;
+            font-size: 13px;
+            font-weight: 500;
+            display: none;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        body.day-mode .attempts-warning {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
         /* BUTTON */
         .btn-primary {
             width: 100%;
@@ -430,15 +512,28 @@
 
             <!-- Team Member Login -->
             <div id="teamLoginSection" style="display: none;">
-                <h2>Team Login</h2>
                 <form id="teamLoginForm">
                     <div class="form-group">
-                        <label class="form-label" for="teamMemberSelect">Seleziona il tuo nome</label>
-                        <select id="teamMemberSelect" class="form-input" required>
-                            <option value="">Caricamento membri del team...</option>
-                        </select>
+                        <label class="form-label" for="teamEmail">Email aziendale</label>
+                        <input type="email" id="teamEmail" class="form-input" placeholder="your.name@balizero.com" required autocomplete="email">
                     </div>
-                    <button type="submit" id="loginSubmit" class="login-button">Accedi</button>
+                    <div class="form-group">
+                        <label class="form-label" for="teamPin">PIN (6 cifre)</label>
+                        <input type="password" id="teamPin" class="form-input" placeholder="••••••" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" required autocomplete="off">
+                        <!-- PIN Visual Indicator -->
+                        <div class="pin-indicator" id="pinIndicator">
+                            <div class="pin-dot"></div>
+                            <div class="pin-dot"></div>
+                            <div class="pin-dot"></div>
+                            <div class="pin-dot"></div>
+                            <div class="pin-dot"></div>
+                            <div class="pin-dot"></div>
+                        </div>
+                        <small style="color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 4px; display: block;">Inserisci il tuo PIN personale a 6 cifre</small>
+                        <!-- Attempts Warning -->
+                        <div class="attempts-warning" id="attemptsWarning"></div>
+                    </div>
+                    <button type="submit" id="teamLoginBtn" class="btn-primary">Accedi al Team</button>
                 </form>
             </div>
 
@@ -474,12 +569,14 @@
                         <img src="assets/logo-google-analytics.png" class="integration-logo" alt="Analytics" title="Google Analytics">
                     </div>
 
-                    <!-- Meta -->
+                    <!-- Social Media -->
                     <div class="integration-group">
-                        <span class="integration-group-label">Meta:</span>
+                        <span class="integration-group-label">Social:</span>
                         <img src="assets/logo-whatsapp.png" class="integration-logo" alt="WhatsApp" title="WhatsApp">
                         <img src="assets/logo-instagram.png" class="integration-logo" alt="Instagram" title="Instagram">
                         <img src="assets/logo-facebook.png" class="integration-logo" alt="Facebook" title="Facebook">
+                        <img src="assets/logo-x.png" class="integration-logo" alt="X (Twitter)" title="X (Twitter)">
+                        <img src="assets/logo-telegram.png" class="integration-logo" alt="Telegram" title="Telegram">
                     </div>
 
                     <!-- AI Services -->
