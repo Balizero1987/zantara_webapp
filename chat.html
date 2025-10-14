@@ -231,7 +231,7 @@
         rightToggle.textContent = '☰';
       }
 
-      updateChatWrapperMargin();
+      updateMainLayout();
     });
 
     rightToggle.addEventListener('click', () => {
@@ -244,21 +244,28 @@
         leftToggle.textContent = '☰';
       }
 
-      updateChatWrapperMargin();
+      updateMainLayout();
     });
 
-    function updateChatWrapperMargin() {
+    function updateMainLayout() {
       const leftOpen = chatHistory.classList.contains('open');
       const rightOpen = articles.classList.contains('open');
       const isMobile = window.innerWidth <= 968;
 
       if (!isMobile) {
-        chatWrapper.style.marginLeft = leftOpen ? '280px' : '0';
-        chatWrapper.style.marginRight = rightOpen ? '280px' : '0';
+        // Desktop: Use grid layout (sidebars push content)
+        main.classList.remove('left-open', 'right-open', 'both-open');
+
+        if (leftOpen && rightOpen) {
+          main.classList.add('both-open');
+        } else if (leftOpen) {
+          main.classList.add('left-open');
+        } else if (rightOpen) {
+          main.classList.add('right-open');
+        }
       } else {
-        // On mobile, sidebars overlay - no margin needed
-        chatWrapper.style.marginLeft = '0';
-        chatWrapper.style.marginRight = '0';
+        // Mobile: Sidebars overlay (no grid classes needed)
+        main.classList.remove('left-open', 'right-open', 'both-open');
       }
     }
 
@@ -273,6 +280,7 @@
           articles.classList.remove('open');
           rightToggle.textContent = '☰';
         }
+        updateMainLayout();
       }
     });
 
@@ -329,7 +337,7 @@
         if (window.innerWidth < 968) {
           chatHistory.classList.remove('open');
           leftToggle.textContent = '☰';
-          updateChatWrapperMargin();
+          updateMainLayout();
         }
       });
     });
