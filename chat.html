@@ -137,11 +137,6 @@
           <button class="btn">📎</button>
           <input type="text" class="input" placeholder="Type a message...">
           <button class="btn">🎤</button>
-          <!-- Mode Selector - ChatGPT Style -->
-          <div class="mode-selector">
-            <button class="mode-btn active" data-mode="ngobrol">Ngobrol</button>
-            <button class="mode-btn" data-mode="mendalam">Mendalam</button>
-          </div>
           <button class="btn">➤</button>
         </div>
       </div>
@@ -357,24 +352,6 @@
     const sendBtn = document.querySelectorAll('.btn')[2]; // ➤ button
     const attachBtn = document.querySelectorAll('.btn')[0]; // 📎 button
 
-    // ZANTARA Mode Management - ChatGPT Style
-    let currentMode = 'ngobrol'; // Default mode
-
-    // Mode selector functionality
-    const modeButtons = document.querySelectorAll('.mode-btn');
-
-    modeButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        // Remove active from all buttons
-        modeButtons.forEach(b => b.classList.remove('active'));
-        // Add active to clicked button
-        btn.classList.add('active');
-        // Update current mode
-        currentMode = btn.dataset.mode;
-        console.log(`💭 Mode: ${currentMode === 'ngobrol' ? 'Ngobrol (casual chat)' : 'Mendalam (deep thinking)'}`);
-      });
-    });
-
     // Send message
     async function sendMessage() {
       const message = inputField.value.trim();
@@ -412,14 +389,13 @@
         // Get user session
         const userEmail = localStorage.getItem('zantara-user-email') || 'guest';
 
-        // Call ZANTARA AI API with session and mode (RAG + Tool Use enabled)
+        // Call ZANTARA AI API (RAG + Tool Use enabled)
         const response = await window.ZANTARA_API.call('/call', {
           key: 'bali.zero.chat',
           params: {
             query: message,
             user_email: userEmail,  // For user recognition
-            user_role: 'member',
-            mode: currentMode  // ZANTARA mode: 'santai' or 'pikiran'
+            user_role: 'member'
           }
         }, true);
 

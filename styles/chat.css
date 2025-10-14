@@ -634,58 +634,6 @@ body.day-mode .input-area {
   border-top-color: #e0e0e0;
 }
 
-/* Mode Selector - ChatGPT Style */
-.mode-selector {
-  display: flex;
-  gap: 0;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 2px;
-  margin: 0 8px;
-}
-
-body.day-mode .mode-selector {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.mode-btn {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.6);
-  padding: 6px 12px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  font-family: inherit;
-}
-
-.mode-btn:hover {
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.mode-btn.active {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-}
-
-body.day-mode .mode-btn {
-  color: rgba(0, 0, 0, 0.6);
-}
-
-body.day-mode .mode-btn:hover {
-  color: rgba(0, 0, 0, 0.9);
-  background: rgba(0, 0, 0, 0.05);
-}
-
-body.day-mode .mode-btn.active {
-  background: rgba(0, 0, 0, 0.1);
-  color: #000;
-}
-
 .input {
   flex: 1;
   background: none;
