@@ -415,7 +415,7 @@ body.day-mode .chat-wrapper::before {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 20px;
-  padding-bottom: 100px;
+  padding-bottom: 180px;
   scroll-behavior: smooth;
   display: flex;
   flex-direction: column;
@@ -518,6 +518,11 @@ body.day-mode .logo-center {
   align-items: center;
   overflow-x: auto;
   flex-shrink: 0;
+  position: fixed;
+  bottom: 72px;
+  left: 0;
+  right: 0;
+  z-index: 99;
 }
 
 body.day-mode .integrations-bar {

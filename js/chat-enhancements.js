@@ -510,8 +510,10 @@
   function initialize() {
     console.log('🚀 Initializing ZANTARA Chat Enhancements...');
 
-    // Create mobile bottom nav
-    if (window.innerWidth <= 768) {
+    // Create mobile bottom nav ONLY on true mobile devices
+    // Use matchMedia for reliable mobile detection
+    const isMobile = window.matchMedia('(max-width: 768px) and (hover: none)').matches;
+    if (isMobile) {
       createMobileBottomNav();
     }
 
