@@ -514,8 +514,8 @@
             <div id="teamLoginSection" style="display: none;">
                 <form id="teamLoginForm">
                     <div class="form-group">
-                        <label class="form-label" for="teamName">Nome</label>
-                        <input type="text" id="teamName" class="form-input" placeholder="Il tuo nome" required autocomplete="name">
+                        <label class="form-label" for="teamEmail">Email aziendale</label>
+                        <input type="email" id="teamEmail" class="form-input" placeholder="your.name@balizero.com" required autocomplete="email">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="teamPin">PIN (6 cifre)</label>
@@ -533,7 +533,7 @@
                         <!-- Attempts Warning -->
                         <div class="attempts-warning" id="attemptsWarning"></div>
                     </div>
-                    <button type="submit" id="teamLoginSubmitBtn" class="btn-primary">Accedi al Team</button>
+                    <button type="submit" id="teamLoginBtn" class="btn-primary">Accedi al Team</button>
                 </form>
             </div>
 
@@ -678,107 +678,6 @@
 
         // Auto-focus email
         document.getElementById('email').focus();
-
-        // PIN Visual Indicator
-        const teamPinInput = document.getElementById('teamPin');
-        const pinDots = document.querySelectorAll('.pin-dot');
-
-        if (teamPinInput) {
-            teamPinInput.addEventListener('input', (e) => {
-                const length = e.target.value.length;
-
-                pinDots.forEach((dot, index) => {
-                    if (index < length) {
-                        dot.classList.add('filled');
-                        dot.classList.remove('complete');
-                    } else {
-                        dot.classList.remove('filled', 'complete');
-                    }
-                });
-
-                // Mark all as complete when PIN is fully entered
-                if (length === 6) {
-                    pinDots.forEach(dot => {
-                        dot.classList.add('complete');
-                        dot.classList.remove('filled');
-                    });
-                }
-            });
-        }
-
-        // Team Login Form Handler
-        const teamLoginForm = document.getElementById('teamLoginForm');
-        if (teamLoginForm) {
-            teamLoginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                const name = document.getElementById('teamName').value;
-                const pin = document.getElementById('teamPin').value;
-                const submitBtn = document.getElementById('teamLoginSubmitBtn');
-                const messageDiv = document.getElementById('loginMessage');
-
-                // Show loading state
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Accesso in corso...';
-
-                try {
-                    // Call team login API
-                    const response = await fetch('https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app/call', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'x-api-key': 'zantara-internal-dev-key-2025'
-                        },
-                        body: JSON.stringify({
-                            key: 'team.login',
-                            params: {
-                                name: name,
-                                email: name.toLowerCase().replace(/\s+/g, '.') + '@balizero.com',
-                                pin: pin
-                            }
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (data.ok && data.data) {
-                        // Save session
-                        localStorage.setItem('zantara-session', JSON.stringify(data.data));
-                        localStorage.setItem('zantara-user-name', data.data.user.name);
-                        localStorage.setItem('zantara-user-email', data.data.user.email);
-                        localStorage.setItem('zantara-user-role', data.data.user.role);
-                        localStorage.setItem('zantara-user-department', data.data.user.department);
-
-                        // Show success message
-                        messageDiv.className = 'message success';
-                        messageDiv.textContent = data.data.personalizedResponse || 'Login effettuato con successo!';
-                        messageDiv.style.display = 'block';
-
-                        // Redirect to chat
-                        setTimeout(() => {
-                            window.location.href = 'chat.html';
-                        }, 1500);
-                    } else {
-                        // Show error
-                        messageDiv.className = 'message error';
-                        messageDiv.textContent = data.error || 'Credenziali non valide';
-                        messageDiv.style.display = 'block';
-
-                        // Reset form
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Accedi al Team';
-                    }
-                } catch (error) {
-                    console.error('Login error:', error);
-                    messageDiv.className = 'message error';
-                    messageDiv.textContent = 'Errore di connessione. Riprova.';
-                    messageDiv.style.display = 'block';
-
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Accedi al Team';
-                }
-            });
-        }
     </script>
 </body>
 </html>
