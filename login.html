@@ -514,8 +514,8 @@
             <div id="teamLoginSection" style="display: none;">
                 <form id="teamLoginForm">
                     <div class="form-group">
-                        <label class="form-label" for="teamEmail">Email aziendale</label>
-                        <input type="email" id="teamEmail" class="form-input" placeholder="your.name@balizero.com" required autocomplete="email">
+                        <label class="form-label" for="teamName">Nome</label>
+                        <input type="text" id="teamName" class="form-input" placeholder="Il tuo nome" required autocomplete="name">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="teamPin">PIN (6 cifre)</label>
@@ -712,7 +712,7 @@
             teamLoginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                const email = document.getElementById('teamEmail').value;
+                const name = document.getElementById('teamName').value;
                 const pin = document.getElementById('teamPin').value;
                 const submitBtn = document.getElementById('teamLoginSubmitBtn');
                 const messageDiv = document.getElementById('loginMessage');
@@ -732,7 +732,8 @@
                         body: JSON.stringify({
                             key: 'team.login',
                             params: {
-                                email: email,
+                                name: name,
+                                email: name.toLowerCase().replace(/\s+/g, '.') + '@balizero.com',
                                 pin: pin
                             }
                         })
@@ -744,7 +745,7 @@
                         // Save session
                         localStorage.setItem('zantara-session', JSON.stringify(data.data));
                         localStorage.setItem('zantara-user-name', data.data.user.name);
-                        localStorage.setItem('zantara-user-email', email);
+                        localStorage.setItem('zantara-user-email', data.data.user.email);
                         localStorage.setItem('zantara-user-role', data.data.user.role);
                         localStorage.setItem('zantara-user-department', data.data.user.department);
 
