@@ -405,7 +405,17 @@
 
         // Extract response from API (supports multiple formats)
         const aiResponse = response?.response || response?.data?.response || response?.reply || response?.message || response?.text || 'Response received from Zantara AI.';
-        aiMsg.textContent = aiResponse;
+
+        // Format message with MessageFormatter (supports markdown, lists, bold, etc.)
+        if (window.MessageFormatter) {
+          aiMsg.innerHTML = MessageFormatter.formatStructuredMessage(aiResponse, {
+            showCTA: true,
+            language: MessageFormatter.detectLanguage(aiResponse, 'it')
+          });
+        } else {
+          // Fallback if formatter not loaded
+          aiMsg.textContent = aiResponse;
+        }
 
         messagesDiv.appendChild(aiMsg);
         scrollToBottom();
