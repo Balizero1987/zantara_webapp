@@ -200,15 +200,6 @@
   </div>
 
   <script>
-    // AUTH CHECK: Redirect to login if not authenticated
-    (function() {
-      const userEmail = localStorage.getItem('zantara-user-email');
-      if (!userEmail) {
-        window.location.href = 'login.html';
-        return;
-      }
-    })();
-
     // Filter functionality
     document.querySelectorAll('.filter').forEach(filter => {
       filter.addEventListener('click', () => {
