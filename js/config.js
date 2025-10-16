@@ -8,9 +8,9 @@
 export const config = {
   // API Endpoints
   api: {
-    // UPDATED 2025-10-16: Railway RAG Backend (scintillating-kindness)
-    baseUrl: import.meta.env?.VITE_API_BASE_URL || 'https://scintillating-kindness-production-47e3.up.railway.app',
-    proxyUrl: import.meta.env?.VITE_PROXY_URL || 'https://scintillating-kindness-production-47e3.up.railway.app',
+    // Updated to point to new RAG backend with mock auth (2025-10-02)
+    baseUrl: import.meta.env?.VITE_API_BASE_URL || 'https://zantara-rag-backend-1064094238013.europe-west1.run.app',
+    proxyUrl: import.meta.env?.VITE_PROXY_URL || 'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app',
     timeout: 30000,
     retryAttempts: 3,
     retryDelay: 1000,

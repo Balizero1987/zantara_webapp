@@ -390,12 +390,9 @@
         const userEmail = localStorage.getItem('zantara-user-email') || 'guest';
 
         // Call ZANTARA AI API (RAG + Tool Use enabled)
-        const response = await window.ZANTARA_API.call('/call', {
-          key: 'ai.chat',
-          params: {
-            message: message,
-            user_email: userEmail  // For user recognition
-          }
+        const response = await window.ZANTARA_API.call('/bali-zero/chat', {
+          query: message,
+          user_email: userEmail  // For user recognition
         }, true);
 
         // Remove loading indicator
@@ -407,7 +404,7 @@
         aiMsg.className = 'ai-message';
 
         // Extract response from API (supports multiple formats)
-        const aiResponse = response?.data?.response || response?.reply || response?.message || response?.text || 'Response received from Zantara AI.';
+        const aiResponse = response?.response || response?.data?.response || response?.reply || response?.message || response?.text || 'Response received from Zantara AI.';
         aiMsg.textContent = aiResponse;
 
         messagesDiv.appendChild(aiMsg);
@@ -522,12 +519,9 @@
           const introMessage = `Ciao, sono ${firstName}`;
 
           try {
-            const response = await window.ZANTARA_API.call('/call', {
-              key: 'ai.chat',
-              params: {
-                message: introMessage,
-                user_email: userEmail  // For user recognition
-              }
+            const response = await window.ZANTARA_API.call('/bali-zero/chat', {
+              query: introMessage,
+              user_email: userEmail  // For user recognition
             }, true);
 
             // Mark as introduced

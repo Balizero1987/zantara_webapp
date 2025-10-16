@@ -202,12 +202,9 @@ export class ChatComponent {
       });
 
       // Add assistant response
-      // Backend adapter returns: {ok: true, data: {response, model, ai_used}}
-      const assistantMessage = response.data?.response || response.result || response.message || 'No response';
-
       stateManager.addMessage({
         role: 'assistant',
-        content: assistantMessage,
+        content: response.result || response.message || 'No response',
       });
     } catch (error) {
       console.error('Chat error:', error);

@@ -7,20 +7,17 @@ const API_CONFIG = {
   // Proxy/BFF endpoints (server-side adds x-api-key, client sends x-user-id)
   proxy: {
     production: {
-      // UPDATED 2025-10-16: Using Railway RAG Backend (scintillating-kindness)
+      // UPDATED 2025-10-16: Railway RAG Backend (Python FastAPI with ChromaDB)
       base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://scintillating-kindness-production-47e3.up.railway.app',
-      call: '/call', // NEW: Webapp compatibility adapter endpoint
-      ai: '/call',  // Webapp format {key: 'ai.chat', params: {message, ...}}
-      aiStream: '/bali-zero/chat.stream', // Streaming endpoint (if available)
-      pricingOfficial: '/call', // Fallback to generic call endpoint
-      priceLookup: '/call',
+      call: '/bali-zero/chat',
+      search: '/search',
       health: '/health'
     }
   },
   // Direct endpoints (Railway RAG Backend) — used only when explicitly forced in dev
   production: {
     base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://scintillating-kindness-production-47e3.up.railway.app',
-    call: '/call', // NEW: Webapp compatibility adapter endpoint
+    call: '/bali-zero/chat',
     health: '/health'
   },
   // Streaming configuration
