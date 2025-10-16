@@ -391,11 +391,10 @@
 
         // Call ZANTARA AI API (RAG + Tool Use enabled)
         const response = await window.ZANTARA_API.call('/call', {
-          key: 'bali.zero.chat',
+          key: 'ai.chat',
           params: {
-            query: message,
-            user_email: userEmail,  // For user recognition
-            user_role: 'member'
+            message: message,
+            user_email: userEmail  // For user recognition
           }
         }, true);
 
@@ -524,11 +523,10 @@
 
           try {
             const response = await window.ZANTARA_API.call('/call', {
-              key: 'bali.zero.chat',
+              key: 'ai.chat',
               params: {
-                query: introMessage,
-                user_email: userEmail,  // For user recognition
-                user_role: 'member'
+                message: introMessage,
+                user_email: userEmail  // For user recognition
               }
             }, true);
 
