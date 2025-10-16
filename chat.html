@@ -409,7 +409,7 @@
         // Format message with MessageFormatter (supports markdown, lists, bold, etc.)
         if (window.MessageFormatter) {
           aiMsg.innerHTML = MessageFormatter.formatStructuredMessage(aiResponse, {
-            showCTA: true,
+            showCTA: false,  // CTA is already in backend response, don't duplicate
             language: MessageFormatter.detectLanguage(aiResponse, 'it')
           });
         } else {
