@@ -9,8 +9,8 @@ const API_CONFIG = {
     production: {
       // UPDATED 2025-10-16: Using Railway RAG Backend (scintillating-kindness)
       base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://scintillating-kindness-production-47e3.up.railway.app',
-      call: '/bali-zero/chat', // Railway RAG chat endpoint
-      ai: '/bali-zero/chat',  // Same endpoint for AI chat
+      call: '/call', // NEW: Webapp compatibility adapter endpoint
+      ai: '/call',  // Webapp format {key: 'ai.chat', params: {message, ...}}
       aiStream: '/bali-zero/chat.stream', // Streaming endpoint (if available)
       pricingOfficial: '/call', // Fallback to generic call endpoint
       priceLookup: '/call',
@@ -20,7 +20,7 @@ const API_CONFIG = {
   // Direct endpoints (Railway RAG Backend) — used only when explicitly forced in dev
   production: {
     base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://scintillating-kindness-production-47e3.up.railway.app',
-    call: '/bali-zero/chat',
+    call: '/call', // NEW: Webapp compatibility adapter endpoint
     health: '/health'
   },
   // Streaming configuration
