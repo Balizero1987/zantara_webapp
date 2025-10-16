@@ -7,20 +7,20 @@ const API_CONFIG = {
   // Proxy/BFF endpoints (server-side adds x-api-key, client sends x-user-id)
   proxy: {
     production: {
-      // CORRECTED 2025-10-15: Using ACTUAL deployed Cloud Run URL
-      base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://zantara-v520-nuzantara-1064094238013.europe-west1.run.app',
-      call: '/call',
-      ai: '/ai.chat',
-      aiStream: '/ai.chat.stream',
-      pricingOfficial: '/pricing.official',
-      priceLookup: '/price.lookup',
+      // UPDATED 2025-10-16: Using Railway RAG Backend (scintillating-kindness)
+      base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://scintillating-kindness-production-47e3.up.railway.app',
+      call: '/bali-zero/chat', // Railway RAG chat endpoint
+      ai: '/bali-zero/chat',  // Same endpoint for AI chat
+      aiStream: '/bali-zero/chat.stream', // Streaming endpoint (if available)
+      pricingOfficial: '/call', // Fallback to generic call endpoint
+      priceLookup: '/call',
       health: '/health'
     }
   },
-  // Direct endpoints (Cloud Run) — used only when explicitly forced in dev
+  // Direct endpoints (Railway RAG Backend) — used only when explicitly forced in dev
   production: {
-    base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://zantara-v520-nuzantara-1064094238013.europe-west1.run.app',
-    call: '/call',
+    base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://scintillating-kindness-production-47e3.up.railway.app',
+    call: '/bali-zero/chat',
     health: '/health'
   },
   // Streaming configuration
