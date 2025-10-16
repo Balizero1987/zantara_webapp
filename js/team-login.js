@@ -5,7 +5,8 @@
 
 class SecureTeamLogin {
   constructor() {
-    this.apiBase = 'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app';
+    // UPDATED 2025-10-16: Using Railway RAG Backend
+    this.apiBase = 'https://scintillating-kindness-production-47e3.up.railway.app';
     this.apiKey = 'zantara-internal-dev-key-2025';
     this.currentUser = null;
     this.token = null;
