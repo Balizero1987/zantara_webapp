@@ -673,8 +673,10 @@
             // CRITICAL: Reset introduction flag on NEW login
             sessionStorage.removeItem('zantara-introduced');
 
-            // Redirect to chat
-            window.location.href = 'chat.html';
+            // Redirect to chat or original destination
+            const redirectUrl = sessionStorage.getItem('zantara-redirect-after-login') || 'chat.html';
+            sessionStorage.removeItem('zantara-redirect-after-login'); // Clean up
+            window.location.href = redirectUrl;
         });
 
         // Auto-focus email

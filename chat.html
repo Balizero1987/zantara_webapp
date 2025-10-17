@@ -6,6 +6,7 @@
   <title>ZANTARA - Official</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <script src="js/api-config.js"></script>
+  <script src="js/team-login.js"></script>
   <link rel="stylesheet" href="styles/design-tokens.css">
   <link rel="stylesheet" href="styles/chat.css">
   <link rel="stylesheet" href="styles/message-formatter.css">
@@ -17,6 +18,28 @@
   <script src="js/message-formatter.js"></script>
   <script src="js/user-badges.js"></script>
   <script src="js/chat-enhancements.js"></script>
+
+  <!-- 🔒 AUTH GUARD - Redirect to login if not authenticated -->
+  <script>
+    // IMPORTANT: This runs BEFORE page loads to prevent unauthorized access
+    (function() {
+      // Check authentication status
+      const token = localStorage.getItem('zantara-auth-token');
+      const user = localStorage.getItem('zantara-user');
+
+      // Legacy public login support (for backward compatibility)
+      const legacyEmail = localStorage.getItem('zantara-user-email');
+
+      // If neither team auth nor legacy auth exists, redirect to login
+      if (!token && !user && !legacyEmail) {
+        // Store attempted URL for redirect after login
+        sessionStorage.setItem('zantara-redirect-after-login', window.location.href);
+
+        // Redirect to login page
+        window.location.replace('login.html');
+      }
+    })();
+  </script>
 </head>
 <body>
   <!-- APP -->

@@ -5,7 +5,8 @@
 
 class SecureTeamLogin {
   constructor() {
-    this.apiBase = 'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app';
+    // Railway RAG Backend (PRIMARY) - supports team.login.secure via TypeScript proxy
+    this.apiBase = 'https://nuzantara-production.up.railway.app';
     this.apiKey = 'zantara-internal-dev-key-2025';
     this.currentUser = null;
     this.token = null;
@@ -310,9 +311,11 @@ class SecureTeamLogin {
           pinInput.value = '';
           this.updatePinIndicator(0);
 
-          // Redirect to chat
+          // Redirect to chat or original destination
           setTimeout(() => {
-            window.location.href = 'chat.html';
+            const redirectUrl = sessionStorage.getItem('zantara-redirect-after-login') || 'chat.html';
+            sessionStorage.removeItem('zantara-redirect-after-login'); // Clean up
+            window.location.href = redirectUrl;
           }, 1500);
         } else {
           // Feature #3: Parse remaining attempts from error message
