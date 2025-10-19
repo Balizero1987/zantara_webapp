@@ -18,6 +18,9 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/phosphor-icons/2.0.0/bold/style.min.css">
 
+    <!-- WebSocket Client -->
+    <script src="js/zantara-websocket.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -501,6 +504,280 @@
             color: var(--z-text-muted);
         }
 
+        /* WebSocket Connection Status */
+        .ws-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--z-radius-md);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .ws-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .ws-status.connected .ws-status-dot {
+            background: #10b981;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Chat Widget */
+        .chat-widget {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 380px;
+            height: 500px;
+            background: var(--z-bg-card);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--z-border-subtle);
+            border-radius: var(--z-radius-xl);
+            box-shadow: var(--z-shadow-xl);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transform: translateY(calc(100% + 24px));
+            transition: transform var(--z-transition-base);
+        }
+
+        .chat-widget.open {
+            transform: translateY(0);
+        }
+
+        .chat-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--z-border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .chat-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--z-radius-md);
+            background: var(--z-gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .chat-close {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--z-radius-md);
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: var(--z-text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--z-transition-fast);
+        }
+
+        .chat-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--z-text-primary);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 12px;
+            animation: slideInUp 0.3s ease-out;
+        }
+
+        .chat-message.own {
+            flex-direction: row-reverse;
+        }
+
+        .chat-message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--z-radius-md);
+            background: var(--z-gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .chat-message.own .chat-message-avatar {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-message-content {
+            max-width: 70%;
+        }
+
+        .chat-message-bubble {
+            padding: 12px 16px;
+            border-radius: var(--z-radius-lg);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--z-border-subtle);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .chat-message.own .chat-message-bubble {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .chat-message-time {
+            font-size: 11px;
+            color: var(--z-text-muted);
+            margin-top: 4px;
+            padding: 0 4px;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-input-container {
+            padding: 16px 20px;
+            border-top: 1px solid var(--z-border-subtle);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--z-border-subtle);
+            border-radius: var(--z-radius-lg);
+            padding: 12px 16px;
+            color: var(--z-text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: all var(--z-transition-fast);
+        }
+
+        .chat-input:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--z-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .chat-input::placeholder {
+            color: var(--z-text-muted);
+        }
+
+        .chat-send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--z-radius-md);
+            background: var(--z-gradient-primary);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--z-transition-fast);
+        }
+
+        .chat-send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--z-shadow-glow);
+        }
+
+        .chat-send-btn:active {
+            transform: translateY(0);
+        }
+
+        .chat-toggle-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--z-gradient-primary);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--z-shadow-xl);
+            z-index: 999;
+            transition: all var(--z-transition-base);
+        }
+
+        .chat-toggle-btn:hover {
+            transform: scale(1.1);
+            box-shadow: var(--z-shadow-glow);
+        }
+
+        .chat-toggle-btn.hide {
+            transform: scale(0);
+        }
+
+        .chat-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background: #ef4444;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--z-bg-primary);
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .sidebar {
@@ -517,6 +794,13 @@
             .charts-grid {
                 grid-template-columns: 1fr;
             }
+
+            .chat-widget {
+                width: calc(100vw - 48px);
+                right: 24px;
+                left: 24px;
+                bottom: 24px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -531,6 +815,10 @@
 
             .stats-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .chat-widget {
+                height: calc(100vh - 48px);
             }
         }
     </style>
@@ -591,9 +879,15 @@
                 </div>
 
                 <div class="topbar-actions">
-                    <button class="icon-button">
+                    <!-- WebSocket Status -->
+                    <div class="ws-status" id="wsStatus">
+                        <span class="ws-status-dot"></span>
+                        <span>Connecting...</span>
+                    </div>
+
+                    <button class="icon-button" id="notificationsBtn">
                         <i class="ph-bold ph-bell"></i>
-                        <span class="notification-badge"></span>
+                        <span class="notification-badge" id="notificationBadge" style="display: none;"></span>
                     </button>
 
                     <button class="icon-button">
@@ -732,9 +1026,63 @@
         </main>
     </div>
 
+    <!-- Chat Widget -->
+    <button class="chat-toggle-btn" id="chatToggle">
+        <i class="ph-bold ph-chats-circle"></i>
+        <span class="chat-badge" id="chatBadge" style="display: none;">0</span>
+    </button>
+
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-header">
+            <div class="chat-header-title">
+                <div class="chat-avatar">Z</div>
+                <div>
+                    <div style="font-size: 14px; font-weight: 600;">ZANTARA AI</div>
+                    <div style="font-size: 11px; color: var(--z-text-muted);" id="chatStatus">Connecting...</div>
+                </div>
+            </div>
+            <button class="chat-close" id="chatClose">
+                <i class="ph-bold ph-x"></i>
+            </button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-message">
+                <div class="chat-message-avatar">Z</div>
+                <div class="chat-message-content">
+                    <div class="chat-message-bubble">
+                        Welcome to ZANTARA! I'm your AI assistant. How can I help you today?
+                    </div>
+                    <div class="chat-message-time">Just now</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Type your message...">
+                <button class="chat-send-btn" id="chatSend">
+                    <i class="ph-bold ph-paper-plane-tilt"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Global WebSocket instance
+        let zantaraWS = null;
+        let currentUser = 'zero@balizero.com';
+        let unreadMessages = 0;
+        let unreadNotifications = 0;
+
         // Add interactivity
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize WebSocket
+            initializeWebSocket();
+
+            // Chat UI handlers
+            initializeChatUI();
+
             // Animate stats on scroll
             const observeElements = () => {
                 const observer = new IntersectionObserver((entries) => {
@@ -768,6 +1116,246 @@
 
             observeElements();
         });
+
+        // Initialize WebSocket
+        function initializeWebSocket() {
+            console.log('🔌 Initializing WebSocket...');
+
+            zantaraWS = new ZantaraWebSocket(currentUser, {
+                debug: true,
+                autoReconnect: true
+            });
+
+            // Connected event
+            zantaraWS.on('connected', (data) => {
+                console.log('✅ WebSocket connected!', data);
+                updateWSStatus(true);
+                updateChatStatus('Online');
+
+                // Subscribe to channels
+                zantaraWS.subscribe('chat');
+                zantaraWS.subscribe('notifications');
+                zantaraWS.subscribe('analytics');
+            });
+
+            // Disconnected event
+            zantaraWS.on('disconnected', (data) => {
+                console.log('❌ WebSocket disconnected', data);
+                updateWSStatus(false);
+                updateChatStatus('Offline');
+            });
+
+            // Error event
+            zantaraWS.on('error', (data) => {
+                console.error('WebSocket error:', data);
+            });
+
+            // Chat messages
+            zantaraWS.on('chat', (data) => {
+                console.log('💬 Chat message:', data);
+                addChatMessage(data, false);
+
+                // Show badge if chat is closed
+                const chatWidget = document.getElementById('chatWidget');
+                if (!chatWidget.classList.contains('open')) {
+                    unreadMessages++;
+                    updateChatBadge();
+                }
+            });
+
+            // Notifications
+            zantaraWS.on('notifications', (data) => {
+                console.log('🔔 Notification:', data);
+                showNotification(data);
+                unreadNotifications++;
+                updateNotificationBadge();
+            });
+
+            // Analytics (update stats in real-time)
+            zantaraWS.on('analytics', (data) => {
+                console.log('📊 Analytics update:', data);
+                updateDashboardStats(data);
+            });
+        }
+
+        // Update WebSocket status in topbar
+        function updateWSStatus(connected) {
+            const wsStatus = document.getElementById('wsStatus');
+            const statusText = wsStatus.querySelector('span:last-child');
+
+            if (connected) {
+                wsStatus.classList.add('connected');
+                statusText.textContent = 'Connected';
+            } else {
+                wsStatus.classList.remove('connected');
+                statusText.textContent = 'Disconnected';
+            }
+        }
+
+        // Update chat status
+        function updateChatStatus(status) {
+            const chatStatus = document.getElementById('chatStatus');
+            chatStatus.textContent = status;
+        }
+
+        // Initialize Chat UI
+        function initializeChatUI() {
+            const chatToggle = document.getElementById('chatToggle');
+            const chatClose = document.getElementById('chatClose');
+            const chatWidget = document.getElementById('chatWidget');
+            const chatInput = document.getElementById('chatInput');
+            const chatSend = document.getElementById('chatSend');
+
+            // Toggle chat
+            chatToggle.addEventListener('click', () => {
+                chatWidget.classList.add('open');
+                chatToggle.classList.add('hide');
+                chatInput.focus();
+
+                // Clear unread messages
+                unreadMessages = 0;
+                updateChatBadge();
+            });
+
+            // Close chat
+            chatClose.addEventListener('click', () => {
+                chatWidget.classList.remove('open');
+                chatToggle.classList.remove('hide');
+            });
+
+            // Send message on Enter
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+
+            // Send message on button click
+            chatSend.addEventListener('click', () => {
+                sendChatMessage();
+            });
+        }
+
+        // Send chat message
+        function sendChatMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+
+            if (!message) return;
+
+            // Add message to UI
+            addChatMessage({ text: message, user: currentUser }, true);
+
+            // Send via WebSocket
+            if (zantaraWS && zantaraWS.isConnected()) {
+                zantaraWS.sendMessage('chat', {
+                    text: message,
+                    user: currentUser,
+                    timestamp: new Date().toISOString()
+                });
+            } else {
+                console.warn('WebSocket not connected - message not sent');
+            }
+
+            // Clear input
+            chatInput.value = '';
+        }
+
+        // Add chat message to UI
+        function addChatMessage(data, isOwn = false) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageEl = document.createElement('div');
+            messageEl.className = 'chat-message' + (isOwn ? ' own' : '');
+
+            const initials = isOwn ? 'Z' : 'AI';
+            const time = new Date().toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            messageEl.innerHTML = `
+                <div class="chat-message-avatar">${initials}</div>
+                <div class="chat-message-content">
+                    <div class="chat-message-bubble">
+                        ${escapeHtml(data.text || JSON.stringify(data))}
+                    </div>
+                    <div class="chat-message-time">${time}</div>
+                </div>
+            `;
+
+            chatMessages.appendChild(messageEl);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Update chat badge
+        function updateChatBadge() {
+            const chatBadge = document.getElementById('chatBadge');
+            if (unreadMessages > 0) {
+                chatBadge.textContent = unreadMessages > 99 ? '99+' : unreadMessages;
+                chatBadge.style.display = 'flex';
+            } else {
+                chatBadge.style.display = 'none';
+            }
+        }
+
+        // Update notification badge
+        function updateNotificationBadge() {
+            const notificationBadge = document.getElementById('notificationBadge');
+            if (unreadNotifications > 0) {
+                notificationBadge.style.display = 'block';
+            } else {
+                notificationBadge.style.display = 'none';
+            }
+        }
+
+        // Show notification (could expand to use browser notifications API)
+        function showNotification(data) {
+            console.log('Notification:', data);
+            // TODO: Add notification UI (toast, banner, etc.)
+            // For now, just update activity feed
+            updateActivityFeed(data);
+        }
+
+        // Update dashboard stats (from analytics channel)
+        function updateDashboardStats(data) {
+            // Example: update stat cards with real-time data
+            if (data.activeApplications) {
+                // Update applications stat
+            }
+            if (data.aiInteractions) {
+                // Update AI interactions stat
+            }
+        }
+
+        // Update activity feed
+        function updateActivityFeed(data) {
+            // Add to activity feed in real-time
+            const activityFeed = document.querySelector('.activity-feed');
+            if (activityFeed && data.type === 'activity') {
+                const activityItem = document.createElement('div');
+                activityItem.className = 'activity-item';
+                activityItem.innerHTML = `
+                    <div class="activity-avatar">${data.user?.substring(0, 2).toUpperCase() || 'AI'}</div>
+                    <div class="activity-content">
+                        <div class="activity-text">${escapeHtml(data.message || data.text)}</div>
+                        <div class="activity-time">Just now</div>
+                    </div>
+                `;
+                activityFeed.insertBefore(activityItem, activityFeed.firstChild);
+
+                // Keep only last 10 items
+                while (activityFeed.children.length > 10) {
+                    activityFeed.removeChild(activityFeed.lastChild);
+                }
+            }
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
     </script>
 </body>
 </html>

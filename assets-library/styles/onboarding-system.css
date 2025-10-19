@@ -1,0 +1,560 @@
+/* ZANTARA Onboarding System - Welcome Flow & Help System */
+
+/* Help Button */
+.z-help-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 9999;
+}
+
+.help-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--z-accent) 0%, var(--z-primary) 100%);
+    border: none;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: var(--z-shadow-lg);
+    transition: all var(--z-transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.help-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--z-shadow-xl);
+}
+
+.help-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--z-focus);
+}
+
+.help-icon {
+    position: relative;
+    z-index: 2;
+}
+
+.help-pulse {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    animation: pulse-ring 2s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Help Menu */
+.z-help-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.help-menu-content {
+    background: var(--z-bg-elevated);
+    border: 1px solid var(--z-border-default);
+    border-radius: var(--z-radius-xl);
+    box-shadow: var(--z-shadow-xl);
+    width: 90%;
+    max-width: 480px;
+    max-height: 600px;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+.help-menu-header {
+    padding: var(--z-space-xl);
+    background: linear-gradient(135deg, var(--z-accent) 0%, var(--z-primary) 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.help-menu-header h3 {
+    margin: 0;
+    font-size: var(--z-font-xl);
+    font-weight: 700;
+}
+
+.close-help-menu {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: var(--z-radius-sm);
+    font-size: 18px;
+    cursor: pointer;
+    transition: all var(--z-transition-fast);
+}
+
+.close-help-menu:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.help-menu-body {
+    padding: var(--z-space-xl);
+}
+
+.help-option {
+    display: flex;
+    align-items: center;
+    gap: var(--z-space-lg);
+    padding: var(--z-space-lg);
+    border-radius: var(--z-radius-md);
+    cursor: pointer;
+    transition: all var(--z-transition-fast);
+    margin-bottom: var(--z-space-md);
+}
+
+.help-option:hover {
+    background: var(--z-bg-hover);
+    transform: translateX(4px);
+}
+
+.help-option:last-child {
+    margin-bottom: 0;
+}
+
+.help-option-icon {
+    font-size: 24px;
+    width: 40px;
+    text-align: center;
+}
+
+.help-option-content h4 {
+    margin: 0 0 4px 0;
+    font-size: var(--z-font-base);
+    color: var(--z-text-primary);
+    font-weight: 600;
+}
+
+.help-option-content p {
+    margin: 0;
+    font-size: var(--z-font-sm);
+    color: var(--z-text-secondary);
+    line-height: 1.4;
+}
+
+/* Tour Steps */
+.tour-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 10000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.z-tour-step {
+    position: fixed;
+    z-index: 10002;
+    background: var(--z-bg-elevated);
+    border: 1px solid var(--z-border-default);
+    border-radius: var(--z-radius-xl);
+    box-shadow: var(--z-shadow-xl);
+    max-width: 400px;
+    min-width: 320px;
+    animation: slideUp 0.3s ease-out;
+}
+
+.z-tour-step.tour-center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 500px;
+}
+
+.tour-content {
+    padding: var(--z-space-xl);
+}
+
+.tour-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--z-space-lg);
+}
+
+.tour-header h3 {
+    margin: 0;
+    font-size: var(--z-font-lg);
+    color: var(--z-text-primary);
+    font-weight: 700;
+}
+
+.tour-skip {
+    background: none;
+    border: none;
+    color: var(--z-text-secondary);
+    font-size: var(--z-font-sm);
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color var(--z-transition-fast);
+}
+
+.tour-skip:hover {
+    color: var(--z-text-primary);
+}
+
+.tour-body {
+    margin-bottom: var(--z-space-xl);
+}
+
+.tour-body p {
+    margin: 0 0 var(--z-space-md) 0;
+    font-size: var(--z-font-base);
+    color: var(--z-text-secondary);
+    line-height: 1.6;
+}
+
+/* Advanced Features Preview */
+.advanced-features-preview {
+    background: var(--z-bg-card);
+    border: 1px solid var(--z-border-subtle);
+    border-radius: var(--z-radius-md);
+    padding: var(--z-space-lg);
+    margin-top: var(--z-space-md);
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: var(--z-space-md);
+    margin-bottom: var(--z-space-sm);
+}
+
+.feature-item:last-child {
+    margin-bottom: 0;
+}
+
+.feature-icon {
+    font-size: 16px;
+    width: 24px;
+    text-align: center;
+}
+
+.feature-name {
+    font-size: var(--z-font-sm);
+    color: var(--z-text-primary);
+    font-weight: 500;
+}
+
+/* Tour Actions */
+.tour-actions {
+    display: flex;
+    gap: var(--z-space-md);
+    margin-bottom: var(--z-space-lg);
+}
+
+.tour-btn {
+    padding: var(--z-space-md) var(--z-space-xl);
+    border: 1px solid var(--z-border-default);
+    border-radius: var(--z-radius-md);
+    font-size: var(--z-font-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--z-transition-fast);
+    flex: 1;
+}
+
+.tour-btn.primary {
+    background: var(--z-primary);
+    color: white;
+    border-color: var(--z-primary);
+}
+
+.tour-btn.primary:hover {
+    background: var(--z-primary-hover);
+    border-color: var(--z-primary-hover);
+}
+
+.tour-btn.secondary {
+    background: transparent;
+    color: var(--z-text-secondary);
+}
+
+.tour-btn.secondary:hover {
+    background: var(--z-bg-hover);
+    color: var(--z-text-primary);
+}
+
+.tour-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--z-focus);
+}
+
+/* Tour Progress */
+.tour-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--z-space-md);
+    border-top: 1px solid var(--z-border-subtle);
+}
+
+.progress-dots {
+    display: flex;
+    gap: var(--z-space-xs);
+}
+
+.progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--z-border-default);
+    transition: all var(--z-transition-fast);
+}
+
+.progress-dot.active {
+    background: var(--z-primary);
+    transform: scale(1.2);
+}
+
+.progress-dot.completed {
+    background: var(--z-success);
+}
+
+.progress-text {
+    font-size: var(--z-font-xs);
+    color: var(--z-text-secondary);
+}
+
+/* Tour Highlight */
+.tour-highlight {
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.4), var(--z-shadow-xl) !important;
+    border-radius: var(--z-radius-md) !important;
+    transition: all var(--z-transition-base) !important;
+}
+
+/* Completion Notification */
+.tour-completion-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10003;
+    background: var(--z-bg-elevated);
+    border: 1px solid var(--z-border-default);
+    border-radius: var(--z-radius-lg);
+    box-shadow: var(--z-shadow-xl);
+    animation: slideInRight 0.3s ease-out;
+    max-width: 350px;
+}
+
+.completion-content {
+    padding: var(--z-space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--z-space-md);
+}
+
+.completion-icon {
+    font-size: 24px;
+}
+
+.completion-text h4 {
+    margin: 0 0 4px 0;
+    font-size: var(--z-font-base);
+    color: var(--z-text-primary);
+    font-weight: 600;
+}
+
+.completion-text p {
+    margin: 0;
+    font-size: var(--z-font-sm);
+    color: var(--z-text-secondary);
+    line-height: 1.4;
+}
+
+.completion-close {
+    margin-left: auto;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: none;
+    color: var(--z-text-secondary);
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: var(--z-radius-sm);
+    transition: all var(--z-transition-fast);
+}
+
+.completion-close:hover {
+    background: var(--z-bg-hover);
+    color: var(--z-text-primary);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .z-help-button {
+        bottom: 80px; /* Account for mobile browser bars */
+        left: 10px;
+    }
+
+    .help-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .help-menu-content {
+        width: 95%;
+        margin: 20px;
+    }
+
+    .help-menu-header,
+    .help-menu-body {
+        padding: var(--z-space-lg);
+    }
+
+    .z-tour-step {
+        max-width: 350px;
+        min-width: 280px;
+        margin: 20px;
+    }
+
+    .z-tour-step.tour-center {
+        max-width: 95%;
+        min-width: 280px;
+    }
+
+    .tour-actions {
+        flex-direction: column;
+    }
+
+    .tour-btn {
+        flex: none;
+    }
+
+    .tour-completion-notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .help-btn,
+    .z-tour-step,
+    .help-menu-content {
+        border-width: 2px;
+    }
+
+    .tour-highlight {
+        box-shadow: 0 0 0 4px var(--z-primary), var(--z-shadow-xl) !important;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .help-pulse,
+    .z-tour-step,
+    .help-menu-content,
+    .tour-completion-notification {
+        animation: none;
+    }
+
+    .help-btn:hover,
+    .help-option:hover,
+    .tour-highlight {
+        transform: none;
+    }
+
+    .progress-dot.active {
+        transform: none;
+    }
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+    .tour-backdrop {
+        background: rgba(0, 0, 0, 0.8);
+    }
+
+    .help-pulse {
+        background: rgba(255, 255, 255, 0.2);
+    }
+}
+
+/* Focus management for accessibility */
+.tour-btn:focus,
+.help-option:focus,
+.close-help-menu:focus,
+.tour-skip:focus {
+    outline: 2px solid var(--z-primary);
+    outline-offset: 2px;
+}
+
+/* Ensure proper contrast */
+.help-menu-header h3,
+.tour-header h3 {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}

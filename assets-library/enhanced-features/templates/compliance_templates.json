@@ -1,0 +1,342 @@
+{
+  "compliance_templates": {
+    "metadata": {
+      "version": "4.1.0",
+      "created": "2025-01-21",
+      "description": "Comprehensive compliance email templates for Zantara Bridge",
+      "total_templates": 15
+    },
+    
+    "visa_compliance": {
+      "visa_application_reminder": {
+        "category": "visa",
+        "priority": "high",
+        "variables": ["recipient_name", "country", "visa_type", "deadline_date", "days_remaining", "reference_number", "required_actions"],
+        "description": "Reminder for upcoming visa application deadlines",
+        "trigger_days": [30, 14, 7, 3, 1]
+      },
+      
+      "visa_document_missing": {
+        "category": "visa",
+        "priority": "critical",
+        "variables": ["recipient_name", "country", "visa_type", "missing_documents", "submission_deadline", "contact_info"],
+        "description": "Alert for missing visa documentation",
+        "trigger_condition": "missing_documents_detected"
+      },
+      
+      "visa_status_update": {
+        "category": "visa",
+        "priority": "medium",
+        "variables": ["recipient_name", "country", "visa_type", "current_status", "next_steps", "estimated_completion"],
+        "description": "Update on visa application status changes",
+        "trigger_condition": "status_change"
+      }
+    },
+    
+    "tax_compliance": {
+      "tax_filing_deadline": {
+        "category": "tax",
+        "priority": "high",
+        "variables": ["recipient_name", "tax_type", "jurisdiction", "deadline_date", "tax_year", "estimated_amount", "required_documents"],
+        "description": "Tax filing deadline notifications",
+        "trigger_days": [60, 30, 14, 7, 1]
+      },
+      
+      "tax_payment_reminder": {
+        "category": "tax",
+        "priority": "critical",
+        "variables": ["recipient_name", "tax_type", "amount_due", "payment_deadline", "payment_methods", "penalty_info"],
+        "description": "Tax payment deadline reminders",
+        "trigger_days": [14, 7, 3, 1]
+      },
+      
+      "tax_regulation_update": {
+        "category": "tax",
+        "priority": "medium",
+        "variables": ["recipient_name", "jurisdiction", "regulation_changes", "effective_date", "impact_assessment", "required_actions"],
+        "description": "Updates on tax regulation changes",
+        "trigger_condition": "regulation_change"
+      }
+    },
+    
+    "permit_compliance": {
+      "work_permit_renewal": {
+        "category": "permit",
+        "priority": "high",
+        "variables": ["recipient_name", "permit_type", "expiry_date", "renewal_requirements", "processing_time", "fee_information"],
+        "description": "Work permit renewal notifications",
+        "trigger_days": [90, 60, 30, 14]
+      },
+      
+      "residence_permit_update": {
+        "category": "permit",
+        "priority": "high",
+        "variables": ["recipient_name", "permit_type", "current_status", "required_updates", "deadline", "supporting_documents"],
+        "description": "Residence permit update requirements",
+        "trigger_condition": "status_change_required"
+      }
+    },
+    
+    "general_compliance": {
+      "compliance_audit_notice": {
+        "category": "compliance",
+        "priority": "critical",
+        "variables": ["recipient_name", "audit_type", "audit_date", "required_documents", "preparation_checklist", "contact_person"],
+        "description": "Notification of upcoming compliance audits",
+        "trigger_condition": "audit_scheduled"
+      },
+      
+      "regulatory_update": {
+        "category": "compliance",
+        "priority": "medium",
+        "variables": ["recipient_name", "regulation_type", "update_summary", "effective_date", "compliance_requirements", "deadline"],
+        "description": "General regulatory updates and changes",
+        "trigger_condition": "regulation_published"
+      },
+      
+      "document_expiry_alert": {
+        "category": "compliance",
+        "priority": "high",
+        "variables": ["recipient_name", "document_type", "document_number", "expiry_date", "renewal_process", "required_actions"],
+        "description": "Alert for expiring compliance documents",
+        "trigger_days": [60, 30, 14, 7]
+      }
+    },
+    
+    "business_compliance": {
+      "license_renewal_notice": {
+        "category": "business",
+        "priority": "high",
+        "variables": ["recipient_name", "license_type", "license_number", "expiry_date", "renewal_fee", "renewal_steps"],
+        "description": "Business license renewal notifications",
+        "trigger_days": [90, 60, 30, 14]
+      },
+      
+      "corporate_filing_reminder": {
+        "category": "business",
+        "priority": "critical",
+        "variables": ["recipient_name", "filing_type", "deadline_date", "required_forms", "filing_fee", "penalties"],
+        "description": "Corporate filing deadline reminders",
+        "trigger_days": [30, 14, 7, 1]
+      },
+      
+      "compliance_training_notice": {
+        "category": "business",
+        "priority": "medium",
+        "variables": ["recipient_name", "training_topic", "training_date", "requirements", "certification_needed", "registration_link"],
+        "description": "Mandatory compliance training notifications",
+        "trigger_condition": "training_scheduled"
+      }
+    },
+    
+    "reporting_templates": {
+      "monthly_compliance_report": {
+        "category": "reporting",
+        "priority": "medium",
+        "variables": ["recipient_name", "report_period", "compliance_summary", "outstanding_items", "next_actions", "report_attachment"],
+        "description": "Monthly compliance status reports",
+        "trigger_schedule": "monthly"
+      },
+      
+      "incident_report_notification": {
+        "category": "reporting",
+        "priority": "critical",
+        "variables": ["recipient_name", "incident_type", "incident_date", "impact_assessment", "corrective_actions", "follow_up_required"],
+        "description": "Compliance incident notifications",
+        "trigger_condition": "incident_detected"
+      }
+    }
+  },
+  
+  "template_configurations": {
+    "default_settings": {
+      "sender_name": "Zantara Bridge Compliance Team",
+      "sender_email": "compliance@zantarabridge.com",
+      "reply_to": "support@zantarabridge.com",
+      "signature": "Best regards,\\nZantara Bridge Compliance Team\\nGenerated automatically by Zantara Bridge v4.1.0",
+      "timezone": "UTC",
+      "language": "en"
+    },
+    
+    "priority_settings": {
+      "critical": {
+        "send_immediately": true,
+        "escalation_hours": 4,
+        "max_retries": 3,
+        "notification_channels": ["email", "sms", "push"]
+      },
+      "high": {
+        "send_immediately": true,
+        "escalation_hours": 24,
+        "max_retries": 2,
+        "notification_channels": ["email", "push"]
+      },
+      "medium": {
+        "send_immediately": false,
+        "batch_sending": true,
+        "escalation_hours": 72,
+        "max_retries": 1,
+        "notification_channels": ["email"]
+      }
+    },
+    
+    "customization_options": {
+      "branding": {
+        "logo_url": "https://assets.zantarabridge.com/logo.png",
+        "primary_color": "#1a73e8",
+        "secondary_color": "#34a853",
+        "font_family": "Arial, sans-serif"
+      },
+      
+      "localization": {
+        "supported_languages": ["en", "es", "fr", "de", "it", "pt"],
+        "date_formats": {
+          "en": "MMMM dd, yyyy",
+          "es": "dd 'de' MMMM 'de' yyyy",
+          "fr": "dd MMMM yyyy",
+          "de": "dd. MMMM yyyy",
+          "it": "dd MMMM yyyy",
+          "pt": "dd 'de' MMMM 'de' yyyy"
+        },
+        "currency_formats": {
+          "USD": "$#,##0.00",
+          "EUR": "€#,##0.00",
+          "GBP": "£#,##0.00"
+        }
+      }
+    }
+  },
+  
+  "automation_rules": {
+    "trigger_conditions": {
+      "deadline_approaching": {
+        "description": "Trigger when deadline is within specified days",
+        "parameters": ["days_threshold"],
+        "applicable_templates": ["visa_application_reminder", "tax_filing_deadline", "work_permit_renewal"]
+      },
+      
+      "document_expiry": {
+        "description": "Trigger when document is approaching expiry",
+        "parameters": ["expiry_threshold_days"],
+        "applicable_templates": ["document_expiry_alert", "license_renewal_notice"]
+      },
+      
+      "status_change": {
+        "description": "Trigger when status changes",
+        "parameters": ["previous_status", "new_status"],
+        "applicable_templates": ["visa_status_update", "residence_permit_update"]
+      },
+      
+      "scheduled_event": {
+        "description": "Trigger based on schedule",
+        "parameters": ["schedule_pattern"],
+        "applicable_templates": ["monthly_compliance_report", "compliance_training_notice"]
+      }
+    },
+    
+    "escalation_rules": {
+      "no_response": {
+        "wait_hours": 24,
+        "action": "send_escalation_email",
+        "escalate_to": "supervisor"
+      },
+      
+      "critical_deadline": {
+        "threshold_days": 3,
+        "action": "increase_frequency",
+        "notification_methods": ["email", "sms", "phone_call"]
+      },
+      
+      "overdue": {
+        "threshold_hours": 0,
+        "action": "immediate_escalation",
+        "escalate_to": "management"
+      }
+    }
+  },
+  
+  "integration_settings": {
+    "calendar_integration": {
+      "create_events": true,
+      "event_duration_minutes": 60,
+      "reminder_minutes": [1440, 60, 15],
+      "calendar_color": "blue"
+    },
+    
+    "crm_integration": {
+      "sync_contacts": true,
+      "track_interactions": true,
+      "update_status": true,
+      "create_tasks": true
+    },
+    
+    "document_management": {
+      "attach_related_docs": true,
+      "generate_pdf_reports": true,
+      "archive_communications": true,
+      "retention_days": 2555
+    }
+  },
+  
+  "compliance_categories": {
+    "visa_immigration": {
+      "description": "Visa and immigration related compliance",
+      "regulations": ["Immigration Act", "Visa Regulations", "Border Control"],
+      "authorities": ["Immigration Department", "Embassy", "Consulate"],
+      "typical_deadlines": [30, 60, 90]
+    },
+    
+    "tax_financial": {
+      "description": "Tax and financial compliance",
+      "regulations": ["Tax Code", "Financial Regulations", "Reporting Standards"],
+      "authorities": ["Tax Authority", "Financial Regulator", "Central Bank"],
+      "typical_deadlines": [30, 90, 365]
+    },
+    
+    "employment_labor": {
+      "description": "Employment and labor compliance",
+      "regulations": ["Labor Law", "Employment Standards", "Safety Regulations"],
+      "authorities": ["Labor Department", "Employment Agency", "Safety Board"],
+      "typical_deadlines": [14, 30, 365]
+    },
+    
+    "business_corporate": {
+      "description": "Business and corporate compliance",
+      "regulations": ["Corporate Law", "Business Regulations", "Licensing Requirements"],
+      "authorities": ["Business Registry", "Licensing Board", "Corporate Regulator"],
+      "typical_deadlines": [30, 90, 365]
+    }
+  },
+  
+  "quality_assurance": {
+    "template_validation": {
+      "required_fields": ["subject", "recipient_name", "content"],
+      "content_guidelines": {
+        "max_subject_length": 150,
+        "min_content_length": 100,
+        "required_elements": ["greeting", "main_content", "call_to_action", "signature"]
+      },
+      "accessibility": {
+        "alt_text_images": true,
+        "readable_fonts": true,
+        "color_contrast": "WCAG_AA",
+        "screen_reader_compatible": true
+      }
+    },
+    
+    "delivery_tracking": {
+      "track_opens": true,
+      "track_clicks": true,
+      "track_replies": true,
+      "bounce_handling": true,
+      "unsubscribe_handling": true
+    },
+    
+    "performance_metrics": {
+      "delivery_rate": "target_95_percent",
+      "open_rate": "target_60_percent",
+      "response_rate": "target_30_percent",
+      "compliance_rate": "target_98_percent"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "app_title": "ZANTARA - Intelligente Assistent",
+  "header_title": "ZANTARA Intelligence",
+  "header_subtitle": "Uw AI-assistent met toegang tot kennis, agenda, e-mail, kaarten en meer",
+
+  "welcome_greeting": "👋 Hallo! Ik ben ZANTARA, uw intelligente assistent.",
+  "welcome_can_help": "Ik kan u helpen met:",
+  "welcome_visas": "📚 Informatie over visa en immigratie",
+  "welcome_calendar": "📅 Agenda- en e-mailbeheer",
+  "welcome_maps": "🗺️ Locaties en routebeschrijvingen vinden",
+  "welcome_memory": "💾 Uw voorkeuren opslaan",
+  "welcome_chat": "🤖 Gesprek over elk onderwerp",
+  "welcome_question": "Wat kan ik voor u doen?",
+
+  "suggestion_visa": "Wat zijn de vereisten voor het Golden Visa?",
+  "suggestion_calendar": "Toon mijn aankomende agenda-evenementen",
+  "suggestion_restaurant": "Restaurants in Ubud vinden",
+  "suggestion_email": "Toon mijn nieuwste e-mails",
+
+  "input_placeholder": "Schrijf uw bericht in natuurlijke taal...",
+  "send_button": "Verzenden",
+  "thinking": "Aan het denken...",
+
+  "error_connection": "Verbindingsfout",
+  "error_unknown": "Onbekende fout",
+  "error_occurred": "Er is een fout opgetreden",
+
+  "sources_prefix": "📚 Bronnen:",
+  "sources_documents": "geraadpleegde documenten",
+
+  "language": "Taal",
+  "select_language": "Taal Selecteren"
+}

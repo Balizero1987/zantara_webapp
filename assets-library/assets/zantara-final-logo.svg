@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient principale -->
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9b87f5"/>
+      <stop offset="50%" style="stop-color:#7c3aed"/>
+      <stop offset="100%" style="stop-color:#6d28d9"/>
+    </linearGradient>
+    
+    <!-- Gradient per overlay -->
+    <linearGradient id="overlayGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:0.9"/>
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:0.9"/>
+    </linearGradient>
+    
+    <!-- Gradient per le linee -->
+    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:0.7"/>
+      <stop offset="100%" style="stop-color:#9b87f5;stop-opacity:0.5"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Gruppo principale centrato -->
+  <g transform="translate(256, 180)">
+    
+    <!-- Petalo centrale -->
+    <path d="M 0,-120 Q -35,-85 -35,-35 Q -35,25 0,40 Q 35,25 35,-35 Q 35,-85 0,-120" 
+          fill="url(#mainGradient)" opacity="0.95"/>
+    
+    <!-- Petali laterali interni (ruotati) -->
+    <g transform="rotate(-35)">
+      <path d="M 0,-110 Q -30,-75 -30,-30 Q -30,20 0,30 Q 30,20 30,-30 Q 30,-75 0,-110" 
+            fill="url(#overlayGradient)" opacity="0.85"/>
+    </g>
+    
+    <g transform="rotate(35)">
+      <path d="M 0,-110 Q -30,-75 -30,-30 Q -30,20 0,30 Q 30,20 30,-30 Q 30,-75 0,-110" 
+            fill="url(#overlayGradient)" opacity="0.85"/>
+    </g>
+    
+    <!-- Petali laterali esterni (più ruotati) -->
+    <g transform="rotate(-65)">
+      <path d="M 0,-100 Q -25,-70 -25,-25 Q -25,15 0,20 Q 25,15 25,-25 Q 25,-70 0,-100" 
+            fill="#a78bfa" opacity="0.7"/>
+    </g>
+    
+    <g transform="rotate(65)">
+      <path d="M 0,-100 Q -25,-70 -25,-25 Q -25,15 0,20 Q 25,15 25,-25 Q 25,-70 0,-100" 
+            fill="#a78bfa" opacity="0.7"/>
+    </g>
+    
+    <!-- Dettagli centrali - piccoli cerchi -->
+    <circle cx="0" cy="-50" r="5" fill="white" opacity="0.6"/>
+    <circle cx="-6" cy="-30" r="4" fill="white" opacity="0.5"/>
+    <circle cx="6" cy="-10" r="3" fill="white" opacity="0.4"/>
+    
+    <!-- Stelo principale -->
+    <path d="M 0,40 L 0,140" stroke="url(#mainGradient)" stroke-width="8" stroke-linecap="round"/>
+    
+    <!-- Linee laterali sottili -->
+    <path d="M 0,140 L -60,180" stroke="url(#lineGradient)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 0,140 L 60,180" stroke="url(#lineGradient)" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Testo ZANTARA -->
+  <text x="256" y="420" font-family="Helvetica, Arial, sans-serif" font-size="52" font-weight="600" 
+        fill="url(#mainGradient)" text-anchor="middle" letter-spacing="8">
+    ZANTARA
+  </text>
+</svg>

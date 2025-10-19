@@ -1,0 +1,471 @@
+/* ZANTARA Feature Discovery - Interactive Tooltips */
+
+.z-feature-tooltip {
+    position: fixed;
+    background: var(--z-bg-elevated);
+    border: 1px solid var(--z-border-default);
+    border-radius: var(--z-radius-lg);
+    box-shadow: var(--z-shadow-xl);
+    max-width: 320px;
+    min-width: 280px;
+    z-index: 10003;
+    animation: featureTooltipIn 0.3s ease-out;
+    font-family: var(--z-font-primary);
+}
+
+/* Category-based styling */
+.z-feature-tooltip.dev {
+    border-left: 4px solid var(--z-warning);
+}
+
+.z-feature-tooltip.zantara {
+    border-left: 4px solid var(--z-primary);
+}
+
+.z-feature-tooltip.performance {
+    border-left: 4px solid var(--z-accent);
+}
+
+.z-feature-tooltip.utility {
+    border-left: 4px solid var(--z-success);
+}
+
+.z-feature-tooltip.advanced {
+    border-left: 4px solid var(--z-secondary);
+}
+
+.z-feature-tooltip.basic {
+    border-left: 4px solid var(--z-neutral-600);
+}
+
+/* Tooltip Content */
+.tooltip-content {
+    padding: var(--z-space-lg);
+}
+
+.tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--z-space-md);
+}
+
+.tooltip-header h4 {
+    margin: 0;
+    font-size: var(--z-font-base);
+    color: var(--z-text-primary);
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.tooltip-close {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: none;
+    color: var(--z-text-secondary);
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: var(--z-radius-sm);
+    transition: all var(--z-transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tooltip-close:hover {
+    background: var(--z-bg-hover);
+    color: var(--z-text-primary);
+}
+
+.tooltip-body {
+    margin-bottom: var(--z-space-lg);
+}
+
+.tooltip-body p {
+    margin: 0 0 var(--z-space-md) 0;
+    font-size: var(--z-font-sm);
+    color: var(--z-text-secondary);
+    line-height: 1.5;
+}
+
+.tooltip-demo-btn {
+    padding: 6px 12px;
+    background: var(--z-accent);
+    color: white;
+    border: none;
+    border-radius: var(--z-radius-sm);
+    font-size: var(--z-font-xs);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--z-transition-fast);
+    margin-top: var(--z-space-sm);
+}
+
+.tooltip-demo-btn:hover {
+    background: var(--z-accent-hover);
+    transform: translateY(-1px);
+}
+
+.tooltip-actions {
+    display: flex;
+    gap: var(--z-space-sm);
+    justify-content: flex-end;
+}
+
+.tooltip-got-it,
+.tooltip-dont-show {
+    padding: 6px 12px;
+    border: 1px solid var(--z-border-default);
+    border-radius: var(--z-radius-sm);
+    font-size: var(--z-font-xs);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--z-transition-fast);
+}
+
+.tooltip-got-it {
+    background: var(--z-primary);
+    color: white;
+    border-color: var(--z-primary);
+}
+
+.tooltip-got-it:hover {
+    background: var(--z-primary-hover);
+    border-color: var(--z-primary-hover);
+}
+
+.tooltip-dont-show {
+    background: transparent;
+    color: var(--z-text-secondary);
+}
+
+.tooltip-dont-show:hover {
+    background: var(--z-bg-hover);
+    color: var(--z-text-primary);
+}
+
+/* Tooltip Arrow */
+.tooltip-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 8px solid transparent;
+}
+
+/* Position-specific arrow styling */
+.z-feature-tooltip.position-top .tooltip-arrow {
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-top-color: var(--z-bg-elevated);
+    border-bottom: none;
+}
+
+.z-feature-tooltip.position-bottom .tooltip-arrow {
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-bottom-color: var(--z-bg-elevated);
+    border-top: none;
+}
+
+.z-feature-tooltip.position-left .tooltip-arrow {
+    right: -16px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-left-color: var(--z-bg-elevated);
+    border-right: none;
+}
+
+.z-feature-tooltip.position-right .tooltip-arrow {
+    left: -16px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-right-color: var(--z-bg-elevated);
+    border-left: none;
+}
+
+.z-feature-tooltip.position-center .tooltip-arrow {
+    display: none;
+}
+
+/* Animations */
+@keyframes featureTooltipIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+/* Feature highlighting effects */
+@keyframes featureHighlight {
+    0% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(99, 102, 241, 0.3);
+    }
+    100% {
+        box-shadow: 0 0 0 20px rgba(99, 102, 241, 0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+}
+
+/* Feature discovery indicators */
+.feature-discovered {
+    position: relative;
+}
+
+.feature-discovered::after {
+    content: '✨';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 12px;
+    background: var(--z-success);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2) rotate(180deg);
+        opacity: 0.8;
+    }
+}
+
+/* Discovery progress indicator */
+.discovery-progress {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--z-bg-elevated);
+    border: 1px solid var(--z-border-default);
+    border-radius: var(--z-radius-lg);
+    padding: var(--z-space-md);
+    box-shadow: var(--z-shadow-md);
+    z-index: 10002;
+    min-width: 200px;
+}
+
+.discovery-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--z-space-sm);
+}
+
+.discovery-progress-title {
+    font-size: var(--z-font-sm);
+    font-weight: 600;
+    color: var(--z-text-primary);
+}
+
+.discovery-progress-close {
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: none;
+    color: var(--z-text-secondary);
+    cursor: pointer;
+    border-radius: var(--z-radius-sm);
+}
+
+.discovery-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--z-bg-surface);
+    border-radius: var(--z-radius-sm);
+    overflow: hidden;
+    margin-bottom: var(--z-space-sm);
+}
+
+.discovery-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--z-accent) 0%, var(--z-primary) 100%);
+    border-radius: var(--z-radius-sm);
+    transition: width var(--z-transition-base);
+}
+
+.discovery-progress-text {
+    font-size: var(--z-font-xs);
+    color: var(--z-text-secondary);
+    text-align: center;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .z-feature-tooltip {
+        max-width: 280px;
+        min-width: 240px;
+        margin: 10px;
+    }
+
+    .tooltip-content {
+        padding: var(--z-space-md);
+    }
+
+    .tooltip-actions {
+        flex-direction: column;
+        gap: var(--z-space-xs);
+    }
+
+    .tooltip-got-it,
+    .tooltip-dont-show {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Adjust positioning for mobile */
+    .z-feature-tooltip.position-left,
+    .z-feature-tooltip.position-right {
+        left: 10px !important;
+        right: 10px !important;
+        width: calc(100vw - 20px);
+        max-width: none;
+    }
+
+    .discovery-progress {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .z-feature-tooltip {
+        border-width: 2px;
+    }
+
+    .tooltip-arrow {
+        border-width: 10px;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .z-feature-tooltip {
+        animation: none;
+    }
+
+    @keyframes featureTooltipIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+
+    .feature-discovered::after {
+        animation: none;
+    }
+
+    .tooltip-demo-btn:hover {
+        transform: none;
+    }
+}
+
+/* Focus management for accessibility */
+.tooltip-close:focus,
+.tooltip-got-it:focus,
+.tooltip-dont-show:focus,
+.tooltip-demo-btn:focus {
+    outline: 2px solid var(--z-primary);
+    outline-offset: 2px;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .tooltip-arrow {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+}
+
+/* Interactive states for discovered features */
+.feature-interactive {
+    transition: all var(--z-transition-base);
+    position: relative;
+}
+
+.feature-interactive:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--z-shadow-md);
+}
+
+.feature-interactive.pulsing {
+    animation: featureHighlight 2s ease-in-out infinite;
+}
+
+/* Category color coding for tooltips */
+.z-feature-tooltip.dev .tooltip-header h4::before {
+    content: '🔧 ';
+}
+
+.z-feature-tooltip.zantara .tooltip-header h4::before {
+    content: '🤖 ';
+}
+
+.z-feature-tooltip.performance .tooltip-header h4::before {
+    content: '⚡ ';
+}
+
+.z-feature-tooltip.utility .tooltip-header h4::before {
+    content: '🛠️ ';
+}
+
+.z-feature-tooltip.advanced .tooltip-header h4::before {
+    content: '🚀 ';
+}
+
+.z-feature-tooltip.basic .tooltip-header h4::before {
+    content: '💡 ';
+}
+
+/* Stacking context for multiple tooltips */
+.z-feature-tooltip:nth-of-type(1) { z-index: 10003; }
+.z-feature-tooltip:nth-of-type(2) { z-index: 10002; }
+.z-feature-tooltip:nth-of-type(3) { z-index: 10001; }
+
+/* Smooth transitions for all interactive elements */
+.z-feature-tooltip * {
+    transition: inherit;
+}
