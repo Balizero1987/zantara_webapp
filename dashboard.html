@@ -21,6 +21,28 @@
     <!-- WebSocket Client -->
     <script src="js/zantara-websocket.js"></script>
 
+    <!-- 🔒 AUTH GUARD - Redirect to login if not authenticated -->
+    <script>
+        // IMPORTANT: This runs BEFORE page loads to prevent unauthorized access
+        (function() {
+            // Check authentication status
+            const token = localStorage.getItem('zantara-auth-token');
+            const user = localStorage.getItem('zantara-user');
+
+            // Legacy public login support (for backward compatibility)
+            const legacyEmail = localStorage.getItem('zantara-user-email');
+
+            // If neither team auth nor legacy auth exists, redirect to login
+            if (!token && !user && !legacyEmail) {
+                // Store attempted URL for redirect after login
+                sessionStorage.setItem('zantara-redirect-after-login', window.location.href);
+
+                // Redirect to login page
+                window.location.replace('login.html');
+            }
+        })();
+    </script>
+
     <style>
         * {
             margin: 0;
@@ -895,10 +917,10 @@
                     </button>
 
                     <div class="user-menu">
-                        <div class="avatar avatar-octagon">Z</div>
+                        <div class="avatar avatar-octagon" id="userAvatar">Z</div>
                         <div>
-                            <div style="font-size: 14px; font-weight: 600;">Zero Master</div>
-                            <div style="font-size: 12px; color: var(--z-text-muted);">CEO</div>
+                            <div style="font-size: 14px; font-weight: 600;" id="userName">Loading...</div>
+                            <div style="font-size: 12px; color: var(--z-text-muted);" id="userRole">...</div>
                         </div>
                     </div>
                 </div>
@@ -1071,12 +1093,28 @@
     <script>
         // Global WebSocket instance
         let zantaraWS = null;
-        let currentUser = 'zero@balizero.com';
+
+        // Get current user from localStorage (set by login)
+        let currentUser = (() => {
+            try {
+                const user = localStorage.getItem('zantara-user');
+                if (user) {
+                    const parsed = JSON.parse(user);
+                    return parsed.email;
+                }
+            } catch (e) {}
+            // Fallback to legacy email or default
+            return localStorage.getItem('zantara-user-email') || 'zero@balizero.com';
+        })();
+
         let unreadMessages = 0;
         let unreadNotifications = 0;
 
         // Add interactivity
         document.addEventListener('DOMContentLoaded', () => {
+            // Load and display user info
+            loadUserInfo();
+
             // Initialize WebSocket
             initializeWebSocket();
 
@@ -1116,6 +1154,48 @@
 
             observeElements();
         });
+
+        // Load user info from localStorage
+        function loadUserInfo() {
+            try {
+                const userStr = localStorage.getItem('zantara-user');
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+
+                    // Update user name and role
+                    document.getElementById('userName').textContent = user.name || user.email;
+                    document.getElementById('userRole').textContent = user.role || 'Team Member';
+
+                    // Update avatar with first letter
+                    const initials = user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase();
+                    document.getElementById('userAvatar').textContent = initials;
+
+                    // Update dashboard greeting
+                    const dashboardTitle = document.querySelector('.dashboard-title');
+                    if (dashboardTitle) {
+                        dashboardTitle.textContent = `Welcome back, ${user.name || user.email.split('@')[0]}!`;
+                    }
+                } else {
+                    // Fallback to legacy email
+                    const legacyEmail = localStorage.getItem('zantara-user-email');
+                    const legacyName = localStorage.getItem('zantara-user-name');
+
+                    if (legacyEmail) {
+                        document.getElementById('userName').textContent = legacyName || legacyEmail;
+                        document.getElementById('userRole').textContent = 'User';
+                        document.getElementById('userAvatar').textContent = (legacyName || legacyEmail).charAt(0).toUpperCase();
+
+                        const dashboardTitle = document.querySelector('.dashboard-title');
+                        if (dashboardTitle) {
+                            dashboardTitle.textContent = `Welcome back, ${legacyName || legacyEmail.split('@')[0]}!`;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+                // Keep default "Loading..." text
+            }
+        }
 
         // Initialize WebSocket
         function initializeWebSocket() {
