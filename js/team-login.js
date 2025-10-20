@@ -115,6 +115,12 @@ class SecureTeamLogin {
    * ✅ Check if user is logged in
    */
   isLoggedIn() {
+    // Use unified storage manager if available
+    if (window.ZantaraStorage) {
+      return window.ZantaraStorage.isLoggedIn();
+    }
+
+    // Fallback to manual check
     const token = localStorage.getItem('zantara-auth-token');
     const user = localStorage.getItem('zantara-user');
 
@@ -136,6 +142,12 @@ class SecureTeamLogin {
    * 👤 Get current user
    */
   getCurrentUser() {
+    // Use unified storage manager if available
+    if (window.ZantaraStorage) {
+      return window.ZantaraStorage.getUser();
+    }
+
+    // Fallback to manual retrieval
     if (this.currentUser) {
       return this.currentUser;
     }
