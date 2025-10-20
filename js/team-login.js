@@ -81,13 +81,20 @@ class SecureTeamLogin {
     // Clear all session data
     this.token = null;
     this.currentUser = null;
-    localStorage.removeItem('zantara-auth-token');
-    localStorage.removeItem('zantara-user');
-    localStorage.removeItem('zantara-permissions');
-    localStorage.removeItem('zantara-user-name');
-    localStorage.removeItem('zantara-user-role');
-    localStorage.removeItem('zantara-user-department');
-    localStorage.removeItem('zantara-session');
+
+    // Clear ALL authentication keys (prevents corrupted localStorage)
+    const keysToRemove = [
+      'zantara-auth-token',
+      'zantara-user',
+      'zantara-permissions',
+      'zantara-user-email',      // ← FIX: was missing, caused corrupted state
+      'zantara-user-name',
+      'zantara-user-role',
+      'zantara-user-department',
+      'zantara-session'
+    ];
+
+    keysToRemove.forEach(key => localStorage.removeItem(key));
   }
 
   /**
