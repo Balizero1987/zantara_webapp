@@ -8,7 +8,7 @@ const API_CONFIG = {
   proxy: {
     production: {
       // Default to the provided Cloud Run proxy; still overridable via window/localStorage
-      base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://zantara-web-proxy-himaadsxua-ew.a.run.app/api/zantara',
+      base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://ts-backend-production-568d.up.railway.app/api/zantara',
       call: '/call',
       ai: '/ai.chat',
       aiStream: '/ai.chat.stream',
@@ -19,7 +19,7 @@ const API_CONFIG = {
   },
   // Direct endpoints (Cloud Run) — used only when explicitly forced in dev
   production: {
-    base: 'https://zantara-v520-production-1064094238013.europe-west1.run.app',
+    base: 'https://ts-backend-production-568d.up.railway.app',
     call: '/call',
     health: '/health'
   },

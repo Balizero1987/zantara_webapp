@@ -1,8 +1,8 @@
 {
   "name": "ZANTARA",
   "description": "AI Assistant for Bali Zero - Intelligent automation and chat support",
-  "avatarUrl": "https://storage.googleapis.com/gweb-cloudblog-publish/images/google-chat.max-1000x1000.png",
-  "botUrl": "https://224d3f4e1c3c.ngrok-free.app/chatbot",
+  "avatarUrl": "https://ts-backend-production-568d.up.railway.app/assets/zantara-avatar.png",
+  "botUrl": "https://ts-backend-production-568d.up.railway.app/chatbot",
   "interactive": true,
   "canJoinSpaces": true,
   "canReceiveDirectMessages": true,

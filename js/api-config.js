@@ -7,8 +7,8 @@ const API_CONFIG = {
   // Proxy/BFF endpoints (server-side adds x-api-key, client sends x-user-id)
   proxy: {
     production: {
-      // UPDATED 2025-10-16: Railway RAG Backend (Python FastAPI with ChromaDB)
-      base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://scintillating-kindness-production-47e3.up.railway.app',
+      // Railway backends (correct URLs)
+      base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://ts-backend-production-568d.up.railway.app',
       call: '/bali-zero/chat',
       search: '/search',
       health: '/health'
@@ -156,13 +156,16 @@ async function callZantaraAPI(endpoint, data, useProxy = true) {
     }
 
     const started = performance.now();
-    // Build headers: Add API key for production reliability
+    // Build headers: Add API key and auth token for production reliability
     const userId = (typeof window !== 'undefined') ? (localStorage.getItem('zantara-user-email') || '') : '';
+    const authToken = (typeof window !== 'undefined') ? (window.ZantaraStorage?.getToken() || localStorage.getItem('zantara-auth-token') || '') : '';
     const headers = {
       ...API_CONFIG.headers,
       // FIX: Add API key for production reliability
       'x-api-key': 'zantara-internal-dev-key-2025',
-      ...(userId ? { 'x-user-id': userId } : {})
+      ...(userId ? { 'x-user-id': userId } : {}),
+      ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),  // Add JWT token
+      ...(data?.auth_token ? { 'Authorization': `Bearer ${data.auth_token}` } : {})  // Override if passed in data
     };
 
     // Exponential backoff (429/5xx)

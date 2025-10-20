@@ -602,6 +602,17 @@ body.day-mode .user-message {
   opacity: 0.6;
 }
 
+.ai-message.streaming::after {
+  content: '▊';
+  animation: cursor-blink 1s infinite;
+  margin-left: 2px;
+}
+
+@keyframes cursor-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
 body.day-mode .ai-message {
   color: #000;
   background: none !important;

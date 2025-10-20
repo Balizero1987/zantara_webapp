@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ZANTARA - Official</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <script src="js/api-config.js"></script>
-  <script src="js/storage-manager.js"></script>
-  <script src="js/team-login.js"></script>
+  <script src="js/api-config.js?v=2025102101"></script>
+  <script src="js/sse-client.js?v=2025102101"></script>
+  <script src="js/storage-manager.js?v=2025102101"></script>
+  <script src="js/team-login.js?v=2025102101"></script>
   <link rel="stylesheet" href="styles/design-tokens.css">
   <link rel="stylesheet" href="styles/chat.css">
   <link rel="stylesheet" href="styles/message-formatter.css">
@@ -224,6 +225,10 @@
   </div>
 
   <script>
+    // 🔍 VERSION CHECK - Shows immediately which version is loaded
+    console.log('🚀 [ZANTARA] Version: SSE-STREAMING-2025-10-21-v2');
+    console.log('📋 [ZANTARA] Expected logs: 🌊 [SSE Stream] Starting, 📦 [SSE Chunk]');
+
     /**
      * 🛡️ LOCALSTORAGE HEALTH CHECK
      * Validates and repairs corrupted localStorage at app startup
@@ -474,7 +479,7 @@
     let conversationHistory = [];
     let lastAiUsed = null;
 
-    // Send message
+    // Send message with SSE streaming
     async function sendMessage() {
       const message = inputField.value.trim();
       if (!message) return;
@@ -493,7 +498,7 @@
       userMsg.textContent = message;
       messagesDiv.appendChild(userMsg);
 
-      // FIX: Add to conversation history
+      // Add to conversation history
       conversationHistory.push({
         role: 'user',
         content: message
@@ -510,76 +515,103 @@
       // Scroll to bottom
       scrollToBottom();
 
-      // Add loading indicator
-      const loadingMsg = document.createElement('div');
-      loadingMsg.className = 'ai-message loading';
-      loadingMsg.textContent = '⏳ Zantara is thinking...';
-      loadingMsg.id = 'loading-msg';
-      messagesDiv.appendChild(loadingMsg);
+      // Create empty AI message for streaming
+      const aiMsg = document.createElement('div');
+      aiMsg.className = 'ai-message streaming';
+      aiMsg.id = 'streaming-msg';
+      aiMsg.textContent = '⏳ Zantara is thinking...';
+      messagesDiv.appendChild(aiMsg);
       scrollToBottom();
 
       try {
         // Get user email using robust helper function
         const userEmail = getUserEmail();
 
-        // DEBUG: Log email being sent
-        console.log('🔍 Sending message with user_email:', userEmail || 'null (anonymous)');
-        console.log('📝 Conversation history length:', conversationHistory.length);
+        // DEBUG: Log streaming request
+        console.log('🌊 [SSE Stream] Starting for user:', userEmail || 'anonymous');
 
-        // FIX: Call ZANTARA AI API with conversation history
-        const response = await window.ZANTARA_API.call('/bali-zero/chat', {
-          query: message,
-          user_email: userEmail,
-          conversation_history: conversationHistory  // FIX: Send history for context!
-        }, true);
+        // Use SSE streaming client
+        let streamingText = '';
 
-        // Remove loading indicator
-        const loading = document.getElementById('loading-msg');
-        if (loading) loading.remove();
-
-        // Add AI response
-        const aiMsg = document.createElement('div');
-        aiMsg.className = 'ai-message';
-
-        // Extract response from API (supports multiple formats)
-        const aiResponse = response?.response || response?.data?.response || response?.reply || response?.message || response?.text || 'Response received from Zantara AI.';
-
-        // FIX: Save ai_used for next request (follow-up continuity)
-        if (response?.ai_used) {
-          lastAiUsed = response.ai_used;
-          console.log('🤖 AI used:', lastAiUsed);
-        }
-
-        // FIX: Add to conversation history
-        conversationHistory.push({
-          role: 'assistant',
-          content: aiResponse
+        // 🧹 IMPORTANT: Clear all previous event listeners to prevent stacking
+        // (Otherwise each new message adds MORE listeners, causing lag!)
+        const events = ['start', 'delta', 'complete', 'error', 'connected', 'stop'];
+        events.forEach(event => {
+          const listeners = window.ZANTARA_SSE.listeners.get(event);
+          if (listeners) {
+            listeners.length = 0;  // Clear all listeners for this event
+          }
         });
 
-        // Limit history again
-        if (conversationHistory.length > 20) {
-          conversationHistory = conversationHistory.slice(-20);
-        }
+        window.ZANTARA_SSE
+          .on('start', () => {
+            console.log('🌊 [SSE Stream] Connected');
+            aiMsg.textContent = '';  // Clear "thinking" message
+          })
+          .on('delta', ({chunk, message}) => {
+            // ⚡ PERFORMANCE: Show plain text during streaming (fast!)
+            // Markdown formatting will be applied only at the end
+            streamingText = message;
+            aiMsg.textContent = streamingText;
 
-        // Format message with MessageFormatter (supports markdown, lists, bold, etc.)
-        if (window.MessageFormatter) {
-          aiMsg.innerHTML = MessageFormatter.formatStructuredMessage(aiResponse, {
-            showCTA: false,  // CTA is already in backend response, don't duplicate
-            language: MessageFormatter.detectLanguage(aiResponse, 'it')
+            // Debug: Log every chunk received (check browser console!)
+            console.log('📦 [SSE Chunk]:', chunk);
+
+            // Scroll only every 10 chunks to reduce lag
+            if (!window._scrollCounter) window._scrollCounter = 0;
+            window._scrollCounter++;
+            if (window._scrollCounter % 10 === 0) {
+              scrollToBottom();
+            }
+          })
+          .on('complete', ({message: finalMessage}) => {
+            console.log('✅ [SSE Stream] Complete');
+
+            // Add to conversation history
+            conversationHistory.push({
+              role: 'assistant',
+              content: finalMessage
+            });
+
+            // Limit history
+            if (conversationHistory.length > 20) {
+              conversationHistory = conversationHistory.slice(-20);
+            }
+
+            // 🎨 NOW apply Markdown formatting (only once at the end)
+            if (window.MessageFormatter) {
+              aiMsg.innerHTML = MessageFormatter.formatStructuredMessage(finalMessage, {
+                showCTA: false,
+                language: MessageFormatter.detectLanguage(finalMessage, 'it')
+              });
+            } else {
+              aiMsg.textContent = finalMessage;
+            }
+
+            aiMsg.classList.remove('streaming');
+            scrollToBottom();
+
+            // Reset scroll counter
+            window._scrollCounter = 0;
+          })
+          .on('error', ({error}) => {
+            console.error('❌ [SSE Stream] Error:', error);
+
+            // Show error
+            aiMsg.className = 'error-message';
+            aiMsg.textContent = '❌ Error: ' + error;
+            scrollToBottom();
           });
-        } else {
-          // Fallback if formatter not loaded
-          aiMsg.textContent = aiResponse;
-        }
 
-        messagesDiv.appendChild(aiMsg);
-        scrollToBottom();
+        // Start streaming
+        await window.ZANTARA_SSE.stream(message, userEmail);
+
       } catch (error) {
         console.error('AI chat error:', error);
 
-        // Remove loading indicator
-        const loading = document.getElementById('loading-msg');
-        if (loading) loading.remove();
+        // Remove streaming message
+        const streaming = document.getElementById('streaming-msg');
+        if (streaming) streaming.remove();
 
         // Show error message
         const errorMsg = document.createElement('div');
