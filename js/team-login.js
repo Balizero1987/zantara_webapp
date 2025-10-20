@@ -43,16 +43,26 @@ class SecureTeamLogin {
         this.token = data.data.token;
         this.currentUser = data.data.user;
 
-        // Save to localStorage (secure token storage)
-        localStorage.setItem('zantara-auth-token', this.token);
-        localStorage.setItem('zantara-user', JSON.stringify(this.currentUser));
-        localStorage.setItem('zantara-permissions', JSON.stringify(data.data.permissions));
-
-        // Legacy compatibility
-        localStorage.setItem('zantara-user-email', this.currentUser.email);
-        localStorage.setItem('zantara-user-name', this.currentUser.name);
-        localStorage.setItem('zantara-user-role', this.currentUser.role);
-        localStorage.setItem('zantara-user-department', this.currentUser.department);
+        // Use unified storage manager (auto-save enabled)
+        if (window.ZantaraStorage) {
+          window.ZantaraStorage.setUser({
+            email: this.currentUser.email,
+            name: this.currentUser.name,
+            role: this.currentUser.role,
+            department: this.currentUser.department,
+            badge: this.currentUser.badge,
+            id: this.currentUser.id,
+            token: this.token,
+            permissions: data.data.permissions,
+            language: this.currentUser.language
+          });
+        } else {
+          console.error('❌ ZantaraStorage not available! Using fallback.');
+          // Fallback to manual storage
+          localStorage.setItem('zantara-auth-token', this.token);
+          localStorage.setItem('zantara-user', JSON.stringify(this.currentUser));
+          localStorage.setItem('zantara-permissions', JSON.stringify(data.data.permissions));
+        }
 
         return {
           success: true,
@@ -82,19 +92,23 @@ class SecureTeamLogin {
     this.token = null;
     this.currentUser = null;
 
-    // Clear ALL authentication keys (prevents corrupted localStorage)
-    const keysToRemove = [
-      'zantara-auth-token',
-      'zantara-user',
-      'zantara-permissions',
-      'zantara-user-email',      // ← FIX: was missing, caused corrupted state
-      'zantara-user-name',
-      'zantara-user-role',
-      'zantara-user-department',
-      'zantara-session'
-    ];
-
-    keysToRemove.forEach(key => localStorage.removeItem(key));
+    // Use unified storage manager
+    if (window.ZantaraStorage) {
+      window.ZantaraStorage.clear();
+    } else {
+      // Fallback to manual cleanup
+      const keysToRemove = [
+        'zantara-auth-token',
+        'zantara-user',
+        'zantara-permissions',
+        'zantara-user-email',
+        'zantara-user-name',
+        'zantara-user-role',
+        'zantara-user-department',
+        'zantara-session'
+      ];
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+    }
   }
 
   /**

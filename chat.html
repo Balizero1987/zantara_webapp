@@ -6,6 +6,7 @@
   <title>ZANTARA - Official</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <script src="js/api-config.js"></script>
+  <script src="js/storage-manager.js"></script>
   <script src="js/team-login.js"></script>
   <link rel="stylesheet" href="styles/design-tokens.css">
   <link rel="stylesheet" href="styles/chat.css">
@@ -287,12 +288,16 @@
     })();
 
     /**
-     * 📧 GET USER EMAIL (Robust Helper)
-     * Safely retrieves user email from localStorage with multiple fallbacks
-     * Returns null if no valid email found
+     * 📧 GET USER EMAIL (Unified Storage)
+     * Uses ZantaraStorage for consistent, failsafe access
      */
     function getUserEmail() {
-      // Try primary source: zantara-user (JSON)
+      if (window.ZantaraStorage) {
+        return window.ZantaraStorage.getUserEmail();
+      }
+
+      // Fallback to manual retrieval (shouldn't happen)
+      console.warn('⚠️ [getUserEmail] ZantaraStorage not available, using fallback');
       try {
         const userStr = localStorage.getItem('zantara-user');
         if (userStr && userStr !== 'undefined' && userStr !== 'null') {
@@ -302,20 +307,14 @@
           }
         }
       } catch (e) {
-        console.warn('[getUserEmail] Failed to parse zantara-user, using fallback:', e);
+        console.warn('[getUserEmail] Fallback failed:', e);
       }
 
-      // Fallback: legacy storage
       const legacyEmail = localStorage.getItem('zantara-user-email');
-      if (legacyEmail &&
-          legacyEmail !== 'undefined' &&
-          legacyEmail !== 'null' &&
-          legacyEmail !== 'guest' &&
-          legacyEmail !== '') {
+      if (legacyEmail && legacyEmail !== 'undefined' && legacyEmail !== 'null' && legacyEmail !== 'guest' && legacyEmail !== '') {
         return legacyEmail;
       }
 
-      // No valid email found
       return null;
     }
 
@@ -617,22 +616,34 @@
     });
     // Check if user is logged in and initialize session
     document.addEventListener('DOMContentLoaded', () => {
-      // Get user info (support both team login and legacy login)
+      // Get user info using unified storage manager
       let userEmail = null;
       let userName = null;
-      try {
-        const userStr = localStorage.getItem('zantara-user');
-        if (userStr) {
-          const user = JSON.parse(userStr);
+
+      if (window.ZantaraStorage && window.ZantaraStorage.isLoggedIn()) {
+        const user = window.ZantaraStorage.getUser();
+        if (user) {
           userEmail = user.email;
           userName = user.name;
-        } else {
+          console.log('✅ [Chat] User loaded from storage:', userEmail);
+        }
+      } else {
+        // Fallback to manual retrieval (legacy support)
+        console.warn('⚠️ [Chat] ZantaraStorage not available or no session, trying fallback');
+        try {
+          const userStr = localStorage.getItem('zantara-user');
+          if (userStr) {
+            const user = JSON.parse(userStr);
+            userEmail = user.email;
+            userName = user.name;
+          } else {
+            userEmail = localStorage.getItem('zantara-user-email');
+            userName = localStorage.getItem('zantara-user-name');
+          }
+        } catch (e) {
           userEmail = localStorage.getItem('zantara-user-email');
           userName = localStorage.getItem('zantara-user-name');
         }
-      } catch (e) {
-        userEmail = localStorage.getItem('zantara-user-email');
-        userName = localStorage.getItem('zantara-user-name');
       }
 
       const hasIntroduced = sessionStorage.getItem('zantara-introduced');
@@ -675,19 +686,23 @@
           alert(`👤 Profilo: ${userEmail}\n\n(Funzionalità in arrivo)`);
         };
 
-        // Logout button - use teamLogin.logout() for complete cleanup
+        // Logout button - use unified storage manager
         document.getElementById('logoutBtn').onclick = () => {
           userDropdown.classList.remove('show');
           if (confirm('Vuoi fare logout?')) {
-            // FIX: Clear conversation history on logout
+            // Clear conversation history on logout
             conversationHistory = [];
             lastAiUsed = null;
 
-            // Use teamLogin.logout() if available (clears ALL auth data)
-            if (window.teamLogin && typeof window.teamLogin.logout === 'function') {
+            // Use unified storage manager for complete cleanup
+            if (window.ZantaraStorage) {
+              window.ZantaraStorage.clear();
+            } else if (window.teamLogin && typeof window.teamLogin.logout === 'function') {
+              // Fallback to teamLogin
               window.teamLogin.logout();
             } else {
-              // Fallback: manual cleanup
+              // Final fallback: manual cleanup
+              console.warn('⚠️ No storage manager available, manual cleanup');
               const keysToRemove = [
                 'zantara-auth-token',
                 'zantara-user',
@@ -699,8 +714,9 @@
                 'zantara-session'
               ];
               keysToRemove.forEach(key => localStorage.removeItem(key));
+              sessionStorage.removeItem('zantara-introduced');
             }
-            sessionStorage.removeItem('zantara-introduced');
+
             window.location.reload();
           }
         };
