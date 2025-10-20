@@ -644,23 +644,13 @@
         document.getElementById('publicLoginBtn').addEventListener('click', () => toggleLoginType('public'));
         document.getElementById('teamLoginBtn').addEventListener('click', () => toggleLoginType('team'));
 
-        // Check if user is already logged in
+        // Check if user is already logged in - auto-redirect to chat
         if (window.teamLogin && window.teamLogin.isLoggedIn()) {
             const user = window.teamLogin.getCurrentUser();
             if (user) {
-                // Show welcome message for logged in user with manual login button
-                document.getElementById('loginMessage').innerHTML = `
-                    <div class="message success">
-                        Benvenuto di nuovo, ${user.name}!<br>
-                        Ruolo: ${user.role} | Dipartimento: ${user.department}<br><br>
-                        <button onclick="window.location.href='chat.html'" class="btn-primary" style="margin-top: 12px;">
-                            Continua alla Chat
-                        </button>
-                    </div>
-                `;
-                document.getElementById('loginMessage').style.display = 'block';
-
-                // REMOVED AUTO-REDIRECT - User must click button to continue
+                console.log('✅ User already logged in, redirecting to chat:', user.email);
+                // Auto-redirect immediately (don't block, user is already authenticated)
+                window.location.replace('chat.html');
             }
         }
 
