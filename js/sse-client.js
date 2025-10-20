@@ -14,21 +14,23 @@ class ZantaraSSEClient {
     this.baseUrl = this.getAPIBase();
   }
 
-  // Get API base URL from config
+  // Get API base URL for SSE streaming
   getAPIBase() {
-    // Try to get from config
-    if (window.ZANTARA_API?.config) {
-      const config = window.ZANTARA_API.config;
-      const isProxy = config.mode === 'proxy';
+    // ⚠️ IMPORTANT: SSE streaming is ONLY available on RAG Backend!
+    // The TypeScript backend doesn't have /bali-zero/chat-stream endpoint.
+    // Always use RAG backend for SSE, regardless of api-config.js settings.
 
-      if (isProxy && config.proxy?.production?.base) {
-        return config.proxy.production.base;
-      }
-      return config.production?.base || 'https://scintillating-kindness-production-47e3.up.railway.app';
+    const RAG_BACKEND = 'https://scintillating-kindness-production-47e3.up.railway.app';
+
+    // Check if config explicitly overrides SSE endpoint
+    if (window.ZANTARA_API?.config?.sse_backend) {
+      console.log('[ZantaraSSE] Using custom SSE backend:', window.ZANTARA_API.config.sse_backend);
+      return window.ZANTARA_API.config.sse_backend;
     }
 
-    // Fallback
-    return 'https://scintillating-kindness-production-47e3.up.railway.app';
+    // Default: Always use RAG backend for SSE
+    console.log('[ZantaraSSE] Using RAG backend for SSE streaming:', RAG_BACKEND);
+    return RAG_BACKEND;
   }
 
   // Event listeners management
