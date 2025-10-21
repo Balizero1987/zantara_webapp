@@ -615,7 +615,10 @@
     });
 
     // Input buttons functionality
-    const inputField = document.querySelector('.input');
+    // NOTE: NO cached reference to .input element!
+    // UX Manager converts INPUT → TEXTAREA at DOMContentLoaded,
+    // so any cached reference would become stale.
+    // Always query .input dynamically when needed.
     const sendBtn = document.getElementById('sendBtn');
     const attachBtn = document.getElementById('attachBtn');
     const imageGenBtn = document.getElementById('imageGenBtn');
