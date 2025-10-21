@@ -155,7 +155,9 @@ body.day-mode .typing-indicator {
   box-shadow: 0 2px 8px rgba(47, 123, 214, 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   color: #fff !important;
-  max-width: none !important;
+  max-width: fit-content !important;
+  width: auto;
+  display: inline-block;
   word-wrap: break-word;
   line-height: 1.5;
 }
@@ -171,7 +173,9 @@ body.day-mode .typing-indicator {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   color: #fff !important;
-  max-width: none !important;
+  max-width: 85% !important;
+  width: auto;
+  display: inline-block;
   word-wrap: break-word;
   line-height: 1.5;
 }
