@@ -14,26 +14,33 @@
   <link rel="stylesheet" href="styles/message-formatter.css">
   <link rel="stylesheet" href="styles/indonesian-badges.css">
   <link rel="stylesheet" href="styles/chat-enhancements.css">
-  <link rel="stylesheet" href="styles/ux-enhancements.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css">
   <script src="js/message-formatter.js"></script>
   <script src="js/user-badges.js"></script>
   <script src="js/chat-enhancements.js"></script>
-  <script src="js/ux-manager.js"></script>
 
-  <!-- 🔓 GUEST ACCESS ALLOWED - Login optional for basic chat -->
+  <!-- 🔒 AUTH GUARD - Redirect to login if not authenticated -->
   <script>
-    // IMPORTANT: Chat works for everyone (logged in or anonymous)
-    // Login is optional and enables additional features:
-    // - Profile photo upload
-    // - Chat history saving
-    // - Personalized AI responses
-    // - Team collaboration features
+    // IMPORTANT: This runs BEFORE page loads to prevent unauthorized access
+    (function() {
+      // Check authentication status
+      const token = localStorage.getItem('zantara-auth-token');
+      const user = localStorage.getItem('zantara-user');
 
-    // No forced redirect - users can access chat immediately
-    console.log('✅ [ZANTARA] Guest access enabled - Login optional for advanced features');
+      // Legacy public login support (for backward compatibility)
+      const legacyEmail = localStorage.getItem('zantara-user-email');
+
+      // If neither team auth nor legacy auth exists, redirect to login
+      if (!token && !user && !legacyEmail) {
+        // Store attempted URL for redirect after login
+        sessionStorage.setItem('zantara-redirect-after-login', window.location.href);
+
+        // Redirect to login page
+        window.location.replace('login.html');
+      }
+    })();
   </script>
 </head>
 <body>
@@ -304,7 +311,7 @@
           <button class="btn" id="attachBtn" title="Attach files">📎</button>
           <button class="btn" id="imageGenBtn" title="Generate AI Image">🎨</button>
           <input type="text" class="input" placeholder="Type a message...">
-          <button class="btn" id="voiceBtn" title="Voice message (Coming soon)" style="opacity: 0.5; cursor: not-allowed;">🎤</button>
+          <button class="btn" id="voiceBtn" title="Voice message">🎤</button>
           <button class="btn" id="sendBtn" title="Send message">➤</button>
         </div>
       </div>
@@ -615,19 +622,11 @@
     });
 
     // Input buttons functionality
-    // NOTE: NO cached reference to .input element!
-    // UX Manager converts INPUT → TEXTAREA at DOMContentLoaded,
-    // so any cached reference would become stale.
-    // Always query .input dynamically when needed.
+    const inputField = document.querySelector('.input');
     const sendBtn = document.getElementById('sendBtn');
     const attachBtn = document.getElementById('attachBtn');
     const imageGenBtn = document.getElementById('imageGenBtn');
     const voiceBtn = document.getElementById('voiceBtn');
-
-    // Voice button - Coming soon
-    voiceBtn.addEventListener('click', () => {
-      alert('🎤 Voice messages coming soon!\n\nWe\'re working on adding voice input and output features.');
-    });
 
     // Conversation state (FIX: track history for context)
     let conversationHistory = [];
@@ -635,14 +634,7 @@
 
     // Send message with SSE streaming
     async function sendMessage() {
-      // ⚠️ IMPORTANT: Query input element EVERY time because UX Manager converts INPUT → TEXTAREA
-      const currentInput = document.querySelector('.input');
-      if (!currentInput) {
-        console.error('❌ Input element not found!');
-        return;
-      }
-
-      const message = currentInput.value.trim();
+      const message = inputField.value.trim();
       if (!message) return;
 
       const messagesDiv = document.querySelector('.messages');
@@ -653,9 +645,11 @@
         messagesDiv.innerHTML = '';
       }
 
-      // 🎨 UX: Use new message wrapper with avatar
-      const userMsgWrapper = window.ZantaraUX.createMessage('user', message, { showTime: false });
-      messagesDiv.appendChild(userMsgWrapper);
+      // Add user message
+      const userMsg = document.createElement('div');
+      userMsg.className = 'user-message';
+      userMsg.textContent = message;
+      messagesDiv.appendChild(userMsg);
 
       // Add to conversation history
       conversationHistory.push({
@@ -669,17 +663,18 @@
       }
 
       // Clear input
-      currentInput.value = '';
-      if (currentInput.tagName === 'TEXTAREA') {
-        currentInput.style.height = 'auto';
-      }
-
-      // 🎨 UX: Show typing indicator instead of empty message
-      window.ZantaraUX.showTypingIndicator();
-      window.ZantaraUX.setSendButtonLoading(true);
+      inputField.value = '';
 
       // Scroll to bottom
-      window.ZantaraUX.scrollToBottom();
+      scrollToBottom();
+
+      // Create empty AI message for streaming
+      const aiMsg = document.createElement('div');
+      aiMsg.className = 'ai-message streaming';
+      aiMsg.id = 'streaming-msg';
+      aiMsg.textContent = '⏳ Zantara is thinking...';
+      messagesDiv.appendChild(aiMsg);
+      scrollToBottom();
 
       try {
         // Get user email using robust helper function
@@ -701,30 +696,14 @@
           }
         });
 
-        // 🎨 UX: Create AI message container
-        let aiMsgWrapper = null;
-        let aiMsg = null;
-
         window.ZANTARA_SSE
           .on('start', () => {
             console.log('🌊 [SSE Stream] Connected');
-
-            // 🎨 UX: Remove typing indicator and create AI message
-            window.ZantaraUX.removeTypingIndicator();
-
-            aiMsgWrapper = window.ZantaraUX.createMessage('ai', '', { showTime: false });
-            messagesDiv.appendChild(aiMsgWrapper);
-
-            // Get the actual message bubble
-            aiMsg = aiMsgWrapper.querySelector('.ai-message');
-            aiMsg.classList.add('streaming');
-
-            window.ZantaraUX.scrollToBottom();
+            aiMsg.textContent = '';  // Clear "thinking" message
           })
           .on('delta', ({chunk, message}) => {
-            if (!aiMsg) return;
-
             // ⚡ PERFORMANCE: Show plain text during streaming (fast!)
+            // Markdown formatting will be applied only at the end
             streamingText = message;
             aiMsg.textContent = streamingText;
 
@@ -735,14 +714,11 @@
             if (!window._scrollCounter) window._scrollCounter = 0;
             window._scrollCounter++;
             if (window._scrollCounter % 10 === 0) {
-              window.ZantaraUX.scrollToBottom(false);
+              scrollToBottom();
             }
           })
           .on('complete', ({message: finalMessage}) => {
             console.log('✅ [SSE Stream] Complete');
-
-            // 🎨 UX: Reset send button
-            window.ZantaraUX.setSendButtonLoading(false);
 
             // Add to conversation history
             conversationHistory.push({
@@ -755,8 +731,6 @@
               conversationHistory = conversationHistory.slice(-20);
             }
 
-            if (!aiMsg) return;
-
             // 🎨 NOW apply Markdown formatting (only once at the end)
             if (window.MessageFormatter) {
               aiMsg.innerHTML = MessageFormatter.formatStructuredMessage(finalMessage, {
@@ -768,10 +742,7 @@
             }
 
             aiMsg.classList.remove('streaming');
-            window.ZantaraUX.scrollToBottom();
-
-            // 🎨 UX: Show success feedback
-            window.ZantaraUX.showMessageSuccess(aiMsgWrapper);
+            scrollToBottom();
 
             // Reset scroll counter
             window._scrollCounter = 0;
@@ -779,106 +750,40 @@
           .on('error', ({error}) => {
             console.error('❌ [SSE Stream] Error:', error);
 
-            // 🎨 UX: Reset UI
-            window.ZantaraUX.removeTypingIndicator();
-            window.ZantaraUX.setSendButtonLoading(false);
-
-            // Show error in message
-            if (aiMsg) {
-              aiMsg.className = 'error-message';
-              aiMsg.textContent = '❌ Error: ' + error;
-              window.ZantaraUX.showMessageError(aiMsgWrapper);
-            }
-
-            window.ZantaraUX.scrollToBottom();
+            // Show error
+            aiMsg.className = 'error-message';
+            aiMsg.textContent = '❌ Error: ' + error;
+            scrollToBottom();
           });
 
-        // Start streaming with conversation history for context
-        await window.ZANTARA_SSE.stream(message, userEmail, conversationHistory);
+        // Start streaming
+        await window.ZANTARA_SSE.stream(message, userEmail);
 
       } catch (error) {
-        console.error('❌ SSE streaming failed:', error);
+        console.error('AI chat error:', error);
 
-        // 🔄 FALLBACK: Try regular API call if SSE fails
-        try {
-          console.log('🔄 Attempting fallback to regular API...');
+        // Remove streaming message
+        const streaming = document.getElementById('streaming-msg');
+        if (streaming) streaming.remove();
 
-          // Clean up SSE UI
-          window.ZantaraUX.removeTypingIndicator();
-
-          // Show new typing indicator for fallback
-          window.ZantaraUX.showTypingIndicator();
-
-          // Build conversation history for context
-          const historyParam = conversationHistory.length > 0
-            ? { conversation_history: conversationHistory }
-            : {};
-
-          // Call regular API endpoint
-          const response = await window.ZANTARA_API.call('/bali-zero/chat', {
-            query: message,
-            user_email: userEmail,
-            ...historyParam
-          }, true);
-
-          // Remove typing indicator
-          window.ZantaraUX.removeTypingIndicator();
-          window.ZantaraUX.setSendButtonLoading(false);
-
-          // Extract response text
-          const responseText = response?.data?.reply || response?.reply || response?.text || 'No response received';
-
-          // Add conversation history
-          conversationHistory.push({
-            role: 'assistant',
-            content: responseText
-          });
-
-          // Create AI message
-          const aiMsgWrapper = window.ZantaraUX.createMessage('ai', '', { showTime: false });
-          messagesDiv.appendChild(aiMsgWrapper);
-
-          const aiMsg = aiMsgWrapper.querySelector('.ai-message');
-
-          // Format and display message
-          if (window.MessageFormatter) {
-            aiMsg.innerHTML = MessageFormatter.formatStructuredMessage(responseText, {
-              showCTA: false,
-              language: MessageFormatter.detectLanguage(responseText, 'it')
-            });
-          } else {
-            aiMsg.textContent = responseText;
-          }
-
-          window.ZantaraUX.scrollToBottom();
-          window.ZantaraUX.showMessageSuccess(aiMsgWrapper);
-
-          console.log('✅ Fallback successful!');
-
-        } catch (fallbackError) {
-          console.error('❌ Fallback also failed:', fallbackError);
-
-          // 🎨 UX: Clean up on total failure
-          window.ZantaraUX.removeTypingIndicator();
-          window.ZantaraUX.setSendButtonLoading(false);
-
-          // Show error message
-          const errorWrapper = window.ZantaraUX.createMessage('ai', '❌ Connection error. Please check your internet and try again.', { showTime: false });
-          const errorBubble = errorWrapper.querySelector('.ai-message');
-          errorBubble.className = 'error-message';
-
-          messagesDiv.appendChild(errorWrapper);
-          window.ZantaraUX.scrollToBottom();
-          window.ZantaraUX.showMessageError(errorWrapper);
-        }
+        // Show error message
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.textContent = '❌ Error: ' + (error.message || 'Failed to get response from Zantara AI');
+        messagesDiv.appendChild(errorMsg);
+        scrollToBottom();
       }
     }
 
     // Send on button click
     sendBtn.addEventListener('click', sendMessage);
 
-    // NOTE: Enter key is now handled by UX Manager (ux-manager.js)
-    // which converts the input to textarea and manages keyboard events
+    // Send on Enter key
+    inputField.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
 
     // 🎨 IMAGE GENERATION - Imagine.art Integration
     imageGenBtn.addEventListener('click', () => {
@@ -917,12 +822,12 @@
       try {
         console.log('🎨 Generating image with Imagine.art...', { prompt, style, aspectRatio });
 
-        // Call Imagine.art API via backend TS (use centralized API key)
+        // Call Imagine.art API via backend TS
         const response = await fetch('https://ts-backend-production-568d.up.railway.app/call', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-api-key': window.ZANTARA_API?.config?.apiKey || 'zantara-internal-dev-key-2025'
+            'x-api-key': 'zantara-internal-dev-key-2025'
           },
           body: JSON.stringify({
             key: 'ai-services.image.generate',
@@ -1231,18 +1136,38 @@
         userBtn.style.display = 'none';
       }
 
-      // ❌ REMOVED: Auto-introduction feature disabled
-      // Reason: Created endpoint inconsistency (used /bali-zero/chat instead of SSE streaming)
-      // User recognition now happens naturally through SSE streaming when they send first message
+      // If logged in but hasn't introduced yet, send automatic introduction
+      if (userEmail && !hasIntroduced) {
+        // Extract first name from email
+        const firstName = userEmail.split('@')[0].toLowerCase();
 
-      // Mark as introduced to prevent legacy code from running
-      if (userEmail) {
-        sessionStorage.setItem('zantara-introduced', 'true');
-        console.log('✅ User logged in:', userEmail);
+        // Send introduction message automatically
+        setTimeout(async () => {
+          const introMessage = `Ciao, sono ${firstName}`;
+
+          try {
+            const response = await window.ZANTARA_API.call('/bali-zero/chat', {
+              query: introMessage,
+              user_email: userEmail  // For user recognition
+            }, true);
+
+            // Mark as introduced
+            sessionStorage.setItem('zantara-introduced', 'true');
+
+            // Just log recognition, no welcome banner
+            if (response?.data?.recognized) {
+              console.log('✅ User recognized:', firstName, '- Language:', response.data.language || 'default');
+            } else {
+              console.log('✅ User introduced to ZANTARA:', firstName);
+            }
+          } catch (error) {
+            console.warn('Failed to send introduction:', error);
+          }
+        }, 1000);
       }
 
-      // No auth required - users can chat as guests or logged-in members
-      // Login enables: profile photo, history, personalization
+      // No auto-redirect - user can use chat without login
+      // Login button is always visible in header
     });
   </script>
 </body>
