@@ -850,17 +850,19 @@
         const result = await response.json();
         console.log('✅ Image generated:', result);
 
-        if (result.status === 'ok' && result.reply && result.reply.image_url) {
+        // Backend returns: {ok: true, data: {image_url: "..."}}
+        if (result.ok && result.data && result.data.image_url) {
           // Show generated image
-          document.getElementById('generatedImage').src = result.reply.image_url;
+          document.getElementById('generatedImage').src = result.data.image_url;
           document.getElementById('imageGenResult').style.display = 'block';
           document.getElementById('imageGenProgress').style.display = 'none';
           document.getElementById('sendImageBtn').style.display = 'inline-block';
 
           // Store image URL for sending to chat
-          window._generatedImageUrl = result.reply.image_url;
+          window._generatedImageUrl = result.data.image_url;
           window._generatedImagePrompt = prompt;
         } else {
+          console.error('❌ Invalid response structure:', result);
           throw new Error('No image URL in response');
         }
       } catch (error) {
