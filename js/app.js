@@ -307,7 +307,21 @@ class ZantaraApp {
     if (sender === 'assistant') {
       div.innerHTML = DOMPurify.sanitize(`<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`);
     } else {
-      div.innerHTML = DOMPurify.sanitize(`<div class="message-bubble">${content}</div>`);
+      // Get user avatar from localStorage
+      const user = JSON.parse(localStorage.getItem('zantara-user') || '{}');
+      const userId = user.id || user.email || 'guest';
+      const savedAvatar = localStorage.getItem(`zantara-avatar-${userId}`);
+      
+      let avatarHtml = '';
+      if (savedAvatar) {
+        avatarHtml = `<div class="message-avatar"><img src="${savedAvatar}" alt="User Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;"></div>`;
+      } else {
+        const userName = localStorage.getItem('zantara-user-name') || 'U';
+        const firstLetter = userName.charAt(0).toUpperCase();
+        avatarHtml = `<div class="message-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: #2f7bd6; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">${firstLetter}</div>`;
+      }
+      
+      div.innerHTML = DOMPurify.sanitize(`${avatarHtml}<div class="message-bubble">${content}</div>`);
     }
 
     // Add click handler to copy message text
@@ -733,8 +747,25 @@ class ZantaraApp {
     for (const m of visible) {
       const div = document.createElement('div'); div.className = `message ${m.sender}`;
       const content = m.html ? DOMPurify.sanitize(String(m.text)) : this.escape(m.text);
-      if (m.sender === 'assistant') div.innerHTML = DOMPurify.sanitize(`<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`);
-      else div.innerHTML = DOMPurify.sanitize(`<div class="message-bubble">${content}</div>`);
+      if (m.sender === 'assistant') {
+        div.innerHTML = DOMPurify.sanitize(`<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">${content}</div>`);
+      } else {
+        // Get user avatar from localStorage
+        const user = JSON.parse(localStorage.getItem('zantara-user') || '{}');
+        const userId = user.id || user.email || 'guest';
+        const savedAvatar = localStorage.getItem(`zantara-avatar-${userId}`);
+        
+        let avatarHtml = '';
+        if (savedAvatar) {
+          avatarHtml = `<div class="message-avatar"><img src="${savedAvatar}" alt="User Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;"></div>`;
+        } else {
+          const userName = localStorage.getItem('zantara-user-name') || 'U';
+          const firstLetter = userName.charAt(0).toUpperCase();
+          avatarHtml = `<div class="message-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: #2f7bd6; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">${firstLetter}</div>`;
+        }
+        
+        div.innerHTML = DOMPurify.sanitize(`${avatarHtml}<div class="message-bubble">${content}</div>`);
+      }
 
       // Add click handler to copy message text
       const bubble = div.querySelector('.message-bubble');
