@@ -145,23 +145,30 @@ body.day-mode .typing-indicator {
 }
 
 .message-content .user-message {
-  margin: 0;
+  margin: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  align-self: unset !important;
   box-shadow: 0 2px 8px rgba(47, 123, 214, 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .message-content .ai-message {
-  margin: 0;
+  margin: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  align-self: unset !important;
   padding: 12px 16px;
-  background: linear-gradient(135deg, #2a2a2a 0%, #252525 100%);
+  background: linear-gradient(135deg, #2a2a2a 0%, #252525 100%) !important;
   border-radius: 18px 18px 18px 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 body.day-mode .message-content .ai-message {
-  background: linear-gradient(135deg, #f5f5f5 0%, #ebebeb 100%);
+  background: linear-gradient(135deg, #f5f5f5 0%, #ebebeb 100%) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  color: #000 !important;
 }
 
 .message-wrapper:hover .message-content .user-message,
