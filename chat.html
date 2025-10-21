@@ -632,7 +632,14 @@
 
     // Send message with SSE streaming
     async function sendMessage() {
-      const message = inputField.value.trim();
+      // ⚠️ IMPORTANT: Query input element EVERY time because UX Manager converts INPUT → TEXTAREA
+      const currentInput = document.querySelector('.input');
+      if (!currentInput) {
+        console.error('❌ Input element not found!');
+        return;
+      }
+
+      const message = currentInput.value.trim();
       if (!message) return;
 
       const messagesDiv = document.querySelector('.messages');
@@ -659,9 +666,9 @@
       }
 
       // Clear input
-      inputField.value = '';
-      if (inputField.tagName === 'TEXTAREA') {
-        inputField.style.height = 'auto';
+      currentInput.value = '';
+      if (currentInput.tagName === 'TEXTAREA') {
+        currentInput.style.height = 'auto';
       }
 
       // 🎨 UX: Show typing indicator instead of empty message
