@@ -642,14 +642,26 @@
     const imageGenBtn = document.getElementById('imageGenBtn');
     const voiceBtn = document.getElementById('voiceBtn');
 
+    // Debug: verify elements are found
+    if (!inputField) {
+      console.error('❌ [Init Error] Input field not found!');
+    } else {
+      console.log('✅ [Init] Input field found and ready');
+    }
+
     // Conversation state (FIX: track history for context)
     let conversationHistory = [];
     let lastAiUsed = null;
 
     // Send message with SSE streaming
     async function sendMessage() {
+      console.log('📤 [sendMessage] Function called');
       const message = inputField.value.trim();
-      if (!message) return;
+      console.log('📝 [sendMessage] Message:', message);
+      if (!message) {
+        console.log('⚠️ [sendMessage] Empty message, returning');
+        return;
+      }
 
       const messagesDiv = document.querySelector('.messages');
 
@@ -797,9 +809,20 @@
     // Send on button click
     sendBtn.addEventListener('click', sendMessage);
 
-    // Send on Enter key
+    // Send on Enter key (using keydown for better compatibility)
+    inputField.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault(); // Prevent default behavior
+        console.log('✅ [Enter Key] Detected - sending message');
+        sendMessage();
+      }
+    });
+
+    // Fallback for keypress event (in case keydown doesn't work on some browsers)
     inputField.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        console.log('✅ [Enter Key Fallback] Detected via keypress - sending message');
         sendMessage();
       }
     });
