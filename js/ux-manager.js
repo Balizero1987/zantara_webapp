@@ -11,7 +11,7 @@ class ZantaraUXManager {
     this.typingIndicator = null;
     this.scrollIndicator = null;
     this.connectionStatus = null;
-    this.init();
+    // Don't call init() here - wait for DOM to be ready
   }
 
   init() {
@@ -360,8 +360,12 @@ class ZantaraUXManager {
 // Initialize and expose globally
 window.ZantaraUX = new ZantaraUXManager();
 
-// Quick actions for welcome screen
+// Initialize when DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
+  // Initialize UX Manager (setup all DOM-dependent features)
+  window.ZantaraUX.init();
+
+  // Quick actions for welcome screen
   const quickActions = [
     {
       icon: '🛂',
@@ -385,7 +389,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   ];
 
-  // Add quick actions after a short delay
+  // Add quick actions after a short delay (wrapped in separate setTimeout)
   setTimeout(() => {
     window.ZantaraUX.addQuickActions(quickActions);
   }, 500);

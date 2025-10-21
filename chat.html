@@ -23,26 +23,17 @@
   <script src="js/chat-enhancements.js"></script>
   <script src="js/ux-manager.js"></script>
 
-  <!-- 🔒 AUTH GUARD - Redirect to login if not authenticated -->
+  <!-- 🔓 GUEST ACCESS ALLOWED - Login optional for basic chat -->
   <script>
-    // IMPORTANT: This runs BEFORE page loads to prevent unauthorized access
-    (function() {
-      // Check authentication status
-      const token = localStorage.getItem('zantara-auth-token');
-      const user = localStorage.getItem('zantara-user');
+    // IMPORTANT: Chat works for everyone (logged in or anonymous)
+    // Login is optional and enables additional features:
+    // - Profile photo upload
+    // - Chat history saving
+    // - Personalized AI responses
+    // - Team collaboration features
 
-      // Legacy public login support (for backward compatibility)
-      const legacyEmail = localStorage.getItem('zantara-user-email');
-
-      // If neither team auth nor legacy auth exists, redirect to login
-      if (!token && !user && !legacyEmail) {
-        // Store attempted URL for redirect after login
-        sessionStorage.setItem('zantara-redirect-after-login', window.location.href);
-
-        // Redirect to login page
-        window.location.replace('login.html');
-      }
-    })();
+    // No forced redirect - users can access chat immediately
+    console.log('✅ [ZANTARA] Guest access enabled - Login optional for advanced features');
   </script>
 </head>
 <body>
@@ -787,8 +778,8 @@
             window.ZantaraUX.scrollToBottom();
           });
 
-        // Start streaming
-        await window.ZANTARA_SSE.stream(message, userEmail);
+        // Start streaming with conversation history for context
+        await window.ZANTARA_SSE.stream(message, userEmail, conversationHistory);
 
       } catch (error) {
         console.error('AI chat error:', error);
@@ -811,12 +802,8 @@
     // Send on button click
     sendBtn.addEventListener('click', sendMessage);
 
-    // Send on Enter key
-    inputField.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
-    });
+    // NOTE: Enter key is now handled by UX Manager (ux-manager.js)
+    // which converts the input to textarea and manages keyboard events
 
     // 🎨 IMAGE GENERATION - Imagine.art Integration
     imageGenBtn.addEventListener('click', () => {
