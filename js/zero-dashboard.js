@@ -108,27 +108,46 @@ class ZeroDashboardService {
     widget.className = 'zero-dashboard-widget';
     widget.innerHTML = `
       <div class="dashboard-header">
-        <h3>📊 ZERO Dashboard - Team Status</h3>
-        <span class="last-updated">Last updated: ${new Date().toLocaleTimeString()}</span>
+        <div class="dashboard-title">
+          <span class="title-icon">📊</span>
+          <span class="title-text">ZERO Dashboard</span>
+          <span class="title-subtitle">Team Status</span>
+        </div>
+        <div class="last-updated">
+          <span class="update-label">Last updated:</span>
+          <span class="update-time">${new Date().toLocaleTimeString()}</span>
+        </div>
       </div>
       <div class="dashboard-content">
-        <div class="team-summary">
-          <div class="metric">
-            <span class="label">Active Sessions:</span>
-            <span class="value">${data.active_sessions || 0}</span>
+        <div class="metrics-grid">
+          <div class="metric-card active-sessions">
+            <div class="metric-icon">🟢</div>
+            <div class="metric-content">
+              <div class="metric-label">Active Sessions</div>
+              <div class="metric-value">${data.active_sessions || 0}</div>
+            </div>
           </div>
-          <div class="metric">
-            <span class="label">Total Hours Today:</span>
-            <span class="value">${data.total_hours || 0}h</span>
+          <div class="metric-card total-hours">
+            <div class="metric-icon">⏰</div>
+            <div class="metric-content">
+              <div class="metric-label">Total Hours</div>
+              <div class="metric-value">${data.total_hours || 0}h</div>
+            </div>
           </div>
-          <div class="metric">
-            <span class="label">Conversations:</span>
-            <span class="value">${data.total_conversations || 0}</span>
+          <div class="metric-card conversations">
+            <div class="metric-icon">💬</div>
+            <div class="metric-content">
+              <div class="metric-label">Conversations</div>
+              <div class="metric-value">${data.total_conversations || 0}</div>
+            </div>
           </div>
         </div>
-        <div class="team-members">
-          <h4>👥 Team Activity</h4>
-          <div class="members-list">
+        <div class="team-section">
+          <div class="section-header">
+            <span class="section-icon">👥</span>
+            <span class="section-title">Team Activity</span>
+          </div>
+          <div class="members-grid">
             ${this.renderTeamMembers(data.team_members || [])}
           </div>
         </div>
@@ -148,17 +167,28 @@ class ZeroDashboardService {
 
     return members.map(member => `
       <div class="member-card ${member.status}">
-        <div class="member-info">
-          <span class="name">${member.name}</span>
-          <span class="role">${member.role}</span>
+        <div class="member-avatar">
+          <div class="avatar-circle ${member.status}">
+            ${member.name.charAt(0).toUpperCase()}
+          </div>
+        </div>
+        <div class="member-details">
+          <div class="member-name">${member.name}</div>
+          <div class="member-role">${member.role}</div>
+          <div class="member-metrics">
+            <span class="metric-item">
+              <span class="metric-icon">⏰</span>
+              <span class="metric-value">${member.hours_worked || 0}h</span>
+            </span>
+            <span class="metric-item">
+              <span class="metric-icon">💬</span>
+              <span class="metric-value">${member.conversations || 0}</span>
+            </span>
+          </div>
         </div>
         <div class="member-status">
-          <span class="status-indicator ${member.status}"></span>
-          <span class="status-text">${member.status}</span>
-        </div>
-        <div class="member-metrics">
-          <span class="hours">${member.hours_worked || 0}h</span>
-          <span class="conversations">${member.conversations || 0} chats</span>
+          <div class="status-indicator ${member.status}"></div>
+          <div class="status-text">${member.status}</div>
         </div>
       </div>
     `).join('');
@@ -171,145 +201,281 @@ class ZeroDashboardService {
     style.id = 'zero-dashboard-css';
     style.textContent = `
       .zero-dashboard-widget {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-        border: 1px solid #444;
-        border-radius: 12px;
-        padding: 20px;
+        background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d2d2d 100%);
+        border: 1px solid #333;
+        border-radius: 16px;
+        padding: 24px;
         margin: 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .zero-dashboard-widget::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #10B981, #3B82F6, #8B5CF6);
       }
       
       .dashboard-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #444;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #333;
       }
       
-      .dashboard-header h3 {
+      .dashboard-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      
+      .title-icon {
+        font-size: 24px;
+      }
+      
+      .title-text {
         color: #fff;
-        margin: 0;
-        font-size: 18px;
+        font-size: 20px;
+        font-weight: 600;
+      }
+      
+      .title-subtitle {
+        color: #888;
+        font-size: 14px;
+        font-weight: 400;
       }
       
       .last-updated {
-        color: #888;
-        font-size: 12px;
-      }
-      
-      .team-summary {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 20px;
-      }
-      
-      .metric {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        padding: 15px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 8px;
-        min-width: 100px;
+        align-items: flex-end;
+        gap: 4px;
       }
       
-      .metric .label {
+      .update-label {
+        color: #666;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .update-time {
+        color: #10B981;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      
+      .metric-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid #333;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+      }
+      
+      .metric-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: #444;
+        transform: translateY(-2px);
+      }
+      
+      .metric-icon {
+        font-size: 24px;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+      }
+      
+      .metric-content {
+        flex: 1;
+      }
+      
+      .metric-label {
         color: #aaa;
         font-size: 12px;
-        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
       }
       
-      .metric .value {
+      .metric-value {
         color: #fff;
         font-size: 24px;
-        font-weight: bold;
+        font-weight: 700;
       }
       
-      .team-members h4 {
+      .team-section {
+        margin-top: 24px;
+      }
+      
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      
+      .section-icon {
+        font-size: 20px;
+      }
+      
+      .section-title {
         color: #fff;
-        margin: 0 0 15px 0;
         font-size: 16px;
+        font-weight: 600;
       }
       
-      .members-list {
+      .members-grid {
         display: grid;
-        gap: 10px;
+        gap: 12px;
       }
       
       .member-card {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        padding: 12px;
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 8px;
-        border-left: 4px solid #444;
+        gap: 16px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid #333;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+      }
+      
+      .member-card:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: #444;
       }
       
       .member-card.active {
-        border-left-color: #10B981;
+        border-left: 4px solid #10B981;
       }
       
       .member-card.inactive {
-        border-left-color: #EF4444;
+        border-left: 4px solid #EF4444;
       }
       
-      .member-info {
+      .member-avatar {
+        flex-shrink: 0;
+      }
+      
+      .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
         display: flex;
-        flex-direction: column;
-      }
-      
-      .member-info .name {
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 16px;
         color: #fff;
-        font-weight: 500;
       }
       
-      .member-info .role {
+      .avatar-circle.active {
+        background: linear-gradient(135deg, #10B981, #059669);
+      }
+      
+      .avatar-circle.inactive {
+        background: linear-gradient(135deg, #EF4444, #DC2626);
+      }
+      
+      .member-details {
+        flex: 1;
+      }
+      
+      .member-name {
+        color: #fff;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+      
+      .member-role {
         color: #aaa;
         font-size: 12px;
+        margin-bottom: 8px;
+      }
+      
+      .member-metrics {
+        display: flex;
+        gap: 16px;
+      }
+      
+      .metric-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #888;
+        font-size: 11px;
+      }
+      
+      .metric-icon {
+        font-size: 12px;
+      }
+      
+      .metric-value {
+        font-weight: 500;
       }
       
       .member-status {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 5px;
+        gap: 4px;
       }
       
       .status-indicator {
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: #444;
       }
       
       .status-indicator.active {
         background: #10B981;
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
       }
       
       .status-indicator.inactive {
         background: #EF4444;
+        box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
       }
       
       .status-text {
         color: #aaa;
-        font-size: 12px;
-      }
-      
-      .member-metrics {
-        display: flex;
-        gap: 15px;
-        color: #aaa;
-        font-size: 12px;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
       
       .no-data {
         color: #666;
         text-align: center;
-        padding: 20px;
+        padding: 40px;
         font-style: italic;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px dashed #444;
       }
     `;
     

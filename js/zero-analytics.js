@@ -154,96 +154,140 @@ class ZeroAnalyticsHandler {
     const activeMembers = data.team_members?.filter(m => m.status === 'active') || [];
     const inactiveMembers = data.team_members?.filter(m => m.status === 'inactive') || [];
     
-    let response = `📊 **REPORT LOGIN TEAM - ${new Date().toLocaleDateString('it-IT')}**\n\n`;
+    let response = `╔══════════════════════════════════════════════════════════════╗\n`;
+    response += `║                    ZERO DASHBOARD - TEAM STATUS                ║\n`;
+    response += `║                        ${new Date().toLocaleDateString('it-IT')}                        ║\n`;
+    response += `╚══════════════════════════════════════════════════════════════╝\n\n`;
     
     if (activeMembers.length > 0) {
-      response += `🟢 **ATTUALMENTE ATTIVI (${activeMembers.length}):**\n`;
+      response += `🟢 ATTUALMENTE ATTIVI (${activeMembers.length})\n`;
+      response += `┌─────────────────────────────────────────────────────────────┐\n`;
       activeMembers.forEach(member => {
-        response += `• ${member.name} (${member.role}) - online da ${member.login_time || 'N/A'}\n`;
+        const time = member.login_time || 'N/A';
+        const role = member.role || 'N/A';
+        response += `│ ${member.name.padEnd(20)} │ ${role.padEnd(15)} │ ${time.padEnd(12)} │\n`;
       });
-      response += '\n';
+      response += `└─────────────────────────────────────────────────────────────┘\n\n`;
     }
     
     if (inactiveMembers.length > 0) {
-      response += `🔴 **DISCONNESSI (${inactiveMembers.length}):**\n`;
+      response += `🔴 DISCONNESSI (${inactiveMembers.length})\n`;
+      response += `┌─────────────────────────────────────────────────────────────┐\n`;
       inactiveMembers.forEach(member => {
-        response += `• ${member.name} (${member.role}) - ultimo accesso: ${member.last_activity || 'N/A'}\n`;
+        const lastActivity = member.last_activity || 'N/A';
+        const role = member.role || 'N/A';
+        response += `│ ${member.name.padEnd(20)} │ ${role.padEnd(15)} │ ${lastActivity.padEnd(12)} │\n`;
       });
-      response += '\n';
+      response += `└─────────────────────────────────────────────────────────────┘\n\n`;
     }
     
-    response += `📈 **STATISTICHE GIORNALIERE:**\n`;
-    response += `• Ore totali lavorate: ${data.total_hours || 0}h\n`;
-    response += `• Conversazioni totali: ${data.total_conversations || 0}\n`;
-    response += `• Sessioni attive: ${data.active_sessions || 0}\n`;
+    response += `📈 STATISTICHE GIORNALIERE\n`;
+    response += `┌─────────────────────────────────────────────────────────────┐\n`;
+    response += `│ Ore totali lavorate    │ ${String(data.total_hours || 0).padEnd(25)} │\n`;
+    response += `│ Conversazioni totali   │ ${String(data.total_conversations || 0).padEnd(25)} │\n`;
+    response += `│ Sessioni attive        │ ${String(data.active_sessions || 0).padEnd(25)} │\n`;
+    response += `└─────────────────────────────────────────────────────────────┘\n`;
     
     return response;
   }
 
   formatPerformanceReport(data) {
-    let response = `📈 **REPORT PERFORMANCE TEAM - ${new Date().toLocaleDateString('it-IT')}**\n\n`;
+    let response = `╔══════════════════════════════════════════════════════════════╗\n`;
+    response += `║                  ZERO DASHBOARD - PERFORMANCE                 ║\n`;
+    response += `║                        ${new Date().toLocaleDateString('it-IT')}                        ║\n`;
+    response += `╚══════════════════════════════════════════════════════════════╝\n\n`;
     
-    response += `⏰ **ORE LAVORO:**\n`;
-    response += `• Totale ore: ${data.total_hours || 0}h\n`;
-    response += `• Media per membro: ${data.average_hours_per_member || 0}h\n`;
-    response += `• Ore più produttive: ${data.most_productive_hours || 'N/A'}\n\n`;
+    response += `⏰ ORE LAVORO\n`;
+    response += `┌─────────────────────────────────────────────────────────────┐\n`;
+    response += `│ Totale ore              │ ${String(data.total_hours || 0).padEnd(25)} │\n`;
+    response += `│ Media per membro         │ ${String(data.average_hours_per_member || 0).padEnd(25)} │\n`;
+    response += `│ Ore più produttive       │ ${String(data.most_productive_hours || 'N/A').padEnd(25)} │\n`;
+    response += `└─────────────────────────────────────────────────────────────┘\n\n`;
     
-    response += `💬 **ATTIVITÀ CHAT:**\n`;
-    response += `• Conversazioni totali: ${data.total_conversations || 0}\n`;
-    response += `• Media per membro: ${data.average_conversations_per_member || 0}\n`;
-    response += `• Tempo di risposta medio: ${data.average_response_time || 'N/A'}\n\n`;
+    response += `💬 ATTIVITÀ CHAT\n`;
+    response += `┌─────────────────────────────────────────────────────────────┐\n`;
+    response += `│ Conversazioni totali     │ ${String(data.total_conversations || 0).padEnd(25)} │\n`;
+    response += `│ Media per membro         │ ${String(data.average_conversations_per_member || 0).padEnd(25)} │\n`;
+    response += `│ Tempo risposta medio     │ ${String(data.average_response_time || 'N/A').padEnd(25)} │\n`;
+    response += `└─────────────────────────────────────────────────────────────┘\n\n`;
     
     if (data.top_performers && data.top_performers.length > 0) {
-      response += `🏆 **TOP PERFORMERS:**\n`;
+      response += `🏆 TOP PERFORMERS\n`;
+      response += `┌─────────────────────────────────────────────────────────────┐\n`;
       data.top_performers.forEach((performer, index) => {
-        response += `${index + 1}. ${performer.name} - ${performer.hours_worked}h (${performer.conversations} chat)\n`;
+        const rank = `${index + 1}.`.padEnd(3);
+        const name = performer.name.padEnd(15);
+        const hours = `${performer.hours_worked}h`.padEnd(8);
+        const chats = `${performer.conversations} chat`;
+        response += `│ ${rank} ${name} │ ${hours} │ ${chats.padEnd(15)} │\n`;
       });
+      response += `└─────────────────────────────────────────────────────────────┘\n`;
     }
     
     return response;
   }
 
   formatTeamStatus(data) {
-    let response = `🎯 **STATUS TEAM IN TEMPO REALE**\n\n`;
+    let response = `╔══════════════════════════════════════════════════════════════╗\n`;
+    response += `║                ZERO DASHBOARD - TEAM STATUS                   ║\n`;
+    response += `║                        ${new Date().toLocaleDateString('it-IT')}                        ║\n`;
+    response += `╚══════════════════════════════════════════════════════════════╝\n\n`;
     
-    response += `📊 **OVERVIEW:**\n`;
-    response += `• Membri totali: ${data.total_members || 0}\n`;
-    response += `• Attualmente online: ${data.active_members || 0}\n`;
-    response += `• Offline: ${data.inactive_members || 0}\n`;
-    response += `• Ore lavorate oggi: ${data.total_hours || 0}h\n\n`;
+    response += `📊 OVERVIEW\n`;
+    response += `┌─────────────────────────────────────────────────────────────┐\n`;
+    response += `│ Membri totali           │ ${String(data.total_members || 0).padEnd(25)} │\n`;
+    response += `│ Attualmente online       │ ${String(data.active_members || 0).padEnd(25)} │\n`;
+    response += `│ Offline                 │ ${String(data.inactive_members || 0).padEnd(25)} │\n`;
+    response += `│ Ore lavorate oggi       │ ${String(data.total_hours || 0).padEnd(25)} │\n`;
+    response += `└─────────────────────────────────────────────────────────────┘\n\n`;
     
     if (data.departments) {
-      response += `🏢 **PER DIPARTIMENTO:**\n`;
+      response += `🏢 PER DIPARTIMENTO\n`;
+      response += `┌─────────────────────────────────────────────────────────────┐\n`;
       Object.entries(data.departments).forEach(([dept, info]) => {
-        response += `• ${dept}: ${info.active}/${info.total} attivi (${info.hours}h)\n`;
+        const deptName = dept.padEnd(20);
+        const active = `${info.active}/${info.total}`.padEnd(8);
+        const hours = `${info.hours}h`.padEnd(8);
+        response += `│ ${deptName} │ ${active} │ ${hours} │\n`;
       });
+      response += `└─────────────────────────────────────────────────────────────┘\n`;
     }
     
     return response;
   }
 
   formatGeneralReport(data) {
-    let response = `📋 **REPORT GENERALE TEAM - ${new Date().toLocaleDateString('it-IT')}**\n\n`;
+    let response = `╔══════════════════════════════════════════════════════════════╗\n`;
+    response += `║                ZERO DASHBOARD - REPORT GENERALE               ║\n`;
+    response += `║                        ${new Date().toLocaleDateString('it-IT')}                        ║\n`;
+    response += `╚══════════════════════════════════════════════════════════════╝\n\n`;
     
-    response += `👥 **TEAM OVERVIEW:**\n`;
-    response += `• Membri totali: ${data.total_members || 0}\n`;
-    response += `• Sessioni attive: ${data.active_sessions || 0}\n`;
-    response += `• Ore totali: ${data.total_hours || 0}h\n`;
-    response += `• Conversazioni: ${data.total_conversations || 0}\n\n`;
+    response += `👥 TEAM OVERVIEW\n`;
+    response += `┌─────────────────────────────────────────────────────────────┐\n`;
+    response += `│ Membri totali           │ ${String(data.total_members || 0).padEnd(25)} │\n`;
+    response += `│ Sessioni attive         │ ${String(data.active_sessions || 0).padEnd(25)} │\n`;
+    response += `│ Ore totali              │ ${String(data.total_hours || 0).padEnd(25)} │\n`;
+    response += `│ Conversazioni           │ ${String(data.total_conversations || 0).padEnd(25)} │\n`;
+    response += `└─────────────────────────────────────────────────────────────┘\n\n`;
     
     if (data.team_members && data.team_members.length > 0) {
-      response += `👤 **DETTAGLIO MEMBRI:**\n`;
+      response += `👤 DETTAGLIO MEMBRI\n`;
+      response += `┌─────────────────────────────────────────────────────────────┐\n`;
       data.team_members.forEach(member => {
         const status = member.status === 'active' ? '🟢' : '🔴';
-        response += `${status} ${member.name} (${member.role}) - ${member.hours_worked || 0}h\n`;
+        const name = member.name.padEnd(20);
+        const role = member.role.padEnd(15);
+        const hours = `${member.hours_worked || 0}h`.padEnd(8);
+        response += `│ ${status} ${name} │ ${role} │ ${hours} │\n`;
       });
+      response += `└─────────────────────────────────────────────────────────────┘\n`;
     }
     
     return response;
   }
 
   getErrorMessage() {
-    return `❌ **ERRORE SISTEMA TRACKING**\n\nNon riesco a recuperare i dati reali del team. Possibili cause:\n• Backend non disponibile\n• Database non accessibile\n• Sistema di tracking disattivato\n\nContatta il team tecnico per risolvere il problema.`;
+    return `╔══════════════════════════════════════════════════════════════╗\n║                    ERRORE SISTEMA TRACKING                    ║\n╚══════════════════════════════════════════════════════════════╝\n\n❌ Non riesco a recuperare i dati reali del team.\n\n┌─────────────────────────────────────────────────────────────┐\n│ Possibili cause:                                           │\n│ • Backend non disponibile                                  │\n│ • Database non accessibile                                 │\n│ • Sistema di tracking disattivato                          │\n└─────────────────────────────────────────────────────────────┘\n\nContatta il team tecnico per risolvere il problema.`;
   }
 }
 
