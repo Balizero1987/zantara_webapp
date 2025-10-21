@@ -1,0 +1,626 @@
+/**
+ * 🌟 ZANTARA UX ENHANCEMENTS
+ *
+ * Professional, smooth, delightful user experience improvements
+ * Created: 2025-10-21
+ * Focus: Collaborator-centric design
+ */
+
+/* ========================================
+   1. TYPING INDICATOR (Beautiful Animation)
+   ======================================== */
+
+.typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #252525 100%);
+  border-radius: 18px 18px 18px 4px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  animation: fadeInUp 0.3s ease-out;
+}
+
+body.day-mode .typing-indicator {
+  background: linear-gradient(135deg, #f5f5f5 0%, #ebebeb 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.typing-indicator .dot {
+  width: 8px;
+  height: 8px;
+  background: rgba(139, 92, 246, 0.8);
+  border-radius: 50%;
+  animation: typingDot 1.4s infinite ease-in-out;
+}
+
+.typing-indicator .dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator .dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingDot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+/* ========================================
+   2. MESSAGE ANIMATIONS (Smooth Entry)
+   ======================================== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-message,
+.ai-message {
+  animation: fadeInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.user-message {
+  animation-name: fadeInDown;
+}
+
+/* ========================================
+   3. ENHANCED MESSAGE BUBBLES
+   ======================================== */
+
+.message-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.message-wrapper.user {
+  flex-direction: row-reverse;
+}
+
+.message-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.message-wrapper:hover .message-avatar {
+  transform: scale(1.1);
+}
+
+.message-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.message-wrapper.user .message-avatar {
+  background: linear-gradient(135deg, #2f7bd6 0%, #1e5bb8 100%);
+  box-shadow: 0 2px 8px rgba(47, 123, 214, 0.3);
+}
+
+.message-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.message-content .user-message {
+  margin: 0;
+  box-shadow: 0 2px 8px rgba(47, 123, 214, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.message-content .ai-message {
+  margin: 0;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #252525 100%);
+  border-radius: 18px 18px 18px 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.day-mode .message-content .ai-message {
+  background: linear-gradient(135deg, #f5f5f5 0%, #ebebeb 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.message-wrapper:hover .message-content .user-message,
+.message-wrapper:hover .message-content .ai-message {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+body.day-mode .message-wrapper:hover .message-content .ai-message {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Message timestamp (optional) */
+.message-time {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+body.day-mode .message-time {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.message-wrapper:hover .message-time {
+  opacity: 1;
+}
+
+/* ========================================
+   4. ENHANCED INPUT AREA
+   ======================================== */
+
+.input-area {
+  background: linear-gradient(180deg, #252525 0%, #2a2a2a 100%);
+  border-top: 1px solid #3a3a3a;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+body.day-mode .input-area {
+  background: linear-gradient(180deg, #ffffff 0%, #f8f8f8 100%);
+  border-top-color: #e0e0e0;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.input-area:focus-within {
+  border-top-color: #8b5cf6;
+  box-shadow: 0 -4px 24px rgba(139, 92, 246, 0.3);
+}
+
+body.day-mode .input-area:focus-within {
+  box-shadow: 0 -4px 24px rgba(139, 92, 246, 0.15);
+}
+
+.input {
+  transition: all 0.3s ease;
+  resize: none;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.btn {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::before {
+  width: 100px;
+  height: 100px;
+}
+
+.btn:hover {
+  transform: scale(1.1);
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+#sendBtn {
+  position: relative;
+}
+
+#sendBtn.sending {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+#sendBtn.sending::after {
+  content: '⏳';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ========================================
+   5. WELCOME SCREEN ENHANCEMENTS
+   ======================================== */
+
+.welcome {
+  animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.welcome h2 {
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 8s ease infinite;
+  background-size: 200% 200%;
+}
+
+body.day-mode .welcome h2 {
+  background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.welcome .logo-center {
+  transition: transform 0.3s ease, filter 0.3s ease;
+  cursor: pointer;
+}
+
+.welcome .logo-center:hover {
+  transform: scale(1.05) rotate(2deg);
+  filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.6));
+}
+
+/* Quick action suggestions */
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 32px;
+  animation: fadeInUp 1s ease-out 0.4s backwards;
+}
+
+.quick-action {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #252525 100%);
+  border: 1px solid #3a3a3a;
+  border-radius: 20px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body.day-mode .quick-action {
+  background: linear-gradient(135deg, #f5f5f5 0%, #ebebeb 100%);
+  border-color: #d0d0d0;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.quick-action:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+  border-color: #8b5cf6;
+  color: #fff;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+body.day-mode .quick-action:hover {
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);
+}
+
+/* ========================================
+   6. SMOOTH SCROLL IMPROVEMENTS
+   ======================================== */
+
+.messages {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #4a4a4a #2a2a2a;
+}
+
+body.day-mode .messages {
+  scrollbar-color: #c0c0c0 #f0f0f0;
+}
+
+/* Scroll indicator */
+.scroll-indicator {
+  position: absolute;
+  bottom: 100px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.scroll-indicator.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.scroll-indicator:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.6);
+}
+
+.scroll-indicator::before {
+  content: '↓';
+  font-size: 20px;
+  color: white;
+  font-weight: bold;
+}
+
+/* ========================================
+   7. MOBILE TOUCH IMPROVEMENTS
+   ======================================== */
+
+@media (max-width: 968px) {
+  .message-wrapper {
+    gap: 8px;
+  }
+
+  .message-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .quick-actions {
+    gap: 8px;
+  }
+
+  .quick-action {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .typing-indicator {
+    padding: 12px 16px;
+  }
+}
+
+/* ========================================
+   8. LOADING STATES & FEEDBACK
+   ======================================== */
+
+.message-sending {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.message-error {
+  border: 1px solid #ff6b6b !important;
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+/* Success feedback */
+.message-sent {
+  animation: successPulse 0.6s ease;
+}
+
+@keyframes successPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* ========================================
+   9. ACCESSIBILITY IMPROVEMENTS
+   ======================================== */
+
+.btn:focus-visible,
+.quick-action:focus-visible,
+.message-avatar:focus-visible {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ========================================
+   10. PREMIUM TOUCHES
+   ======================================== */
+
+/* Glassmorphism effect for overlays */
+.glass-overlay {
+  background: rgba(26, 26, 26, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.day-mode .glass-overlay {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Shimmer effect for loading */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    #2a2a2a 0%,
+    #3a3a3a 20%,
+    #2a2a2a 40%,
+    #2a2a2a 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+body.day-mode .shimmer {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 20%,
+    #f0f0f0 40%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Connection status indicator */
+.connection-status {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  padding: 8px 16px;
+  background: rgba(26, 26, 26, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.connection-status.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.connection-status.online {
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.connection-status.offline {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.connection-status::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulse 2s ease infinite;
+}
+
+.connection-status.offline::before {
+  background: #ef4444;
+  animation: none;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+}
+
+body.day-mode .connection-status {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #000;
+}

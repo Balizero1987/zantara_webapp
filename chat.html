@@ -14,12 +14,14 @@
   <link rel="stylesheet" href="styles/message-formatter.css">
   <link rel="stylesheet" href="styles/indonesian-badges.css">
   <link rel="stylesheet" href="styles/chat-enhancements.css">
+  <link rel="stylesheet" href="styles/ux-enhancements.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css">
   <script src="js/message-formatter.js"></script>
   <script src="js/user-badges.js"></script>
   <script src="js/chat-enhancements.js"></script>
+  <script src="js/ux-manager.js"></script>
 
   <!-- 🔒 AUTH GUARD - Redirect to login if not authenticated -->
   <script>
@@ -645,11 +647,9 @@
         messagesDiv.innerHTML = '';
       }
 
-      // Add user message
-      const userMsg = document.createElement('div');
-      userMsg.className = 'user-message';
-      userMsg.textContent = message;
-      messagesDiv.appendChild(userMsg);
+      // 🎨 UX: Use new message wrapper with avatar
+      const userMsgWrapper = window.ZantaraUX.createMessage('user', message, { showTime: false });
+      messagesDiv.appendChild(userMsgWrapper);
 
       // Add to conversation history
       conversationHistory.push({
@@ -664,17 +664,16 @@
 
       // Clear input
       inputField.value = '';
+      if (inputField.tagName === 'TEXTAREA') {
+        inputField.style.height = 'auto';
+      }
+
+      // 🎨 UX: Show typing indicator instead of empty message
+      window.ZantaraUX.showTypingIndicator();
+      window.ZantaraUX.setSendButtonLoading(true);
 
       // Scroll to bottom
-      scrollToBottom();
-
-      // Create empty AI message for streaming
-      const aiMsg = document.createElement('div');
-      aiMsg.className = 'ai-message streaming';
-      aiMsg.id = 'streaming-msg';
-      aiMsg.textContent = '⏳ Zantara is thinking...';
-      messagesDiv.appendChild(aiMsg);
-      scrollToBottom();
+      window.ZantaraUX.scrollToBottom();
 
       try {
         // Get user email using robust helper function
@@ -696,14 +695,30 @@
           }
         });
 
+        // 🎨 UX: Create AI message container
+        let aiMsgWrapper = null;
+        let aiMsg = null;
+
         window.ZANTARA_SSE
           .on('start', () => {
             console.log('🌊 [SSE Stream] Connected');
-            aiMsg.textContent = '';  // Clear "thinking" message
+
+            // 🎨 UX: Remove typing indicator and create AI message
+            window.ZantaraUX.removeTypingIndicator();
+
+            aiMsgWrapper = window.ZantaraUX.createMessage('ai', '', { showTime: false });
+            messagesDiv.appendChild(aiMsgWrapper);
+
+            // Get the actual message bubble
+            aiMsg = aiMsgWrapper.querySelector('.ai-message');
+            aiMsg.classList.add('streaming');
+
+            window.ZantaraUX.scrollToBottom();
           })
           .on('delta', ({chunk, message}) => {
+            if (!aiMsg) return;
+
             // ⚡ PERFORMANCE: Show plain text during streaming (fast!)
-            // Markdown formatting will be applied only at the end
             streamingText = message;
             aiMsg.textContent = streamingText;
 
@@ -714,11 +729,14 @@
             if (!window._scrollCounter) window._scrollCounter = 0;
             window._scrollCounter++;
             if (window._scrollCounter % 10 === 0) {
-              scrollToBottom();
+              window.ZantaraUX.scrollToBottom(false);
             }
           })
           .on('complete', ({message: finalMessage}) => {
             console.log('✅ [SSE Stream] Complete');
+
+            // 🎨 UX: Reset send button
+            window.ZantaraUX.setSendButtonLoading(false);
 
             // Add to conversation history
             conversationHistory.push({
@@ -731,6 +749,8 @@
               conversationHistory = conversationHistory.slice(-20);
             }
 
+            if (!aiMsg) return;
+
             // 🎨 NOW apply Markdown formatting (only once at the end)
             if (window.MessageFormatter) {
               aiMsg.innerHTML = MessageFormatter.formatStructuredMessage(finalMessage, {
@@ -742,7 +762,10 @@
             }
 
             aiMsg.classList.remove('streaming');
-            scrollToBottom();
+            window.ZantaraUX.scrollToBottom();
+
+            // 🎨 UX: Show success feedback
+            window.ZantaraUX.showMessageSuccess(aiMsgWrapper);
 
             // Reset scroll counter
             window._scrollCounter = 0;
@@ -750,10 +773,18 @@
           .on('error', ({error}) => {
             console.error('❌ [SSE Stream] Error:', error);
 
-            // Show error
-            aiMsg.className = 'error-message';
-            aiMsg.textContent = '❌ Error: ' + error;
-            scrollToBottom();
+            // 🎨 UX: Reset UI
+            window.ZantaraUX.removeTypingIndicator();
+            window.ZantaraUX.setSendButtonLoading(false);
+
+            // Show error in message
+            if (aiMsg) {
+              aiMsg.className = 'error-message';
+              aiMsg.textContent = '❌ Error: ' + error;
+              window.ZantaraUX.showMessageError(aiMsgWrapper);
+            }
+
+            window.ZantaraUX.scrollToBottom();
           });
 
         // Start streaming
@@ -762,16 +793,18 @@
       } catch (error) {
         console.error('AI chat error:', error);
 
-        // Remove streaming message
-        const streaming = document.getElementById('streaming-msg');
-        if (streaming) streaming.remove();
+        // 🎨 UX: Clean up on error
+        window.ZantaraUX.removeTypingIndicator();
+        window.ZantaraUX.setSendButtonLoading(false);
 
         // Show error message
-        const errorMsg = document.createElement('div');
-        errorMsg.className = 'error-message';
-        errorMsg.textContent = '❌ Error: ' + (error.message || 'Failed to get response from Zantara AI');
-        messagesDiv.appendChild(errorMsg);
-        scrollToBottom();
+        const errorWrapper = window.ZantaraUX.createMessage('ai', '❌ Error: ' + (error.message || 'Failed to get response from ZANTARA AI'), { showTime: false });
+        const errorBubble = errorWrapper.querySelector('.ai-message');
+        errorBubble.className = 'error-message';
+
+        messagesDiv.appendChild(errorWrapper);
+        window.ZantaraUX.scrollToBottom();
+        window.ZantaraUX.showMessageError(errorWrapper);
       }
     }
 
