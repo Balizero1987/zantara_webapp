@@ -304,7 +304,7 @@
           <button class="btn" id="attachBtn" title="Attach files">📎</button>
           <button class="btn" id="imageGenBtn" title="Generate AI Image">🎨</button>
           <input type="text" class="input" placeholder="Type a message...">
-          <button class="btn" id="voiceBtn" title="Voice message">🎤</button>
+          <button class="btn" id="voiceBtn" title="Voice message (Coming soon)" style="opacity: 0.5; cursor: not-allowed;">🎤</button>
           <button class="btn" id="sendBtn" title="Send message">➤</button>
         </div>
       </div>
@@ -621,6 +621,11 @@
     const imageGenBtn = document.getElementById('imageGenBtn');
     const voiceBtn = document.getElementById('voiceBtn');
 
+    // Voice button - Coming soon
+    voiceBtn.addEventListener('click', () => {
+      alert('🎤 Voice messages coming soon!\n\nWe\'re working on adding voice input and output features.');
+    });
+
     // Conversation state (FIX: track history for context)
     let conversationHistory = [];
     let lastAiUsed = null;
@@ -782,20 +787,80 @@
         await window.ZANTARA_SSE.stream(message, userEmail, conversationHistory);
 
       } catch (error) {
-        console.error('AI chat error:', error);
+        console.error('❌ SSE streaming failed:', error);
 
-        // 🎨 UX: Clean up on error
-        window.ZantaraUX.removeTypingIndicator();
-        window.ZantaraUX.setSendButtonLoading(false);
+        // 🔄 FALLBACK: Try regular API call if SSE fails
+        try {
+          console.log('🔄 Attempting fallback to regular API...');
 
-        // Show error message
-        const errorWrapper = window.ZantaraUX.createMessage('ai', '❌ Error: ' + (error.message || 'Failed to get response from ZANTARA AI'), { showTime: false });
-        const errorBubble = errorWrapper.querySelector('.ai-message');
-        errorBubble.className = 'error-message';
+          // Clean up SSE UI
+          window.ZantaraUX.removeTypingIndicator();
 
-        messagesDiv.appendChild(errorWrapper);
-        window.ZantaraUX.scrollToBottom();
-        window.ZantaraUX.showMessageError(errorWrapper);
+          // Show new typing indicator for fallback
+          window.ZantaraUX.showTypingIndicator();
+
+          // Build conversation history for context
+          const historyParam = conversationHistory.length > 0
+            ? { conversation_history: conversationHistory }
+            : {};
+
+          // Call regular API endpoint
+          const response = await window.ZANTARA_API.call('/bali-zero/chat', {
+            query: message,
+            user_email: userEmail,
+            ...historyParam
+          }, true);
+
+          // Remove typing indicator
+          window.ZantaraUX.removeTypingIndicator();
+          window.ZantaraUX.setSendButtonLoading(false);
+
+          // Extract response text
+          const responseText = response?.data?.reply || response?.reply || response?.text || 'No response received';
+
+          // Add conversation history
+          conversationHistory.push({
+            role: 'assistant',
+            content: responseText
+          });
+
+          // Create AI message
+          const aiMsgWrapper = window.ZantaraUX.createMessage('ai', '', { showTime: false });
+          messagesDiv.appendChild(aiMsgWrapper);
+
+          const aiMsg = aiMsgWrapper.querySelector('.ai-message');
+
+          // Format and display message
+          if (window.MessageFormatter) {
+            aiMsg.innerHTML = MessageFormatter.formatStructuredMessage(responseText, {
+              showCTA: false,
+              language: MessageFormatter.detectLanguage(responseText, 'it')
+            });
+          } else {
+            aiMsg.textContent = responseText;
+          }
+
+          window.ZantaraUX.scrollToBottom();
+          window.ZantaraUX.showMessageSuccess(aiMsgWrapper);
+
+          console.log('✅ Fallback successful!');
+
+        } catch (fallbackError) {
+          console.error('❌ Fallback also failed:', fallbackError);
+
+          // 🎨 UX: Clean up on total failure
+          window.ZantaraUX.removeTypingIndicator();
+          window.ZantaraUX.setSendButtonLoading(false);
+
+          // Show error message
+          const errorWrapper = window.ZantaraUX.createMessage('ai', '❌ Connection error. Please check your internet and try again.', { showTime: false });
+          const errorBubble = errorWrapper.querySelector('.ai-message');
+          errorBubble.className = 'error-message';
+
+          messagesDiv.appendChild(errorWrapper);
+          window.ZantaraUX.scrollToBottom();
+          window.ZantaraUX.showMessageError(errorWrapper);
+        }
       }
     }
 
@@ -842,12 +907,12 @@
       try {
         console.log('🎨 Generating image with Imagine.art...', { prompt, style, aspectRatio });
 
-        // Call Imagine.art API via backend TS
+        // Call Imagine.art API via backend TS (use centralized API key)
         const response = await fetch('https://ts-backend-production-568d.up.railway.app/call', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-api-key': 'zantara-internal-dev-key-2025'
+            'x-api-key': window.ZANTARA_API?.config?.apiKey || 'zantara-internal-dev-key-2025'
           },
           body: JSON.stringify({
             key: 'ai-services.image.generate',
@@ -1156,38 +1221,18 @@
         userBtn.style.display = 'none';
       }
 
-      // If logged in but hasn't introduced yet, send automatic introduction
-      if (userEmail && !hasIntroduced) {
-        // Extract first name from email
-        const firstName = userEmail.split('@')[0].toLowerCase();
+      // ❌ REMOVED: Auto-introduction feature disabled
+      // Reason: Created endpoint inconsistency (used /bali-zero/chat instead of SSE streaming)
+      // User recognition now happens naturally through SSE streaming when they send first message
 
-        // Send introduction message automatically
-        setTimeout(async () => {
-          const introMessage = `Ciao, sono ${firstName}`;
-
-          try {
-            const response = await window.ZANTARA_API.call('/bali-zero/chat', {
-              query: introMessage,
-              user_email: userEmail  // For user recognition
-            }, true);
-
-            // Mark as introduced
-            sessionStorage.setItem('zantara-introduced', 'true');
-
-            // Just log recognition, no welcome banner
-            if (response?.data?.recognized) {
-              console.log('✅ User recognized:', firstName, '- Language:', response.data.language || 'default');
-            } else {
-              console.log('✅ User introduced to ZANTARA:', firstName);
-            }
-          } catch (error) {
-            console.warn('Failed to send introduction:', error);
-          }
-        }, 1000);
+      // Mark as introduced to prevent legacy code from running
+      if (userEmail) {
+        sessionStorage.setItem('zantara-introduced', 'true');
+        console.log('✅ User logged in:', userEmail);
       }
 
-      // No auto-redirect - user can use chat without login
-      // Login button is always visible in header
+      // No auth required - users can chat as guests or logged-in members
+      // Login enables: profile photo, history, personalization
     });
   </script>
 </body>

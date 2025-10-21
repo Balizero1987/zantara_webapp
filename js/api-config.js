@@ -25,7 +25,9 @@ const API_CONFIG = {
     path: '/chat' // NDJSON endpoint (proxied as /api/zantara/chat)
   },
   // Default headers (client)
-  headers: { 'Content-Type': 'application/json' }
+  headers: { 'Content-Type': 'application/json' },
+  // API key for internal services (centralized)
+  apiKey: 'zantara-internal-dev-key-2025'
 };
 
 // Lightweight Telemetry
@@ -161,8 +163,8 @@ async function callZantaraAPI(endpoint, data, useProxy = true) {
     const authToken = (typeof window !== 'undefined') ? (window.ZantaraStorage?.getToken() || localStorage.getItem('zantara-auth-token') || '') : '';
     const headers = {
       ...API_CONFIG.headers,
-      // FIX: Add API key for production reliability
-      'x-api-key': 'zantara-internal-dev-key-2025',
+      // Use centralized API key
+      'x-api-key': API_CONFIG.apiKey,
       ...(userId ? { 'x-user-id': userId } : {}),
       ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),  // Add JWT token
       ...(data?.auth_token ? { 'Authorization': `Bearer ${data.auth_token}` } : {})  // Override if passed in data
