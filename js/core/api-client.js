@@ -2,11 +2,14 @@
  * API Client Layer
  *
  * Handles all HTTP communication with ZANTARA backend.
- * Implements retry logic, error handling, and JWT authentication.
+ * Implements retry logic, error handling, JWT authentication,
+ * response caching, and request deduplication.
  */
 
 import { config } from '../config.js';
 import { jwtService } from '../auth/jwt-service.js';
+import { cacheManager } from './cache-manager.js';
+import { requestDeduplicator } from './request-deduplicator.js';
 
 class APIClient {
   constructor() {
@@ -47,41 +50,58 @@ class APIClient {
   }
 
   /**
-   * Standard (non-streaming) API call with retry logic
+   * Standard (non-streaming) API call with retry logic, caching, and deduplication
    */
   async _standardCall(headers, body, attempt = 1) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    const endpoint = body.key;
+    const params = body.params;
 
-      const response = await fetch(`${this.baseUrl}/call`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(body),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      // Handle rate limiting and server errors with retry
-      if ((response.status === 429 || response.status >= 500) && attempt < this.retryAttempts) {
-        const delay = this.retryDelay * Math.pow(2, attempt - 1); // Exponential backoff
-        await this._sleep(delay);
-        return this._standardCall(headers, body, attempt + 1);
-      }
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-        throw new Error(error.message || `HTTP ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        throw new Error('Request timeout');
-      }
-      throw error;
+    // Check cache first
+    const cached = cacheManager.get(endpoint, params);
+    if (cached) {
+      return cached;
     }
+
+    // Deduplicate concurrent requests
+    return requestDeduplicator.deduplicate(endpoint, params, async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+        const response = await fetch(`${this.baseUrl}/call`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(body),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        // Handle rate limiting and server errors with retry
+        if ((response.status === 429 || response.status >= 500) && attempt < this.retryAttempts) {
+          const delay = this.retryDelay * Math.pow(2, attempt - 1); // Exponential backoff
+          await this._sleep(delay);
+          return this._standardCall(headers, body, attempt + 1);
+        }
+
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({ message: 'Unknown error' }));
+          throw new Error(error.message || `HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        // Cache successful response
+        cacheManager.set(endpoint, params, data);
+        
+        return data;
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          throw new Error('Request timeout');
+        }
+        throw error;
+      }
+    });
   }
 
   /**

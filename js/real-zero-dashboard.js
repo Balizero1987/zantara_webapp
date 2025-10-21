@@ -1,117 +1,84 @@
 /**
- * ZERO Dashboard Service
- * Real-time team analytics and monitoring for ZERO (CEO)
- * Connects to backend tracking system for real data
+ * ZERO Real Dashboard Service
+ * Displays authentic team analytics from PostgreSQL database
  */
 
-class ZeroDashboardService {
+class RealZeroDashboardService {
   constructor() {
-    this.apiBase = 'https://scintillating-kindness-production-47e3.up.railway.app';
+    this.apiBase = window.ZANTARA_API?.config?.backend_url || 'https://scintillating-kindness-production-47e3.up.railway.app';
     this.isZero = false;
-    this.refreshInterval = null;
-    this.currentData = null;
-    
+    this.dashboardElement = null;
+    this.updateInterval = null;
+
     this.init();
   }
 
-  async init() {
-    // Check if current user is ZERO
-    this.isZero = this.checkIfZero();
-    
-    if (this.isZero) {
-      console.log('🎯 [ZeroDashboard] ZERO access detected - enabling dashboard');
-      await this.loadTeamData();
-      this.setupAutoRefresh();
-    } else {
-      console.log('👤 [ZeroDashboard] Regular user - dashboard disabled');
-    }
-  }
-
-  checkIfZero() {
-    const user = this.getCurrentUser();
-    if (!user) return false;
-    
-    // Check if user is ZERO (CEO)
-    const zeroEmails = [
-      'zero@balizero.com',
-      'antonello@balizero.com', 
-      'antonello.siano@balizero.com'
-    ];
-    
-    return zeroEmails.includes(user.email?.toLowerCase()) || 
-           user.role?.toLowerCase().includes('ceo') ||
-           user.name?.toLowerCase().includes('antonello');
-  }
-
-  getCurrentUser() {
-    if (window.ZantaraStorage && window.ZantaraStorage.isLoggedIn()) {
-      return window.ZantaraStorage.getUser();
-    }
-    
-    try {
-      const userStr = localStorage.getItem('zantara-user');
-      if (userStr) {
-        return JSON.parse(userStr);
+  init() {
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = window.ZantaraStorage?.getUser();
+      if (user && user.email === 'zero@balizero.com') {
+        this.isZero = true;
+        console.log('[RealZeroDashboard] Identified as ZERO. Initializing real dashboard.');
+        this.fetchAndRenderRealDashboard();
+        this.startAutoUpdate();
+      } else {
+        console.log('[RealZeroDashboard] Not ZERO, real dashboard not enabled.');
       }
-    } catch (e) {
-      console.warn('⚠️ [ZeroDashboard] Could not parse user data');
-    }
-    
-    return null;
+    });
   }
 
-  async loadTeamData() {
+  startAutoUpdate() {
+    if (this.updateInterval) clearInterval(this.updateInterval);
+    this.updateInterval = setInterval(() => this.fetchAndRenderRealDashboard(), 5 * 60 * 1000); // Every 5 minutes
+    console.log('[RealZeroDashboard] Real auto-update started (every 5 minutes).');
+  }
+
+  async fetchAndRenderRealDashboard() {
+    if (!this.isZero) return;
+
     try {
-      console.log('📊 [ZeroDashboard] Loading real team data...');
-      
-      const response = await fetch(`${this.apiBase}/bali-zero/chat`, {
-        method: 'POST',
+      const response = await fetch(`${this.apiBase}/bali-zero/analytics/dashboard`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          query: 'get_team_analytics',
-          user_email: 'zero@balizero.com',
-          report_type: 'comprehensive',
-          include_sessions: true,
-          include_performance: true
-        })
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        this.currentData = data;
-        this.displayTeamData(data);
+      const data = await response.json();
+      if (data.ok && data.data) {
+        this.renderRealDashboard(data.data);
       } else {
-        console.error('❌ [ZeroDashboard] Failed to load team data');
+        console.error('[RealZeroDashboard] Failed to fetch real dashboard data:', data.error || 'Unknown error');
         this.showErrorMessage();
       }
     } catch (error) {
-      console.error('❌ [ZeroDashboard] Load failed:', error);
+      console.error('[RealZeroDashboard] Error fetching real dashboard data:', error);
       this.showErrorMessage();
     }
   }
 
-  displayTeamData(data) {
-    // Create dashboard widget
-    const dashboard = this.createDashboardWidget(data);
-    
-    // Insert into chat interface
-    const chatContainer = document.querySelector('.chat-wrapper');
-    if (chatContainer) {
-      chatContainer.insertBefore(dashboard, chatContainer.firstChild);
+  renderRealDashboard(data) {
+    if (!this.dashboardElement) {
+      this.dashboardElement = this.createRealDashboardWidget(data);
+      const chatContainer = document.querySelector('.chat-wrapper');
+      if (chatContainer) {
+        chatContainer.insertBefore(this.dashboardElement, chatContainer.firstChild);
+      }
+    } else {
+      // Update existing widget content with real data
+      this.updateRealDashboardContent(data);
     }
   }
 
-  createDashboardWidget(data) {
+  createRealDashboardWidget(data) {
     const widget = document.createElement('div');
-    widget.className = 'zero-dashboard-widget';
+    widget.className = 'real-zero-dashboard-widget';
     widget.innerHTML = `
       <div class="dashboard-header">
         <div class="dashboard-title">
           <span class="title-icon">📊</span>
-          <span class="title-text">ZERO Dashboard</span>
-          <span class="title-subtitle">Team Status</span>
+          <span class="title-text">ZERO Real Dashboard</span>
+          <span class="title-subtitle">Live Team Data</span>
         </div>
         <div class="last-updated">
           <span class="update-label">Last updated:</span>
@@ -130,8 +97,8 @@ class ZeroDashboardService {
           <div class="metric-card total-hours">
             <div class="metric-icon">⏰</div>
             <div class="metric-content">
-              <div class="metric-label">Total Hours</div>
-              <div class="metric-value">${data.total_hours || 0}h</div>
+              <div class="metric-label">Total Hours Today</div>
+              <div class="metric-value">${data.total_hours_today || 0}h</div>
             </div>
           </div>
           <div class="metric-card conversations">
@@ -145,24 +112,34 @@ class ZeroDashboardService {
         <div class="team-section">
           <div class="section-header">
             <span class="section-icon">👥</span>
-            <span class="section-title">Team Activity</span>
+            <span class="section-title">Real Team Activity</span>
           </div>
           <div class="members-grid">
-            ${this.renderTeamMembers(data.team_members || [])}
+            ${this.renderRealTeamMembers(data.team_members || [])}
           </div>
         </div>
       </div>
     `;
 
     // Add CSS
-    this.addDashboardCSS();
+    this.addRealDashboardCSS();
     
     return widget;
   }
 
-  renderTeamMembers(members) {
+  updateRealDashboardContent(data) {
+    if (!this.dashboardElement) return;
+    
+    this.dashboardElement.querySelector('.update-time').textContent = new Date().toLocaleTimeString();
+    this.dashboardElement.querySelector('.active-sessions .metric-value').textContent = data.active_sessions || 0;
+    this.dashboardElement.querySelector('.total-hours .metric-value').textContent = `${data.total_hours_today || 0}h`;
+    this.dashboardElement.querySelector('.conversations .metric-value').textContent = data.total_conversations || 0;
+    this.dashboardElement.querySelector('.members-grid').innerHTML = this.renderRealTeamMembers(data.team_members || []);
+  }
+
+  renderRealTeamMembers(members) {
     if (!members || members.length === 0) {
-      return '<div class="no-data">No team data available</div>';
+      return '<div class="no-data">No real team data available</div>';
     }
 
     return members.map(member => `
@@ -174,7 +151,7 @@ class ZeroDashboardService {
         </div>
         <div class="member-details">
           <div class="member-name">${member.name}</div>
-          <div class="member-role">${member.role}</div>
+          <div class="member-role">${member.role || 'Team Member'}</div>
           <div class="member-metrics">
             <span class="metric-item">
               <span class="metric-icon">⏰</span>
@@ -194,13 +171,13 @@ class ZeroDashboardService {
     `).join('');
   }
 
-  addDashboardCSS() {
-    if (document.getElementById('zero-dashboard-css')) return;
+  addRealDashboardCSS() {
+    if (document.getElementById('real-zero-dashboard-css')) return;
 
     const style = document.createElement('style');
-    style.id = 'zero-dashboard-css';
+    style.id = 'real-zero-dashboard-css';
     style.textContent = `
-      .zero-dashboard-widget {
+      .real-zero-dashboard-widget {
         background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d2d2d 100%);
         border: 1px solid #333;
         border-radius: 16px;
@@ -212,7 +189,7 @@ class ZeroDashboardService {
         overflow: hidden;
       }
       
-      .zero-dashboard-widget::before {
+      .real-zero-dashboard-widget::before {
         content: '';
         position: absolute;
         top: 0;
@@ -483,49 +460,34 @@ class ZeroDashboardService {
   }
 
   showErrorMessage() {
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'zero-dashboard-error';
-    errorDiv.innerHTML = `
-      <div style="background: #EF4444; color: white; padding: 15px; border-radius: 8px; margin: 20px;">
-        <strong>⚠️ Dashboard Error</strong><br>
-        Could not load team data. Backend may be unavailable.
-      </div>
-    `;
-    
-    const chatContainer = document.querySelector('.chat-wrapper');
-    if (chatContainer) {
-      chatContainer.insertBefore(errorDiv, chatContainer.firstChild);
-    }
-  }
-
-  setupAutoRefresh() {
-    // Refresh data every 5 minutes
-    this.refreshInterval = setInterval(() => {
-      this.loadTeamData();
-    }, 5 * 60 * 1000);
-  }
-
-  cleanup() {
-    if (this.refreshInterval) {
-      clearInterval(this.refreshInterval);
+    if (this.dashboardElement) {
+      this.dashboardElement.innerHTML = `
+        <div class="real-zero-dashboard-widget error-state">
+          <div class="dashboard-header">
+            <div class="dashboard-title">
+              <span class="title-icon">❌</span>
+              <span class="title-text">ZERO Real Dashboard Error</span>
+            </div>
+            <div class="last-updated">
+              <span class="update-time">${new Date().toLocaleTimeString()}</span>
+            </div>
+          </div>
+          <div class="dashboard-content">
+            <p class="error-message">
+              Non riesco a recuperare i dati reali del team dal database.
+              <br>
+              Verifica la connessione al backend PostgreSQL.
+            </p>
+          </div>
+        </div>
+      `;
+      this.addRealDashboardCSS();
     }
   }
 }
 
-// Initialize dashboard service
-let zeroDashboard = null;
-
+// Initialize real analytics handler
+let realZeroAnalytics = null;
 document.addEventListener('DOMContentLoaded', () => {
-  zeroDashboard = new ZeroDashboardService();
+  realZeroAnalytics = new RealZeroDashboardService();
 });
-
-// Cleanup on page unload
-window.addEventListener('beforeunload', () => {
-  if (zeroDashboard) {
-    zeroDashboard.cleanup();
-  }
-});
-
-// Export for global access
-window.ZeroDashboardService = ZeroDashboardService;
-window.zeroDashboard = zeroDashboard;

@@ -7,8 +7,8 @@ const API_CONFIG = {
   // Proxy/BFF endpoints (server-side adds x-api-key, client sends x-user-id)
   proxy: {
     production: {
-      // Railway backends (correct URLs)
-      base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://ts-backend-production-568d.up.railway.app',
+      // Railway backends - MUST use RAG Backend for /bali-zero/chat endpoint
+      base: (typeof window !== 'undefined' && (window.ZANTARA_PROXY_BASE || localStorage.getItem('zantara-proxy-base'))) || 'https://scintillating-kindness-production-47e3.up.railway.app',
       call: '/bali-zero/chat',
       search: '/search',
       health: '/health'

@@ -66,9 +66,10 @@ class ZantaraSSEClient {
    *
    * @param {string} query - User message/question
    * @param {string} userEmail - Optional user email for personalization
+   * @param {Array} conversationHistory - Optional conversation history for context
    * @returns {Promise<string>} - Resolves with complete message when done
    */
-  async stream(query, userEmail = null) {
+  async stream(query, userEmail = null, conversationHistory = null) {
     if (this.isStreaming) {
       console.warn('[ZantaraSSE] Already streaming, stopping previous stream');
       this.stop();
@@ -91,6 +92,12 @@ class ZantaraSSEClient {
         if (storedEmail && storedEmail !== 'undefined' && storedEmail !== 'null') {
           url.searchParams.append('user_email', storedEmail);
         }
+      }
+
+      // ✨ Add conversation history for context (as JSON)
+      if (conversationHistory && Array.isArray(conversationHistory) && conversationHistory.length > 0) {
+        url.searchParams.append('conversation_history', JSON.stringify(conversationHistory));
+        console.log('[ZantaraSSE] Sending conversation history:', conversationHistory.length, 'messages');
       }
 
       console.log('[ZantaraSSE] Connecting to:', url.toString());
