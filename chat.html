@@ -15,6 +15,7 @@
   <script src="js/sse-client.js?v=2025102104"></script>
   <script src="js/storage-manager.js?v=2025102104"></script>
   <script src="js/team-login.js?v=2025102104"></script>
+  <script src="js/conversation-persistence.js?v=2025102104"></script>
   <link rel="stylesheet" href="styles/design-tokens.css">
   <link rel="stylesheet" href="styles/chat.css">
   <link rel="stylesheet" href="styles/message-formatter.css">
@@ -738,6 +739,11 @@
               conversationHistory = conversationHistory.slice(-20);
             }
 
+            // 💾 Save conversation to database (debounced)
+            if (window.ConversationPersistence && userEmail) {
+              window.ConversationPersistence.saveConversationDebounced(userEmail, conversationHistory);
+            }
+
             // 🎨 NOW apply Markdown formatting (only once at the end)
             if (window.MessageFormatter) {
               aiMsg.innerHTML = MessageFormatter.formatStructuredMessage(finalMessage, {
@@ -1057,6 +1063,21 @@
       }
 
       const hasIntroduced = sessionStorage.getItem('zantara-introduced');
+
+      // 💾 Load conversation history from database
+      if (userEmail && window.ConversationPersistence) {
+        window.ConversationPersistence.loadConversation(userEmail, 20)
+          .then(messages => {
+            if (messages && messages.length > 0) {
+              conversationHistory = messages;
+              window.ConversationPersistence.renderMessages(messages);
+              console.log(`✅ [Chat] Loaded ${messages.length} messages from database`);
+            }
+          })
+          .catch(err => {
+            console.error('❌ [Chat] Failed to load conversation history:', err);
+          });
+      }
 
       // Update UI based on login status
       const loginBtn = document.getElementById('loginBtn');
