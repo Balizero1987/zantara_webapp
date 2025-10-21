@@ -149,8 +149,15 @@ body.day-mode .typing-indicator {
   margin-left: 0 !important;
   margin-right: 0 !important;
   align-self: unset !important;
+  padding: 10px 14px !important;
+  background: #2f7bd6 !important;
+  border-radius: 18px;
   box-shadow: 0 2px 8px rgba(47, 123, 214, 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: #fff !important;
+  max-width: none !important;
+  word-wrap: break-word;
+  line-height: 1.5;
 }
 
 .message-content .ai-message {
@@ -158,11 +165,15 @@ body.day-mode .typing-indicator {
   margin-left: 0 !important;
   margin-right: 0 !important;
   align-self: unset !important;
-  padding: 12px 16px;
+  padding: 12px 16px !important;
   background: linear-gradient(135deg, #2a2a2a 0%, #252525 100%) !important;
   border-radius: 18px 18px 18px 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: #fff !important;
+  max-width: none !important;
+  word-wrap: break-word;
+  line-height: 1.5;
 }
 
 body.day-mode .message-content .ai-message {
