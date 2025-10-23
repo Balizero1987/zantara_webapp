@@ -1,9 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#10b981">
     <title>ZANTARA - Login</title>
+    
+    <!-- PWA Support -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    
+    <!-- API Layer -->
+    <script src="js/zantara-api.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -15,49 +24,22 @@
             background: #1e1e1e;
             color: #fff;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            height: 100%;
-            overflow: hidden;
-            transition: background 0.3s ease;
+            min-height: 100vh;
         }
 
-        /* DAY MODE */
         body.day-mode {
             background: #ffffff;
             color: #000;
         }
 
-        /* RAINBOW BORDER ANIMATION */
-        @keyframes rainbow-border {
-            0%, 100% { border-color: #FFD700; }
-            25% { border-color: #FF0000; }
-            50% { border-color: #0000FF; }
-            75% { border-color: #00FF00; }
-        }
-
-        /* CONTAINER */
         .login-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
-            position: relative;
         }
 
-        body.day-mode .login-wrapper::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-            border: 2px solid;
-            animation: rainbow-border 8s linear infinite;
-            z-index: 5;
-        }
-
-        /* LOGIN CARD */
         .login-card {
             background: #252525;
             border: 1px solid #3a3a3a;
@@ -66,8 +48,6 @@
             max-width: 480px;
             width: 100%;
             text-align: center;
-            position: relative;
-            z-index: 10;
         }
 
         body.day-mode .login-card {
@@ -75,76 +55,48 @@
             border: 2px solid #e0e0e0;
         }
 
-        /* LOGO */
         .logo-center {
             width: 120px;
             height: 120px;
             margin: 0 auto 20px;
-            display: block;
-            object-fit: contain;
-            filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.4))
-                    drop-shadow(0 0 80px rgba(255, 255, 255, 0.3))
-                    drop-shadow(0 0 120px rgba(255, 255, 255, 0.2));
-            animation: glow-pulse 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.4));
         }
 
-        @keyframes glow-pulse {
-            0%, 100% {
-                filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.4))
-                        drop-shadow(0 0 80px rgba(255, 255, 255, 0.3))
-                        drop-shadow(0 0 120px rgba(255, 255, 255, 0.2));
-            }
-            50% {
-                filter: drop-shadow(0 0 60px rgba(255, 255, 255, 0.6))
-                        drop-shadow(0 0 100px rgba(255, 255, 255, 0.4))
-                        drop-shadow(0 0 140px rgba(255, 255, 255, 0.3));
-            }
-        }
-
-        body.day-mode .logo-center {
-            filter: drop-shadow(0 0 40px rgba(0, 0, 0, 0.15))
-                    drop-shadow(0 0 80px rgba(0, 0, 0, 0.1))
-                    drop-shadow(0 0 120px rgba(0, 0, 0, 0.05));
-            animation: glow-pulse-day 3s ease-in-out infinite;
-        }
-
-        @keyframes glow-pulse-day {
-            0%, 100% {
-                filter: drop-shadow(0 0 40px rgba(0, 0, 0, 0.15))
-                        drop-shadow(0 0 80px rgba(0, 0, 0, 0.1))
-                        drop-shadow(0 0 120px rgba(0, 0, 0, 0.05));
-            }
-            50% {
-                filter: drop-shadow(0 0 60px rgba(0, 0, 0, 0.2))
-                        drop-shadow(0 0 100px rgba(0, 0, 0, 0.15))
-                        drop-shadow(0 0 140px rgba(0, 0, 0, 0.1));
-            }
-        }
-
-        /* TITLE */
         h1 {
             font-size: 28px;
             font-weight: 600;
             margin-bottom: 8px;
-            color: #fff;
-        }
-
-        body.day-mode h1 {
-            color: #000;
         }
 
         .powered-by {
-            font-size: 13px;
             color: rgba(255, 255, 255, 0.6);
-            font-weight: 400;
-            margin-bottom: 40px;
+            font-size: 14px;
+            margin-bottom: 32px;
         }
 
         body.day-mode .powered-by {
-            color: rgba(0, 0, 0, 0.6);
+            color: rgba(0, 0, 0, 0.5);
         }
 
-        /* FORM */
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
         .form-group {
             margin-bottom: 20px;
             text-align: left;
@@ -152,281 +104,181 @@
 
         .form-label {
             display: block;
-            font-size: 14px;
-            font-weight: 500;
             margin-bottom: 8px;
+            font-weight: 500;
             color: rgba(255, 255, 255, 0.9);
         }
 
         body.day-mode .form-label {
-            color: rgba(0, 0, 0, 0.9);
+            color: rgba(0, 0, 0, 0.8);
         }
 
         .form-input {
             width: 100%;
-            padding: 14px 16px;
-            border-radius: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
             border: 1px solid #3a3a3a;
             background: #2a2a2a;
             color: #fff;
-            font-size: 16px;
-            font-family: inherit;
-            transition: all 0.2s;
-            outline: none;
-        }
-
-        .form-input:focus {
-            border-color: #4a4a4a;
-            background: #3a3a3a;
+            font-size: 15px;
         }
 
         body.day-mode .form-input {
-            background: #f8f8f8;
-            border-color: #d0d0d0;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
             color: #000;
         }
 
-        body.day-mode .form-input:focus {
-            border-color: #b0b0b0;
-            background: #f0f0f0;
+        .form-input:focus {
+            outline: none;
+            border-color: #6B46C1;
         }
 
-        .form-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        body.day-mode .form-input::placeholder {
-            color: rgba(0, 0, 0, 0.4);
-        }
-
-        /* BUTTON */
         .btn-primary {
             width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            background: #3a3a3a;
+            padding: 12px 24px;
+            background: #6B46C1;
             color: #fff;
+            border: none;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 24px;
+            transition: all 0.3s;
         }
 
         .btn-primary:hover {
-            background: #4a4a4a;
+            background: #5a38a3;
+            transform: translateY(-1px);
         }
 
-        body.day-mode .btn-primary {
-            background: #000;
-            color: #fff;
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
-        body.day-mode .btn-primary:hover {
-            background: #2a2a2a;
-        }
-
-        /* THEME TOGGLE */
         .theme-toggle {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: #3a3a3a;
-            border: 1px solid #4a4a4a;
-            border-radius: 20px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
             padding: 8px 16px;
-            color: #fff;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
+            color: #fff;
             font-size: 14px;
-            transition: all 0.2s;
-            z-index: 100;
-        }
-
-        .theme-toggle:hover {
-            background: #4a4a4a;
         }
 
         body.day-mode .theme-toggle {
-            background: #f0f0f0;
-            border-color: #d0d0d0;
+            background: #f5f5f5;
+            border-color: #ddd;
             color: #000;
-        }
-
-        /* INTEGRATIONS BAR */
-        .integrations-bar {
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid #3a3a3a;
-        }
-
-        body.day-mode .integrations-bar {
-            border-top-color: #e0e0e0;
-        }
-
-        .integrations-label {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 12px;
-        }
-
-        body.day-mode .integrations-label {
-            color: rgba(0, 0, 0, 0.6);
-        }
-
-        .integration-groups {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .integration-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            background: #2a2a2a;
-            border: 1px solid #3a3a3a;
-            border-radius: 12px;
-        }
-
-        body.day-mode .integration-group {
-            background: #f8f8f8;
-            border-color: #d0d0d0;
-        }
-
-        .integration-group-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.6);
-            margin-right: 4px;
-            min-width: 50px;
-        }
-
-        body.day-mode .integration-group-label {
-            color: rgba(0, 0, 0, 0.6);
-        }
-
-        .integration-logo {
-            width: 20px;
-            height: 20px;
-            object-fit: contain;
-            opacity: 0.8;
-            transition: opacity 0.2s, transform 0.2s;
-            cursor: pointer;
-        }
-
-        .integration-logo:hover {
-            opacity: 1;
-            transform: scale(1.1);
         }
     </style>
 </head>
 <body>
-    <button class="theme-toggle" onclick="toggleTheme()">
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" onclick="toggleTheme()">
         <span id="themeIcon">🌙</span>
         <span id="themeText">Night</span>
-    </button>
+    </div>
 
     <div class="login-wrapper">
         <div class="login-card">
-            <img src="../../assets/logoscon.png" class="logo-center" alt="ZANTARA Logo">
-
+            <img src="assets/logoscon.png" class="logo-center" alt="ZANTARA">
+            
             <h1>Welcome to Zantara</h1>
             <p class="powered-by">powered by Zero AI</p>
-
+            
+            <!-- Message Area -->
+            <div id="message" style="display: none;"></div>
+            
+            <!-- Login Form -->
             <form id="loginForm">
                 <div class="form-group">
-                    <label class="form-label" for="email">Email</label>
-                    <input type="email" id="email" class="form-input" placeholder="your@email.com" required>
+                    <label class="form-label">Email aziendale</label>
+                    <input type="email" id="email" class="form-input" 
+                           placeholder="zero@balizero.com" required autofocus>
                 </div>
-
+                
                 <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
-                    <input type="password" id="password" class="form-input" placeholder="Enter your password">
+                    <label class="form-label">PIN (6 cifre)</label>
+                    <input type="password" id="pin" class="form-input" 
+                           placeholder="••••••" maxlength="6" required>
                 </div>
-
-                <button type="submit" class="btn-primary">Sign In</button>
+                
+                <button type="submit" class="btn-primary" id="loginBtn">
+                    Accedi al Team
+                </button>
             </form>
-
-            <!-- INTEGRATIONS BAR -->
-            <div class="integrations-bar">
-                <div class="integrations-label">Integrated Services</div>
-                <div class="integration-groups">
-                    <!-- Google Workspace -->
-                    <div class="integration-group">
-                        <span class="integration-group-label">Google:</span>
-                        <img src="../../assets/logo-google-drive.png" class="integration-logo" alt="Drive" title="Google Drive">
-                        <img src="../../assets/logo-gmail.png" class="integration-logo" alt="Gmail" title="Gmail">
-                        <img src="../../assets/logo-google-calendar.png" class="integration-logo" alt="Calendar" title="Google Calendar">
-                        <img src="../../assets/logo-google-docs.png" class="integration-logo" alt="Docs" title="Google Docs">
-                        <img src="../../assets/logo-google-sheets.png" class="integration-logo" alt="Sheets" title="Google Sheets">
-                        <img src="../../assets/logo-google-slides.png" class="integration-logo" alt="Slides" title="Google Slides">
-                        <img src="../../assets/logo-google-maps.png" class="integration-logo" alt="Maps" title="Google Maps">
-                        <img src="../../assets/logo-google-analytics.png" class="integration-logo" alt="Analytics" title="Google Analytics">
-                    </div>
-
-                    <!-- Meta -->
-                    <div class="integration-group">
-                        <span class="integration-group-label">Meta:</span>
-                        <img src="../../assets/logo-whatsapp.png" class="integration-logo" alt="WhatsApp" title="WhatsApp">
-                        <img src="../../assets/logo-instagram.png" class="integration-logo" alt="Instagram" title="Instagram">
-                        <img src="../../assets/logo-facebook.png" class="integration-logo" alt="Facebook" title="Facebook">
-                    </div>
-
-                    <!-- AI Services -->
-                    <div class="integration-group">
-                        <span class="integration-group-label">AI:</span>
-                        <img src="../../assets/logo-openai.png" class="integration-logo" alt="OpenAI" title="OpenAI">
-                        <img src="../../assets/logo-claude.png" class="integration-logo" alt="Claude" title="Claude">
-                        <img src="../../assets/logo-gemini.png" class="integration-logo" alt="Gemini" title="Gemini">
-                        <img src="../../assets/logo-perplexity.png" class="integration-logo" alt="Perplexity" title="Perplexity">
-                        <img src="../../assets/logo-llama.png" class="integration-logo" alt="Llama" title="Meta Llama">
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
     <script>
         // Theme toggle
-        let isDark = true;
-
         function toggleTheme() {
-            isDark = !isDark;
-            const body = document.body;
+            document.body.classList.toggle('day-mode');
             const icon = document.getElementById('themeIcon');
             const text = document.getElementById('themeText');
-
-            if (isDark) {
-                body.classList.remove('day-mode');
-                icon.textContent = '🌙';
-                text.textContent = 'Night';
-            } else {
-                body.classList.add('day-mode');
+            
+            if (document.body.classList.contains('day-mode')) {
                 icon.textContent = '☀️';
                 text.textContent = 'Day';
+            } else {
+                icon.textContent = '🌙';
+                text.textContent = 'Night';
             }
         }
-
-        // Login form handling
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
+        
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
             const email = document.getElementById('email').value;
-
-            // Save to localStorage
-            localStorage.setItem('zantara-user-email', email);
-            localStorage.setItem('zantara-user-name', email.split('@')[0].toUpperCase());
-
-            // Redirect to chat
-            window.location.href = 'chat.html';
+            const pin = document.getElementById('pin').value;
+            const name = email.split('@')[0];
+            
+            const messageDiv = document.getElementById('message');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            // Show loading
+            messageDiv.style.display = 'block';
+            messageDiv.className = 'message';
+            messageDiv.textContent = '🔄 Logging in...';
+            loginBtn.disabled = true;
+            
+            try {
+                // Call API
+                const result = await ZANTARA_API.teamLogin(email, pin, name);
+                
+                if (result.success) {
+                    messageDiv.className = 'message success';
+                    messageDiv.textContent = '✅ ' + result.message;
+                    
+                    // Redirect to chat
+                    setTimeout(() => {
+                        window.location.href = 'chat-new.html';
+                    }, 1000);
+                } else {
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = '❌ ' + result.error;
+                    loginBtn.disabled = false;
+                }
+            } catch (error) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = '❌ Errore: ' + error.message;
+                loginBtn.disabled = false;
+            }
         });
-
-        // Auto-focus email
-        document.getElementById('email').focus();
+        
+        // Check if already logged in
+        if (ZANTARA_API.isLoggedIn()) {
+            window.location.href = 'chat-new.html';
+        }
     </script>
 </body>
 </html>
