@@ -698,6 +698,48 @@
 
         // Auto-focus email
         document.getElementById('email').focus();
+
+        // Team login form handler
+        document.getElementById('teamLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('teamEmail').value;
+            const pin = document.getElementById('teamPin').value;
+            const messageDiv = document.getElementById('loginMessage');
+            
+            try {
+                messageDiv.style.display = 'block';
+                messageDiv.className = 'message';
+                messageDiv.textContent = '🔄 Logging in...';
+                
+                // Use team login
+                if (window.teamLogin) {
+                    const result = await window.teamLogin.login(email, pin, email.split('@')[0]);
+                    
+                    if (result.success) {
+                        messageDiv.className = 'message success';
+                        messageDiv.textContent = result.message || '✅ Login successful! Redirecting...';
+                        
+                        // Reset introduction flag
+                        sessionStorage.removeItem('zantara-introduced');
+                        
+                        // Redirect to chat
+                        setTimeout(() => {
+                            window.location.href = 'chat.html';
+                        }, 1000);
+                    } else {
+                        messageDiv.className = 'message error';
+                        messageDiv.textContent = '❌ ' + (result.error || 'Login failed. Check your credentials.');
+                    }
+                } else {
+                    throw new Error('Team login system not loaded');
+                }
+            } catch (error) {
+                console.error('Team login error:', error);
+                messageDiv.className = 'message error';
+                messageDiv.textContent = '❌ Error: ' + error.message;
+            }
+        });
     </script>
 </body>
 </html>
