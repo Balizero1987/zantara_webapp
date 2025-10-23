@@ -26,8 +26,7 @@ class ConversationPersistence {
       const response = await fetch(`${this.apiBase}/bali-zero/conversations/save`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': 'zantara-internal-dev-key-2025'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           user_email: userEmail,

@@ -5,9 +5,8 @@
 
 class SecureTeamLogin {
   constructor() {
-    // Railway RAG Backend (PRIMARY) - supports team.login.secure via TypeScript proxy
+    // TS Backend - team.login endpoint (demo auth, no API key needed)
     this.apiBase = 'https://ts-backend-production-568d.up.railway.app';
-    this.apiKey = 'zantara-internal-dev-key-2025';
     this.currentUser = null;
     this.token = null;
   }

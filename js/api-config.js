@@ -161,10 +161,8 @@ async function callZantaraAPI(endpoint, data, useProxy = true) {
     const authToken = (typeof window !== 'undefined') ? (window.ZantaraStorage?.getToken() || localStorage.getItem('zantara-auth-token') || '') : '';
     const headers = {
       ...API_CONFIG.headers,
-      // FIX: Add API key for production reliability
-      'x-api-key': 'zantara-internal-dev-key-2025',
       ...(userId ? { 'x-user-id': userId } : {}),
-      ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),  // Add JWT token
+      ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {})  // JWT token for authenticated calls
       ...(data?.auth_token ? { 'Authorization': `Bearer ${data.auth_token}` } : {})  // Override if passed in data
     };
 
