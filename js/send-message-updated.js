@@ -275,4 +275,4 @@ if (typeof window !== 'undefined') {
   window.sendMessageUpdated = sendMessageUpdated;
 }
 
-export default sendMessageUpdated;
+// Function available globally as window.sendMessageUpdated

@@ -213,4 +213,4 @@ if (typeof window !== 'undefined') {
   window.ChatInputFix = ChatInputFix;
 }
 
-export default ChatInputFix;
+// Available globally as window.ChatInputFix
