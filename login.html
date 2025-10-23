@@ -716,6 +716,14 @@
                 if (window.teamLogin) {
                     const result = await window.teamLogin.login(email, pin, email.split('@')[0]);
                     
+                    console.log('🔍 Login result:', result);
+                    console.log('🔍 localStorage after login:', {
+                        token: localStorage.getItem('zantara-auth-token'),
+                        user: localStorage.getItem('zantara-user'),
+                        email: localStorage.getItem('zantara-user-email'),
+                        name: localStorage.getItem('zantara-user-name')
+                    });
+                    
                     if (result.success) {
                         messageDiv.className = 'message success';
                         messageDiv.textContent = result.message || '✅ Login successful! Redirecting...';
@@ -723,10 +731,12 @@
                         // Reset introduction flag
                         sessionStorage.removeItem('zantara-introduced');
                         
+                        // WAIT for localStorage to be fully written
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                        
                         // Redirect to chat
-                        setTimeout(() => {
-                            window.location.href = 'chat.html';
-                        }, 1000);
+                        console.log('✅ Redirecting to chat.html...');
+                        window.location.href = 'chat.html';
                     } else {
                         messageDiv.className = 'message error';
                         messageDiv.textContent = '❌ ' + (result.error || 'Login failed. Check your credentials.');
