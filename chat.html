@@ -816,7 +816,10 @@
     }
 
     // Send on button click
-    sendBtn.addEventListener('click', sendMessageUpdated);
+    sendBtn.addEventListener('click', () => {
+      console.log('🔘 Send button clicked');
+      sendMessage();
+    });
 
     // Send on Enter key (ULTRA-ROBUST implementation)
     // Using capture phase to intercept before any other handlers
@@ -827,8 +830,8 @@
         e.stopImmediatePropagation(); // Stop ALL other handlers
         console.log('✅ [Enter Key] Detected - sending message');
         
-        // Execute sendMessageUpdated in next tick to avoid conflicts
-        setTimeout(() => sendMessageUpdated(), 0);
+        // Execute sendMessage directly (function defined above)
+        setTimeout(() => sendMessage(), 0);
         return false;
       }
     }, true); // TRUE = capture phase (runs FIRST)
@@ -840,7 +843,7 @@
         e.stopPropagation();
         e.stopImmediatePropagation();
         console.log('✅ [Enter Key Fallback] Detected via keypress - sending message');
-        setTimeout(() => sendMessageUpdated(), 0);
+        setTimeout(() => sendMessage(), 0);
         return false;
       }
     }, true); // TRUE = capture phase
