@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZANTARA Design Preview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #f8f9fa;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 32px;
+            color: #1a1a1a;
+        }
+
+        .designs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .design-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            transition: transform 0.3s ease;
+        }
+
+        .design-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+
+        .design-preview {
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .design-info {
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .design-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .design-desc {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .btn-apply {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 10px 20px;
+            background: #000;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .btn-apply:hover {
+            background: #333;
+        }
+
+        /* Design 1: Minimal Clean */
+        .design1 {
+            background: #ffffff;
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .design1-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .design1-logo {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+        }
+
+        .design1-messages {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .design1-msg {
+            margin: 12px 0;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 70%;
+            font-size: 14px;
+        }
+
+        .design1-msg.user {
+            background: #f0f0f0;
+            margin-left: auto;
+        }
+
+        .design1-msg.ai {
+            background: #000;
+            color: white;
+        }
+
+        .design1-input {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 12px;
+        }
+
+        /* Design 2: Modern Dark */
+        .design2 {
+            background: #0a0a0a;
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .design2-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .design2-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border-radius: 12px;
+        }
+
+        .design2-title {
+            color: white;
+            font-weight: 600;
+        }
+
+        .design2-messages {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .design2-msg {
+            margin: 12px 0;
+            padding: 14px 18px;
+            border-radius: 20px;
+            max-width: 70%;
+            font-size: 14px;
+        }
+
+        .design2-msg.user {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            margin-left: auto;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .design2-msg.ai {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        /* Design 3: Apple Style */
+        .design3 {
+            background: #f5f5f7;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .design3-header {
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .design3-logo {
+            width: 32px;
+            height: 32px;
+            background: #000;
+            border-radius: 8px;
+            margin: 0 auto;
+        }
+
+        .design3-messages {
+            flex: 1;
+            padding: 20px;
+            background: white;
+        }
+
+        .design3-msg {
+            margin: 16px 0;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 70%;
+            font-size: 15px;
+        }
+
+        .design3-msg.user {
+            background: #007AFF;
+            color: white;
+            margin-left: auto;
+        }
+
+        .design3-msg.ai {
+            background: #E8E8ED;
+            color: #000;
+        }
+
+        /* Design 4: Indonesia Flag */
+        .design4 {
+            background: white;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .design4-header {
+            background: #CE1126;
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .design4-logo {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .design4-title {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .design4-messages {
+            flex: 1;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .design4-msg {
+            margin: 12px 0;
+            padding: 14px 18px;
+            border-radius: 12px;
+            max-width: 70%;
+            font-size: 14px;
+        }
+
+        .design4-msg.user {
+            background: #CE1126;
+            color: white;
+            margin-left: auto;
+        }
+
+        .design4-msg.ai {
+            background: white;
+            border: 2px solid #CE1126;
+            color: #333;
+        }
+
+        /* Design 5: Slack Style */
+        .design5 {
+            background: #1a1d21;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .design5-header {
+            background: #350d36;
+            color: white;
+            padding: 12px 16px;
+            font-weight: 600;
+        }
+
+        .design5-messages {
+            flex: 1;
+            padding: 16px;
+        }
+
+        .design5-msg {
+            margin: 8px 0;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .design5-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background: #CE1126;
+            flex-shrink: 0;
+        }
+
+        .design5-content {
+            flex: 1;
+        }
+
+        .design5-name {
+            color: #d1d2d3;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .design5-text {
+            color: #d1d2d3;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        /* Design 6: Claude Anthropic Style */
+        .design6 {
+            background: #FAF9F7;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Inter', -apple-system, sans-serif;
+        }
+
+        .design6-header {
+            background: #FFFFFF;
+            padding: 16px 20px;
+            border-bottom: 1px solid #E5E3DF;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .design6-logo {
+            width: 32px;
+            height: 32px;
+            background: #D97706;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .design6-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1F1E1C;
+        }
+
+        .design6-messages {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .design6-msg-group {
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .design6-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .design6-avatar.user {
+            background: #5E5C57;
+            color: white;
+        }
+
+        .design6-avatar.ai {
+            background: #D97706;
+            color: white;
+        }
+
+        .design6-content {
+            flex: 1;
+            color: #1F1E1C;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .design6-input-area {
+            background: white;
+            border-top: 1px solid #E5E3DF;
+            padding: 16px 20px;
+        }
+
+        .design6-input-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            background: #FAF9F7;
+            border: 1px solid #E5E3DF;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .design6-input {
+            flex: 1;
+            border: none;
+            background: none;
+            outline: none;
+            font-size: 15px;
+            color: #1F1E1C;
+            resize: none;
+        }
+
+        .design6-send {
+            width: 32px;
+            height: 32px;
+            background: #D97706;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .design6-send:hover {
+            background: #B45309;
+        }
+
+        /* Design 7: WhatsApp Style */
+        .design6 {
+            background: #e5ddd5;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .design6-header {
+            background: #075e54;
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .design6-avatar {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .design6-messages {
+            flex: 1;
+            padding: 16px;
+        }
+
+        .design6-msg {
+            margin: 8px 0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 65%;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .design6-msg.user {
+            background: #dcf8c6;
+            margin-left: auto;
+        }
+
+        .design6-msg.ai {
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Scegli il tuo Design ZANTARA</h1>
+
+        <div class="designs-grid">
+            <!-- Design 1: Minimal Clean -->
+            <div class="design-card">
+                <div class="design-preview">
+                    <div class="design1">
+                        <div class="design1-header">
+                            <div class="design1-logo"></div>
+                            <div style="font-weight: 600;">ZANTARA</div>
+                        </div>
+                        <div class="design1-messages">
+                            <div class="design1-msg ai">Ciao! Come posso aiutarti?</div>
+                            <div class="design1-msg user">Vorrei info sui visti</div>
+                            <div class="design1-msg ai">Certamente! Offriamo vari tipi di visto...</div>
+                        </div>
+                        <div class="design1-input">
+                            <input type="text" placeholder="Scrivi un messaggio..." style="flex: 1; border: none; background: none; outline: none;">
+                            <button style="background: black; color: white; border: none; padding: 8px 16px; border-radius: 8px;">Invia</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="design-info">
+                    <div class="design-title">Minimal Clean</div>
+                    <div class="design-desc">Design minimalista con sfondo bianco, accenti neri. Pulito e professionale.</div>
+                    <a href="#" class="btn-apply" onclick="applyDesign('minimal'); return false;">Applica Design</a>
+                </div>
+            </div>
+
+            <!-- Design 2: Modern Dark -->
+            <div class="design-card">
+                <div class="design-preview">
+                    <div class="design2">
+                        <div class="design2-header">
+                            <div class="design2-logo"></div>
+                            <div class="design2-title">ZANTARA</div>
+                        </div>
+                        <div class="design2-messages">
+                            <div class="design2-msg ai">Benvenuto! Come posso assisterti?</div>
+                            <div class="design2-msg user">Ho bisogno di aiuto</div>
+                            <div class="design2-msg ai">Sono qui per te!</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="design-info">
+                    <div class="design-title">Modern Dark</div>
+                    <div class="design-desc">Tema scuro elegante con gradient colorati. Perfetto per uso prolungato.</div>
+                    <a href="#" class="btn-apply" onclick="applyDesign('dark'); return false;">Applica Design</a>
+                </div>
+            </div>
+
+            <!-- Design 3: Apple Style -->
+            <div class="design-card">
+                <div class="design-preview">
+                    <div class="design3">
+                        <div class="design3-header">
+                            <div class="design3-logo"></div>
+                        </div>
+                        <div class="design3-messages">
+                            <div class="design3-msg ai">Ciao! Sono ZANTARA</div>
+                            <div class="design3-msg user">Ciao!</div>
+                            <div class="design3-msg ai">Come posso aiutarti oggi?</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="design-info">
+                    <div class="design-title">Apple Style</div>
+                    <div class="design-desc">Ispirato a iOS con blu e grigi. Familiare e intuitivo.</div>
+                    <a href="#" class="btn-apply" onclick="applyDesign('apple'); return false;">Applica Design</a>
+                </div>
+            </div>
+
+            <!-- Design 4: Indonesia Flag -->
+            <div class="design-card">
+                <div class="design-preview">
+                    <div class="design4">
+                        <div class="design4-header">
+                            <div class="design4-logo"></div>
+                            <div class="design4-title">ZANTARA Indonesia</div>
+                        </div>
+                        <div class="design4-messages">
+                            <div class="design4-msg ai">Selamat datang!</div>
+                            <div class="design4-msg user">Terima kasih</div>
+                            <div class="design4-msg ai">Ada yang bisa saya bantu?</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="design-info">
+                    <div class="design-title">Indonesia Style</div>
+                    <div class="design-desc">Colori della bandiera Indonesia. Patriottico ed elegante.</div>
+                    <a href="#" class="btn-apply" onclick="applyDesign('indonesia'); return false;">Applica Design</a>
+                </div>
+            </div>
+
+            <!-- Design 5: Slack Style -->
+            <div class="design-card">
+                <div class="design-preview">
+                    <div class="design5">
+                        <div class="design5-header"># zantara-chat</div>
+                        <div class="design5-messages">
+                            <div class="design5-msg">
+                                <div class="design5-avatar"></div>
+                                <div class="design5-content">
+                                    <div class="design5-name">ZANTARA</div>
+                                    <div class="design5-text">Benvenuto nel canale!</div>
+                                </div>
+                            </div>
+                            <div class="design5-msg">
+                                <div class="design5-avatar" style="background: #4a4a4a;"></div>
+                                <div class="design5-content">
+                                    <div class="design5-name">Tu</div>
+                                    <div class="design5-text">Grazie!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="design-info">
+                    <div class="design-title">Slack Style</div>
+                    <div class="design-desc">Layout tipo Slack/Discord. Perfetto per team collaboration.</div>
+                    <a href="#" class="btn-apply" onclick="applyDesign('slack'); return false;">Applica Design</a>
+                </div>
+            </div>
+
+            <!-- Design 6: Claude Anthropic Style -->
+            <div class="design-card">
+                <div class="design-preview">
+                    <div class="design6">
+                        <div class="design6-header">
+                            <div class="design6-logo">Z</div>
+                            <div class="design6-title">ZANTARA</div>
+                        </div>
+                        <div class="design6-messages">
+                            <div class="design6-msg-group">
+                                <div class="design6-avatar user">U</div>
+                                <div class="design6-content">Ciao ZANTARA, puoi aiutarmi?</div>
+                            </div>
+                            <div class="design6-msg-group">
+                                <div class="design6-avatar ai">Z</div>
+                                <div class="design6-content">Certo! Sono qui per assisterti con visti, company setup e servizi fiscali. Come posso aiutarti oggi?</div>
+                            </div>
+                        </div>
+                        <div class="design6-input-area">
+                            <div class="design6-input-container">
+                                <textarea class="design6-input" placeholder="Scrivi un messaggio..." rows="1"></textarea>
+                                <button class="design6-send">→</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="design-info">
+                    <div class="design-title">Claude Anthropic Style</div>
+                    <div class="design-desc">Ispirato all'interfaccia di Claude. Beige/crema, pulito e professionale.</div>
+                    <a href="#" class="btn-apply" onclick="applyDesign('claude'); return false;">Applica Design</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function applyDesign(design) {
+            alert(`Design "${design}" selezionato! Lo implementerò subito.`);
+            // Qui chiameremo il codice per applicare il design scelto
+            window.selectedDesign = design;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ZANTARA BFF Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
+    h1 { color: #8B5CF6; }
+    .status { padding: 15px; margin: 20px 0; border-radius: 8px; font-weight: bold; }
+    .success { background: #c8e6c9; color: #2e7d32; }
+    .error { background: #ffcdd2; color: #c62828; }
+    .info { background: #e3f2fd; color: #1565c0; }
+    .chat { border: 2px solid #ddd; padding: 20px; margin: 20px 0; min-height: 300px; max-height: 500px; overflow-y: auto; background: white; border-radius: 8px; }
+    .message { margin: 10px 0; padding: 12px; border-radius: 8px; animation: fadeIn 0.3s; }
+    .user { background: #e3f2fd; text-align: right; margin-left: 50px; }
+    .assistant { background: #f5f5f5; margin-right: 50px; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    input { width: calc(100% - 120px); padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; }
+    button { padding: 12px 24px; font-size: 16px; cursor: pointer; background: #8B5CF6; color: white; border: none; border-radius: 8px; transition: background 0.3s; }
+    button:hover { background: #7C3AED; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    .config { background: white; padding: 15px; border-radius: 8px; margin: 20px 0; }
+    .config input[type="email"] { width: calc(100% - 150px); }
+  </style>
+</head>
+<body>
+  <h1>🧪 ZANTARA BFF Test</h1>
+  <div class="status info" id="status">Checking connection...</div>
+
+  <div class="config">
+    <h3>⚙️ Configuration</h3>
+    <p><strong>BFF Endpoint:</strong> http://localhost:4000</p>
+    <p><strong>Your Email:</strong>
+      <input type="email" id="email" placeholder="Your email" value="zero@balizero.com">
+      <button onclick="setEmail()">Update</button>
+    </p>
+  </div>
+
+  <h3>💬 Chat with ZANTARA</h3>
+  <div class="chat" id="chat"></div>
+  <div style="margin-top: 10px;">
+    <input type="text" id="input" placeholder="Type a message... (Try: 'Chi sono io?')" onkeypress="if(event.key==='Enter' && !event.shiftKey) send()">
+    <button onclick="send()" id="sendBtn">Send</button>
+  </div>
+
+  <script>
+    const BFF_URL = 'http://localhost:4000';
+    let userEmail = 'zero@balizero.com';
+
+    function setEmail() {
+      userEmail = document.getElementById('email').value;
+      localStorage.setItem('zantara-user-email', userEmail);
+      addStatus('✅ Email set to: ' + userEmail, 'success');
+    }
+
+    function addStatus(msg, type) {
+      const el = document.getElementById('status');
+      el.textContent = msg;
+      el.className = 'status ' + type;
+    }
+
+    function addMessage(role, text) {
+      const chat = document.getElementById('chat');
+      const div = document.createElement('div');
+      div.className = 'message ' + role;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function checkHealth() {
+      try {
+        const res = await fetch(BFF_URL + '/health');
+        const data = await res.json();
+        if (data.status === 'healthy') {
+          addStatus('✅ BFF Healthy | Backend: v' + data.backend.version, 'success');
+        } else {
+          addStatus('❌ BFF unhealthy', 'error');
+        }
+      } catch (e) {
+        addStatus('❌ Cannot connect to BFF: ' + e.message, 'error');
+      }
+    }
+
+    async function send() {
+      const input = document.getElementById('input');
+      const sendBtn = document.getElementById('sendBtn');
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = '';
+      sendBtn.disabled = true;
+      addMessage('user', text);
+
+      try {
+        const res = await fetch(BFF_URL + '/call', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-id': userEmail
+          },
+          // Try to detect if question is about team/pricing/services
+          let handlerKey = 'ai.chat';
+          let handlerParams = {
+            prompt: text,
+            userId: userEmail,
+            context: {
+              userEmail: userEmail,
+              userName: userEmail.split('@')[0]
+            }
+          };
+
+          // Smart routing based on keywords
+          const lowerText = text.toLowerCase();
+          if (lowerText.match(/team|adit|amanda|anton|ari|surya|dewa/i)) {
+            // Fetch team info first, then answer
+            try {
+              const teamRes = await fetch(BFF_URL + '/call', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'x-user-id': userEmail},
+                body: JSON.stringify({key: 'contact.info', params: {}})
+              });
+              const teamData = await teamRes.json();
+              if (teamData.ok && teamData.data.team) {
+                handlerParams.context.teamInfo = teamData.data.team;
+              }
+            } catch (e) {
+              console.warn('Failed to fetch team info:', e);
+            }
+          } else if (lowerText.match(/prez|costo|price|kitas|d12|pt pma/i)) {
+            handlerParams.context.note = 'User asking about pricing - provide official Bali Zero rates';
+          }
+
+          body: JSON.stringify({
+            key: handlerKey,
+            params: handlerParams
+          })
+        });
+
+        const data = await res.json();
+        console.log('Response:', data);
+
+        if (data.ok && data.data && data.data.response) {
+          addMessage('assistant', data.data.response);
+        } else {
+          addMessage('assistant', '❌ Error: ' + (data.error || 'Unknown error'));
+        }
+      } catch (e) {
+        addMessage('assistant', '❌ Network error: ' + e.message);
+        console.error(e);
+      } finally {
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    }
+
+    // Auto-load email from localStorage
+    const saved = localStorage.getItem('zantara-user-email');
+    if (saved) {
+      userEmail = saved;
+      document.getElementById('email').value = saved;
+    }
+
+    // Test connection on load
+    checkHealth();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6366f1">
+    <title>ZANTARA Dashboard - Command Center</title>
+
+    <!-- PWA Support -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="zantara_logo_transparent.png">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Design System -->
+    <link rel="stylesheet" href="styles/design-system.css">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/phosphor-icons/2.0.0/bold/style.min.css">
+
+    <!-- WebSocket Client -->
+    <script src="js/zantara-websocket.js"></script>
+    
+    <!-- API Configuration -->
+    <script src="js/api-config-unified.js?v=2025102104"></script>
+    <script src="js/chat-input-fix.js?v=2025102104"></script>
+
+    <!-- 🔒 AUTH GUARD - Redirect to login if not authenticated -->
+    <script>
+        // IMPORTANT: This runs BEFORE page loads to prevent unauthorized access
+        (function() {
+            // Check authentication status
+            const token = localStorage.getItem('zantara-auth-token');
+            const user = localStorage.getItem('zantara-user');
+
+            // Legacy public login support (for backward compatibility)
+            const legacyEmail = localStorage.getItem('zantara-user-email');
+
+            // If neither team auth nor legacy auth exists, redirect to login
+            if (!token && !user && !legacyEmail) {
+                // Store attempted URL for redirect after login
+                sessionStorage.setItem('zantara-redirect-after-login', window.location.href);
+
+                // Redirect to login page
+                window.location.replace('login.html');
+            }
+        })();
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--z-font-primary);
+            background: var(--z-bg-primary);
+            color: var(--z-text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: var(--z-gradient-dark);
+            overflow: hidden;
+        }
+
+        .background-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: var(--z-gradient-glow);
+            animation: rotate 30s linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .orb1 {
+            width: 600px;
+            height: 600px;
+            background: #6366f1;
+            top: -200px;
+            left: -200px;
+            animation-duration: 25s;
+        }
+
+        .orb2 {
+            width: 400px;
+            height: 400px;
+            background: #a855f7;
+            bottom: -100px;
+            right: -100px;
+            animation-duration: 30s;
+            animation-delay: -5s;
+        }
+
+        .orb3 {
+            width: 300px;
+            height: 300px;
+            background: #10b981;
+            top: 50%;
+            left: 50%;
+            animation-duration: 35s;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(100px, -100px) scale(1.1); }
+            50% { transform: translate(-100px, 50px) scale(0.9); }
+            75% { transform: translate(50px, 100px) scale(1.05); }
+        }
+
+        /* Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--z-border-subtle);
+            display: flex;
+            flex-direction: column;
+            transition: all var(--z-transition-base);
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--z-border-subtle);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--z-gradient-primary);
+            border-radius: var(--z-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            box-shadow: var(--z-shadow-glow);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: var(--z-gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: var(--z-radius-md);
+            color: var(--z-text-secondary);
+            text-decoration: none;
+            transition: all var(--z-transition-fast);
+            margin-bottom: 4px;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: var(--z-bg-hover);
+            color: var(--z-text-primary);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--z-primary-light);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            background: var(--z-primary);
+            border-radius: 0 3px 3px 0;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .topbar {
+            height: 70px;
+            padding: 0 32px;
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--z-border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--z-border-subtle);
+            border-radius: var(--z-radius-lg);
+            padding: 10px 16px;
+            width: 400px;
+            transition: all var(--z-transition-base);
+        }
+
+        .search-box:focus-within {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--z-primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--z-text-primary);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--z-text-muted);
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .icon-button {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--z-radius-md);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--z-border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--z-transition-fast);
+            position: relative;
+        }
+
+        .icon-button:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid var(--z-bg-primary);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--z-radius-lg);
+            cursor: pointer;
+            transition: all var(--z-transition-fast);
+        }
+
+        .user-menu:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        .dashboard-header {
+            margin-bottom: 32px;
+        }
+
+        .dashboard-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ffffff 0%, #a8a8a8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard-subtitle {
+            font-size: 16px;
+            color: var(--z-text-secondary);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--z-bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--z-border-subtle);
+            border-radius: var(--z-radius-xl);
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--z-transition-base);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--z-border-default);
+            box-shadow: var(--z-shadow-xl);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--z-gradient-primary);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: var(--z-text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--z-radius-md);
+            background: rgba(99, 102, 241, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--z-primary-light);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+        }
+
+        .stat-change.positive {
+            color: var(--z-accent);
+        }
+
+        .stat-change.negative {
+            color: #ef4444;
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .chart-card {
+            background: var(--z-bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--z-border-subtle);
+            border-radius: var(--z-radius-xl);
+            padding: 24px;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--z-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--z-text-muted);
+        }
+
+        /* Activity Feed */
+        .activity-feed {
+            background: var(--z-bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--z-border-subtle);
+            border-radius: var(--z-radius-xl);
+            padding: 24px;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--z-border-subtle);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--z-radius-md);
+            background: var(--z-gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-size: 14px;
+            color: var(--z-text-primary);
+            margin-bottom: 4px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: var(--z-text-muted);
+        }
+
+        /* WebSocket Connection Status */
+        .ws-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--z-radius-md);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .ws-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .ws-status.connected .ws-status-dot {
+            background: #10b981;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Chat Widget */
+        .chat-widget {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 380px;
+            height: 500px;
+            background: var(--z-bg-card);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--z-border-subtle);
+            border-radius: var(--z-radius-xl);
+            box-shadow: var(--z-shadow-xl);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transform: translateY(calc(100% + 24px));
+            transition: transform var(--z-transition-base);
+        }
+
+        .chat-widget.open {
+            transform: translateY(0);
+        }
+
+        .chat-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--z-border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .chat-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--z-radius-md);
+            background: var(--z-gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .chat-close {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--z-radius-md);
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: var(--z-text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--z-transition-fast);
+        }
+
+        .chat-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--z-text-primary);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 12px;
+            animation: slideInUp 0.3s ease-out;
+        }
+
+        .chat-message.own {
+            flex-direction: row-reverse;
+        }
+
+        .chat-message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--z-radius-md);
+            background: var(--z-gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .chat-message.own .chat-message-avatar {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-message-content {
+            max-width: 70%;
+        }
+
+        .chat-message-bubble {
+            padding: 12px 16px;
+            border-radius: var(--z-radius-lg);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--z-border-subtle);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .chat-message.own .chat-message-bubble {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .chat-message-time {
+            font-size: 11px;
+            color: var(--z-text-muted);
+            margin-top: 4px;
+            padding: 0 4px;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-input-container {
+            padding: 16px 20px;
+            border-top: 1px solid var(--z-border-subtle);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--z-border-subtle);
+            border-radius: var(--z-radius-lg);
+            padding: 12px 16px;
+            color: var(--z-text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: all var(--z-transition-fast);
+        }
+
+        .chat-input:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--z-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .chat-input::placeholder {
+            color: var(--z-text-muted);
+        }
+
+        .chat-send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--z-radius-md);
+            background: var(--z-gradient-primary);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--z-transition-fast);
+        }
+
+        .chat-send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--z-shadow-glow);
+        }
+
+        .chat-send-btn:active {
+            transform: translateY(0);
+        }
+
+        .chat-toggle-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--z-gradient-primary);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--z-shadow-xl);
+            z-index: 999;
+            transition: all var(--z-transition-base);
+        }
+
+        .chat-toggle-btn:hover {
+            transform: scale(1.1);
+            box-shadow: var(--z-shadow-glow);
+        }
+
+        .chat-toggle-btn.hide {
+            transform: scale(0);
+        }
+
+        .chat-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background: #ef4444;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--z-bg-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                left: -260px;
+                height: 100vh;
+                z-index: 1000;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-widget {
+                width: calc(100vw - 48px);
+                right: 24px;
+                left: 24px;
+                bottom: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-box {
+                width: auto;
+                flex: 1;
+            }
+
+            .dashboard-content {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-widget {
+                height: calc(100vh - 48px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="background-animation">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo">Z</div>
+                    <div class="logo-text">ZANTARA</div>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <i class="ph-bold ph-house nav-icon"></i>
+                    <span class="nav-label">Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="ph-bold ph-users nav-icon"></i>
+                    <span class="nav-label">Team</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="ph-bold ph-briefcase nav-icon"></i>
+                    <span class="nav-label">Applications</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="ph-bold ph-chart-line nav-icon"></i>
+                    <span class="nav-label">Analytics</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="ph-bold ph-robot nav-icon"></i>
+                    <span class="nav-label">AI Assistant</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="ph-bold ph-gear nav-icon"></i>
+                    <span class="nav-label">Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="topbar">
+                <div class="search-box">
+                    <i class="ph-bold ph-magnifying-glass"></i>
+                    <input type="text" class="search-input" placeholder="Search anything...">
+                </div>
+
+                <div class="topbar-actions">
+                    <!-- WebSocket Status -->
+                    <div class="ws-status" id="wsStatus">
+                        <span class="ws-status-dot"></span>
+                        <span>Connecting...</span>
+                    </div>
+
+                    <button class="icon-button" id="notificationsBtn">
+                        <i class="ph-bold ph-bell"></i>
+                        <span class="notification-badge" id="notificationBadge" style="display: none;"></span>
+                    </button>
+
+                    <button class="icon-button">
+                        <i class="ph-bold ph-moon"></i>
+                    </button>
+
+                    <div class="user-menu">
+                        <div class="avatar avatar-octagon" id="userAvatar">Z</div>
+                        <div>
+                            <div style="font-size: 14px; font-weight: 600;" id="userName">Loading...</div>
+                            <div style="font-size: 12px; color: var(--z-text-muted);" id="userRole">...</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <div class="dashboard-header">
+                    <h1 class="dashboard-title">Welcome back, Zero!</h1>
+                    <p class="dashboard-subtitle">Here's what's happening with Bali Zero today.</p>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Active Applications</div>
+                            <div class="stat-icon">
+                                <i class="ph-bold ph-file-text"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">247</div>
+                        <div class="stat-change positive">
+                            <i class="ph-bold ph-arrow-up"></i>
+                            <span>12% from last week</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Team Members</div>
+                            <div class="stat-icon">
+                                <i class="ph-bold ph-users-three"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">23</div>
+                        <div class="stat-change positive">
+                            <i class="ph-bold ph-arrow-up"></i>
+                            <span>2 new this month</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">AI Interactions</div>
+                            <div class="stat-icon">
+                                <i class="ph-bold ph-robot"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">1,842</div>
+                        <div class="stat-change positive">
+                            <i class="ph-bold ph-arrow-up"></i>
+                            <span>28% from yesterday</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Success Rate</div>
+                            <div class="stat-icon">
+                                <i class="ph-bold ph-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">98.7%</div>
+                        <div class="stat-change positive">
+                            <i class="ph-bold ph-arrow-up"></i>
+                            <span>0.3% improvement</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Performance Overview</h3>
+                            <select class="input-modern" style="width: 120px; padding: 8px 12px;">
+                                <option>This Week</option>
+                                <option>This Month</option>
+                                <option>This Year</option>
+                            </select>
+                        </div>
+                        <div class="chart-placeholder">
+                            <span>Chart will be rendered here</span>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Team Activity</h3>
+                        </div>
+                        <div class="activity-feed">
+                            <div class="activity-item">
+                                <div class="activity-avatar">AD</div>
+                                <div class="activity-content">
+                                    <div class="activity-text"><strong>ADIT</strong> processed visa application #1847</div>
+                                    <div class="activity-time">2 minutes ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-avatar">AM</div>
+                                <div class="activity-content">
+                                    <div class="activity-text"><strong>AMANDA</strong> updated client documentation</div>
+                                    <div class="activity-time">15 minutes ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-avatar">AN</div>
+                                <div class="activity-content">
+                                    <div class="activity-text"><strong>ANGEL</strong> completed tax review for PT XYZ</div>
+                                    <div class="activity-time">1 hour ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-avatar">NI</div>
+                                <div class="activity-content">
+                                    <div class="activity-text"><strong>NINA</strong> published new marketing content</div>
+                                    <div class="activity-time">2 hours ago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Chat Widget -->
+    <button class="chat-toggle-btn" id="chatToggle">
+        <i class="ph-bold ph-chats-circle"></i>
+        <span class="chat-badge" id="chatBadge" style="display: none;">0</span>
+    </button>
+
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-header">
+            <div class="chat-header-title">
+                <div class="chat-avatar">Z</div>
+                <div>
+                    <div style="font-size: 14px; font-weight: 600;">ZANTARA AI</div>
+                    <div style="font-size: 11px; color: var(--z-text-muted);" id="chatStatus">Connecting...</div>
+                </div>
+            </div>
+            <button class="chat-close" id="chatClose">
+                <i class="ph-bold ph-x"></i>
+            </button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-message">
+                <div class="chat-message-avatar">Z</div>
+                <div class="chat-message-content">
+                    <div class="chat-message-bubble">
+                        Welcome to ZANTARA! I'm your AI assistant. How can I help you today?
+                    </div>
+                    <div class="chat-message-time">Just now</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Type your message...">
+                <button class="chat-send-btn" id="chatSend">
+                    <i class="ph-bold ph-paper-plane-tilt"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global WebSocket instance
+        let zantaraWS = null;
+
+        // Get current user from localStorage (set by login)
+        let currentUser = (() => {
+            try {
+                const user = localStorage.getItem('zantara-user');
+                if (user) {
+                    const parsed = JSON.parse(user);
+                    return parsed.email;
+                }
+            } catch (e) {}
+            // Fallback to legacy email or default
+            return localStorage.getItem('zantara-user-email') || 'zero@balizero.com';
+        })();
+
+        let unreadMessages = 0;
+        let unreadNotifications = 0;
+
+        // Add interactivity
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load and display user info
+            loadUserInfo();
+
+            // Initialize WebSocket
+            initializeWebSocket();
+
+            // Chat UI handlers
+            initializeChatUI();
+
+            // Animate stats on scroll
+            const observeElements = () => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.animation = 'fadeInUp 0.6s ease-out';
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.stat-card').forEach(card => {
+                    observer.observe(card);
+                });
+            };
+
+            // Add fadeInUp animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            observeElements();
+        });
+
+        // Load user info from localStorage
+        function loadUserInfo() {
+            try {
+                const userStr = localStorage.getItem('zantara-user');
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+
+                    // Update user name and role
+                    document.getElementById('userName').textContent = user.name || user.email;
+                    document.getElementById('userRole').textContent = user.role || 'Team Member';
+
+                    // Update avatar with first letter
+                    const initials = user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase();
+                    document.getElementById('userAvatar').textContent = initials;
+
+                    // Update dashboard greeting
+                    const dashboardTitle = document.querySelector('.dashboard-title');
+                    if (dashboardTitle) {
+                        dashboardTitle.textContent = `Welcome back, ${user.name || user.email.split('@')[0]}!`;
+                    }
+                } else {
+                    // Fallback to legacy email
+                    const legacyEmail = localStorage.getItem('zantara-user-email');
+                    const legacyName = localStorage.getItem('zantara-user-name');
+
+                    if (legacyEmail) {
+                        document.getElementById('userName').textContent = legacyName || legacyEmail;
+                        document.getElementById('userRole').textContent = 'User';
+                        document.getElementById('userAvatar').textContent = (legacyName || legacyEmail).charAt(0).toUpperCase();
+
+                        const dashboardTitle = document.querySelector('.dashboard-title');
+                        if (dashboardTitle) {
+                            dashboardTitle.textContent = `Welcome back, ${legacyName || legacyEmail.split('@')[0]}!`;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+                // Keep default "Loading..." text
+            }
+        }
+
+        // Initialize WebSocket
+        function initializeWebSocket() {
+            console.log('🔌 Initializing WebSocket...');
+
+            zantaraWS = new ZantaraWebSocket(currentUser, {
+                debug: true,
+                autoReconnect: true
+            });
+
+            // Connected event
+            zantaraWS.on('connected', (data) => {
+                console.log('✅ WebSocket connected!', data);
+                updateWSStatus(true);
+                updateChatStatus('Online');
+
+                // Subscribe to channels
+                zantaraWS.subscribe('chat');
+                zantaraWS.subscribe('notifications');
+                zantaraWS.subscribe('analytics');
+            });
+
+            // Disconnected event
+            zantaraWS.on('disconnected', (data) => {
+                console.log('❌ WebSocket disconnected', data);
+                updateWSStatus(false);
+                updateChatStatus('Offline');
+            });
+
+            // Error event
+            zantaraWS.on('error', (data) => {
+                console.error('WebSocket error:', data);
+            });
+
+            // Chat messages
+            zantaraWS.on('chat', (data) => {
+                console.log('💬 Chat message:', data);
+                addChatMessage(data, false);
+
+                // Show badge if chat is closed
+                const chatWidget = document.getElementById('chatWidget');
+                if (!chatWidget.classList.contains('open')) {
+                    unreadMessages++;
+                    updateChatBadge();
+                }
+            });
+
+            // Notifications
+            zantaraWS.on('notifications', (data) => {
+                console.log('🔔 Notification:', data);
+                showNotification(data);
+                unreadNotifications++;
+                updateNotificationBadge();
+            });
+
+            // Analytics (update stats in real-time)
+            zantaraWS.on('analytics', (data) => {
+                console.log('📊 Analytics update:', data);
+                updateDashboardStats(data);
+            });
+        }
+
+        // Update WebSocket status in topbar
+        function updateWSStatus(connected) {
+            const wsStatus = document.getElementById('wsStatus');
+            const statusText = wsStatus.querySelector('span:last-child');
+
+            if (connected) {
+                wsStatus.classList.add('connected');
+                statusText.textContent = 'Connected';
+            } else {
+                wsStatus.classList.remove('connected');
+                statusText.textContent = 'Disconnected';
+            }
+        }
+
+        // Update chat status
+        function updateChatStatus(status) {
+            const chatStatus = document.getElementById('chatStatus');
+            chatStatus.textContent = status;
+        }
+
+        // Initialize Chat UI
+        function initializeChatUI() {
+            const chatToggle = document.getElementById('chatToggle');
+            const chatClose = document.getElementById('chatClose');
+            const chatWidget = document.getElementById('chatWidget');
+            const chatInput = document.getElementById('chatInput');
+            const chatSend = document.getElementById('chatSend');
+
+            // Toggle chat
+            chatToggle.addEventListener('click', () => {
+                chatWidget.classList.add('open');
+                chatToggle.classList.add('hide');
+                chatInput.focus();
+
+                // Clear unread messages
+                unreadMessages = 0;
+                updateChatBadge();
+            });
+
+            // Close chat
+            chatClose.addEventListener('click', () => {
+                chatWidget.classList.remove('open');
+                chatToggle.classList.remove('hide');
+            });
+
+            // Send message on Enter (robust implementation)
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    sendChatMessage();
+                }
+            });
+
+            // Fallback for keypress
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    sendChatMessage();
+                }
+            });
+
+            // Send message on button click
+            chatSend.addEventListener('click', () => {
+                sendChatMessage();
+            });
+        }
+
+        // Send chat message
+        function sendChatMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+
+            if (!message) return;
+
+            // Add message to UI
+            addChatMessage({ text: message, user: currentUser }, true);
+
+            // Send via WebSocket
+            if (zantaraWS && zantaraWS.isConnected()) {
+                zantaraWS.sendMessage('chat', {
+                    text: message,
+                    user: currentUser,
+                    timestamp: new Date().toISOString()
+                });
+            } else {
+                console.warn('WebSocket not connected - message not sent');
+            }
+
+            // Clear input
+            chatInput.value = '';
+        }
+
+        // Add chat message to UI
+        function addChatMessage(data, isOwn = false) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageEl = document.createElement('div');
+            messageEl.className = 'chat-message' + (isOwn ? ' own' : '');
+
+            const initials = isOwn ? 'Z' : 'AI';
+            const time = new Date().toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            messageEl.innerHTML = `
+                <div class="chat-message-avatar">${initials}</div>
+                <div class="chat-message-content">
+                    <div class="chat-message-bubble">
+                        ${escapeHtml(data.text || JSON.stringify(data))}
+                    </div>
+                    <div class="chat-message-time">${time}</div>
+                </div>
+            `;
+
+            chatMessages.appendChild(messageEl);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Update chat badge
+        function updateChatBadge() {
+            const chatBadge = document.getElementById('chatBadge');
+            if (unreadMessages > 0) {
+                chatBadge.textContent = unreadMessages > 99 ? '99+' : unreadMessages;
+                chatBadge.style.display = 'flex';
+            } else {
+                chatBadge.style.display = 'none';
+            }
+        }
+
+        // Update notification badge
+        function updateNotificationBadge() {
+            const notificationBadge = document.getElementById('notificationBadge');
+            if (unreadNotifications > 0) {
+                notificationBadge.style.display = 'block';
+            } else {
+                notificationBadge.style.display = 'none';
+            }
+        }
+
+        // Show notification (could expand to use browser notifications API)
+        function showNotification(data) {
+            console.log('Notification:', data);
+            // TODO: Add notification UI (toast, banner, etc.)
+            // For now, just update activity feed
+            updateActivityFeed(data);
+        }
+
+        // Update dashboard stats (from analytics channel)
+        function updateDashboardStats(data) {
+            // Example: update stat cards with real-time data
+            if (data.activeApplications) {
+                // Update applications stat
+            }
+            if (data.aiInteractions) {
+                // Update AI interactions stat
+            }
+        }
+
+        // Update activity feed
+        function updateActivityFeed(data) {
+            // Add to activity feed in real-time
+            const activityFeed = document.querySelector('.activity-feed');
+            if (activityFeed && data.type === 'activity') {
+                const activityItem = document.createElement('div');
+                activityItem.className = 'activity-item';
+                activityItem.innerHTML = `
+                    <div class="activity-avatar">${data.user?.substring(0, 2).toUpperCase() || 'AI'}</div>
+                    <div class="activity-content">
+                        <div class="activity-text">${escapeHtml(data.message || data.text)}</div>
+                        <div class="activity-time">Just now</div>
+                    </div>
+                `;
+                activityFeed.insertBefore(activityItem, activityFeed.firstChild);
+
+                // Keep only last 10 items
+                while (activityFeed.children.length > 10) {
+                    activityFeed.removeChild(activityFeed.lastChild);
+                }
+            }
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

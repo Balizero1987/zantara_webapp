@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Enter Key</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .test-box {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-top: 0;
+      color: #333;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .log {
+      background: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .log-entry {
+      padding: 2px 0;
+      color: #666;
+    }
+    .success { color: #0a0; }
+    .error { color: #a00; }
+  </style>
+</head>
+<body>
+  <h1>Test Enter Key Handler</h1>
+  
+  <div class="test-box">
+    <h2>Test 1: inline onkeydown (come syncra.html)</h2>
+    <input type="text" id="test1" placeholder="Premi Invio qui..." 
+           onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); return window.testSend ? window.testSend(1) : false; }">
+    <div class="log" id="log1"></div>
+  </div>
+
+  <div class="test-box">
+    <h2>Test 2: addEventListener keydown</h2>
+    <input type="text" id="test2" placeholder="Premi Invio qui...">
+    <div class="log" id="log2"></div>
+  </div>
+
+  <div class="test-box">
+    <h2>Test 3: addEventListener keypress</h2>
+    <input type="text" id="test3" placeholder="Premi Invio qui...">
+    <div class="log" id="log3"></div>
+  </div>
+
+  <div class="test-box">
+    <h2>Test 4: form onsubmit</h2>
+    <form id="form4" onsubmit="return window.testSend ? window.testSend(4) : false;">
+      <input type="text" id="test4" placeholder="Premi Invio qui...">
+    </form>
+    <div class="log" id="log4"></div>
+  </div>
+
+  <script>
+    // Create test send function
+    window.testSend = function(testNum) {
+      const input = document.getElementById('test' + testNum);
+      const log = document.getElementById('log' + testNum);
+      const text = input.value.trim();
+      
+      const entry = document.createElement('div');
+      entry.className = 'log-entry ' + (text ? 'success' : 'error');
+      entry.textContent = `[${new Date().toLocaleTimeString()}] testSend(${testNum}) chiamato: "${text}"`;
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+      
+      if (text) {
+        input.value = '';
+        console.log(`✅ Test ${testNum} success:`, text);
+      } else {
+        console.log(`❌ Test ${testNum} failed: empty text`);
+      }
+      
+      return false; // Prevent default form submission
+    };
+
+    // Setup Test 2: addEventListener keydown
+    document.getElementById('test2').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        window.testSend(2);
+      }
+    });
+
+    // Setup Test 3: addEventListener keypress
+    document.getElementById('test3').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        window.testSend(3);
+      }
+    });
+
+    console.log('✅ Test page loaded. Try pressing Enter in each input field.');
+  </script>
+</body>
+</html>

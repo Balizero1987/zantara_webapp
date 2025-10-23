@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZANTARA Intelligence - Bali Zero AI Assistant</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="zantara_logo_transparent.png">
+    <meta name="theme-color" content="#6366f1">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="ZANTARA Intelligence - Complete AI assistant for Bali Zero services with real data access">
+    <meta name="keywords" content="ZANTARA, Bali Zero, AI Assistant, Visa Services, Company Setup, Tax Services">
+
+    <!-- Geist Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', Helvetica, Arial, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 100%;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #1a0033 0%, #2D1B69 50%, #6B46C1 100%);
+        }
+
+        /* Header */
+        .chat-header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .assistant-info h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            background: linear-gradient(45deg, #ffffff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .assistant-info p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .header-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Messages */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 100%;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message.assistant .message-avatar {
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(45deg, #10b981, #059669);
+        }
+
+        .message-content {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 16px;
+            max-width: calc(100% - 60px);
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+
+        /* Input Area */
+        .input-area {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            resize: none;
+            max-height: 120px;
+            min-height: 52px;
+        }
+
+        .message-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .send-btn {
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
+            border: none;
+            color: white;
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: transform 0.2s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            gap: 8px;
+            align-items: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            width: fit-content;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.2; }
+            30% { opacity: 1; }
+        }
+
+        .welcome-message {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .team-member {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 4px 0;
+        }
+
+        .price-category {
+            margin: 16px 0;
+        }
+
+        .price-category h3 {
+            color: #a78bfa;
+            margin-bottom: 8px;
+        }
+
+        .price-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #6366f1;
+            padding: 8px 12px;
+            margin: 4px 0;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="assistant-info">
+                <h2 id="assistantTitle">ZANTARA Intelligence</h2>
+                <p id="assistantStatus">Bali Zero AI Assistant • v5.2.0</p>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" onclick="testHandlers()">🧪 Test</button>
+                <button class="header-btn" onclick="clearChat()">🗑️ Clear</button>
+            </div>
+        </div>
+
+        <!-- Messages Container -->
+        <div class="messages-container" id="messagesContainer">
+            <div class="welcome-message" id="welcomeMessage">
+                <h3>👋 Welcome to ZANTARA Intelligence!</h3>
+                <p>Your AI assistant for all Bali Zero services.</p>
+                <p>Try asking: "Show me all team members" or "What are the current visa prices?"</p>
+            </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <div class="input-container">
+                <textarea
+                    class="message-input"
+                    id="messageInput"
+                    placeholder="Ask about team, prices, visas, company setup..."
+                    rows="1"
+                ></textarea>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const ZANTARA_API = 'http://localhost:8080';
+        const API_KEY = 'zantara-internal-dev-key-2025';
+
+        // State
+        let chatHistory = [];
+        let isLoading = false;
+        let sessionId = `session-${Date.now()}`;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+            autoResizeTextarea();
+            console.log('✅ ZANTARA Intelligence initialized');
+        });
+
+        function setupEventListeners() {
+            const messageInput = document.getElementById('messageInput');
+
+            if (messageInput) {
+                messageInput.addEventListener('keydown', handleKeyDown);
+                messageInput.addEventListener('input', autoResizeTextarea);
+            }
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function autoResizeTextarea() {
+            const textarea = document.getElementById('messageInput');
+            if (textarea) {
+                textarea.style.height = 'auto';
+                textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+            }
+        }
+
+        // Enhanced handler detection with all v5.2.0 endpoints
+        function detectHandler(message) {
+            const lower = message.toLowerCase();
+
+            // Team queries
+            if (lower.includes('team') || lower.includes('collaborator') ||
+                lower.includes('membri') || lower.includes('persone') ||
+                lower.includes('chi lavora') || lower.includes('staff')) {
+                return 'team.list';
+            }
+
+            // Pricing queries
+            if (lower.includes('prezz') || lower.includes('price') ||
+                lower.includes('cost') || lower.includes('quanto') ||
+                lower.includes('tariffa') || lower.includes('listino')) {
+
+                // Check for specific services
+                if (lower.includes('visa') || lower.includes('visto')) {
+                    return 'price.lookup';
+                }
+                return 'pricing.official';
+            }
+
+            // Contact information
+            if (lower.includes('contact') || lower.includes('contatt') ||
+                lower.includes('info') || lower.includes('whatsapp') ||
+                lower.includes('email') || lower.includes('office')) {
+                return 'contact.info';
+            }
+
+            // Identity resolution
+            if (lower.includes('identity') || lower.includes('who is') ||
+                lower.includes('chi è') || lower.includes('profile')) {
+                return 'identity.resolve';
+            }
+
+            // Lead management
+            if (lower.includes('lead') || lower.includes('save contact') ||
+                lower.includes('register')) {
+                return 'lead.save';
+            }
+
+            // Quote generation
+            if (lower.includes('quote') || lower.includes('preventivo') ||
+                lower.includes('quotation')) {
+                return 'quote.generate';
+            }
+
+            // ZANTARA Intelligence handlers
+            if (lower.includes('personality') || lower.includes('profile analysis')) {
+                return 'zantara.personality.profile';
+            }
+
+            if (lower.includes('mood') || lower.includes('emotional')) {
+                return 'zantara.attune';
+            }
+
+            if (lower.includes('synergy') || lower.includes('collaboration')) {
+                return 'zantara.synergy.map';
+            }
+
+            // Memory system
+            if (lower.includes('remember') || lower.includes('save memory')) {
+                return 'memory.save';
+            }
+
+            if (lower.includes('recall') || lower.includes('retrieve memory')) {
+                return 'memory.retrieve';
+            }
+
+            // Default to ai.chat for general questions
+            return 'ai.chat';
+        }
+
+        function buildParams(handler, message) {
+            switch (handler) {
+                case 'team.list':
+                    return { includeDepartments: true };
+
+                case 'pricing.official':
+                    return { format: 'detailed' };
+
+                case 'price.lookup':
+                    const service = detectServiceFromMessage(message);
+                    return { service };
+
+                case 'contact.info':
+                    return {};
+
+                case 'identity.resolve':
+                    const email = extractEmail(message);
+                    return { email: email || 'zero@balizero.com' };
+
+                case 'lead.save':
+                    return {
+                        name: 'Test User',
+                        email: 'test@example.com',
+                        service: 'visa',
+                        details: message
+                    };
+
+                case 'quote.generate':
+                    return {
+                        service: detectServiceFromMessage(message),
+                        details: message
+                    };
+
+                case 'ai.chat':
+                default:
+                    return {
+                        prompt: message,
+                        context: 'You are ZANTARA, the intelligent AI assistant for Bali Zero. Access all real data and provide accurate information about team members, pricing, and services.'
+                    };
+            }
+        }
+
+        function detectServiceFromMessage(message) {
+            const lower = message.toLowerCase();
+
+            // Visa types
+            if (lower.includes('b211b') || lower.includes('business visa')) return 'B211B';
+            if (lower.includes('voa') || lower.includes('visa on arrival')) return 'VOA';
+            if (lower.includes('kitas')) return 'KITAS';
+            if (lower.includes('kitap')) return 'KITAP';
+            if (lower.includes('c1')) return 'C1';
+            if (lower.includes('d12')) return 'D12';
+
+            // Company types
+            if (lower.includes('pt pma') || lower.includes('company')) return 'PT PMA';
+            if (lower.includes('cv')) return 'CV';
+
+            // Tax services
+            if (lower.includes('tax') || lower.includes('pajak')) return 'tax';
+
+            // Default
+            return 'visa';
+        }
+
+        function extractEmail(message) {
+            const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+            const match = message.match(emailRegex);
+            return match ? match[0] : null;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+
+            if (!message || isLoading) return;
+
+            addMessage('user', message);
+            input.value = '';
+            autoResizeTextarea();
+
+            showTyping();
+            setLoading(true);
+
+            try {
+                const handler = detectHandler(message);
+                const params = buildParams(handler, message);
+
+                console.log('🎯 Handler detected:', handler);
+                console.log('📦 Params:', params);
+
+                const response = await callZantaraAPI(handler, params);
+
+                hideTyping();
+                const formattedResponse = formatResponse(response, handler);
+                addMessage('assistant', formattedResponse);
+
+            } catch (error) {
+                hideTyping();
+                console.error('❌ Error:', error);
+                addMessage('assistant', `❌ Error: ${error.message}\n\nPlease try rephrasing your question.`);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        async function callZantaraAPI(handler, params = {}) {
+            const response = await fetch(`${ZANTARA_API}/call`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': API_KEY,
+                    'x-session-id': sessionId
+                },
+                body: JSON.stringify({
+                    key: handler,
+                    params: params
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`API Error ${response.status}: ${errorText}`);
+            }
+
+            return await response.json();
+        }
+
+        function formatResponse(response, handler) {
+            if (!response || !response.ok) {
+                return `❌ ${response?.error || 'Unable to process request'}`;
+            }
+
+            const data = response.data || response.result;
+            if (!data) return '❌ No data received';
+
+            switch (handler) {
+                case 'team.list':
+                    return formatTeamResponse(data);
+
+                case 'pricing.official':
+                    return formatPricingResponse(data);
+
+                case 'price.lookup':
+                    return formatPriceLookupResponse(data);
+
+                case 'contact.info':
+                    return formatContactResponse(data);
+
+                case 'identity.resolve':
+                    return formatIdentityResponse(data);
+
+                case 'ai.chat':
+                    return data.response || data.message || JSON.stringify(data);
+
+                default:
+                    return typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            }
+        }
+
+        function formatTeamResponse(data) {
+            let response = '👥 **Bali Zero Team Members**\n\n';
+
+            if (data.members) {
+                // Group by department
+                const byDept = {};
+                data.members.forEach(member => {
+                    const dept = member.department || 'General';
+                    if (!byDept[dept]) byDept[dept] = [];
+                    byDept[dept].push(member);
+                });
+
+                Object.keys(byDept).sort().forEach(dept => {
+                    response += `**${dept}**\n`;
+                    byDept[dept].forEach(member => {
+                        response += `• ${member.name} - ${member.role}\n`;
+                        if (member.email) response += `  📧 ${member.email}\n`;
+                    });
+                    response += '\n';
+                });
+            } else if (Array.isArray(data)) {
+                data.forEach(member => {
+                    response += `• **${member.name}** - ${member.role}\n`;
+                });
+            }
+
+            response += `\n📊 Total: ${data.members?.length || data.length || 0} team members`;
+            return response;
+        }
+
+        function formatPricingResponse(data) {
+            let response = '💰 **Official Bali Zero Pricing 2025**\n\n';
+
+            if (data.single_entry_visas) {
+                response += '**📋 Single Entry Visas**\n';
+                Object.entries(data.single_entry_visas).forEach(([key, visa]) => {
+                    response += `• **${key}**: IDR ${visa.price?.toLocaleString() || visa}\n`;
+                    if (visa.extension) response += `  Extension: IDR ${visa.extension.toLocaleString()}\n`;
+                });
+                response += '\n';
+            }
+
+            if (data.multiple_entry_visas) {
+                response += '**🔄 Multiple Entry Visas**\n';
+                Object.entries(data.multiple_entry_visas).forEach(([key, visa]) => {
+                    response += `• **${key}**: ${visa.year1 || visa}\n`;
+                });
+                response += '\n';
+            }
+
+            if (data.kitas) {
+                response += '**🏢 KITAS Permits**\n';
+                Object.entries(data.kitas).forEach(([key, kitas]) => {
+                    response += `• **${key}**: ${kitas.price || kitas}\n`;
+                });
+                response += '\n';
+            }
+
+            if (data.business) {
+                response += '**💼 Business Services**\n';
+                Object.entries(data.business).forEach(([key, service]) => {
+                    response += `• **${key}**: ${service.price || service}\n`;
+                });
+            }
+
+            return response;
+        }
+
+        function formatPriceLookupResponse(data) {
+            let response = `💰 **${data.service || 'Service'} Pricing**\n\n`;
+
+            if (data.price) {
+                response += `Base Price: **IDR ${data.price.toLocaleString()}**\n`;
+            }
+
+            if (data.extension) {
+                response += `Extension: **IDR ${data.extension.toLocaleString()}**\n`;
+            }
+
+            if (data.timeline) {
+                response += `Timeline: ${data.timeline}\n`;
+            }
+
+            if (data.requirements) {
+                response += '\n**Requirements:**\n';
+                data.requirements.forEach(req => {
+                    response += `• ${req}\n`;
+                });
+            }
+
+            return response;
+        }
+
+        function formatContactResponse(data) {
+            return `🏢 **${data.company}**\n${data.tagline}\n\n` +
+                   `📧 Email: ${data.communication?.email || data.email}\n` +
+                   `📱 WhatsApp: ${data.communication?.whatsapp || data.whatsapp}\n` +
+                   `📍 Location: ${data.office?.location || 'Bali, Indonesia'}\n` +
+                   `⏰ ${data.availability || 'Mon-Fri 9AM-6PM WITA'}`;
+        }
+
+        function formatIdentityResponse(data) {
+            return `👤 **${data.name}**\n` +
+                   `Role: ${data.role}\n` +
+                   `Department: ${data.department}\n` +
+                   `Email: ${data.email}\n` +
+                   (data.skills ? `Skills: ${data.skills.join(', ')}` : '');
+        }
+
+        function addMessage(role, content) {
+            const timestamp = new Date().toISOString();
+
+            chatHistory.push({ role, content, timestamp });
+            addMessageToDOM(role, content, timestamp);
+        }
+
+        function addMessageToDOM(role, content, timestamp) {
+            const container = document.getElementById('messagesContainer');
+            const welcomeMsg = document.getElementById('welcomeMessage');
+
+            if (welcomeMsg) {
+                welcomeMsg.style.display = 'none';
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+
+            const avatar = role === 'assistant' ? '🤖' : '👤';
+            const time = new Date(timestamp).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${avatar}</div>
+                <div class="message-content">
+                    <div>${formatContent(content)}</div>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function formatContent(content) {
+            return content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+
+        function showTyping() {
+            document.getElementById('typingIndicator').style.display = 'flex';
+        }
+
+        function hideTyping() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        function setLoading(loading) {
+            isLoading = loading;
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = loading;
+        }
+
+        function clearChat() {
+            if (confirm('Clear all messages?')) {
+                chatHistory = [];
+                const container = document.getElementById('messagesContainer');
+                container.innerHTML = `
+                    <div class="welcome-message" id="welcomeMessage">
+                        <h3>👋 Chat cleared!</h3>
+                        <p>How can ZANTARA help you today?</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testHandlers() {
+            const tests = [
+                { message: 'show all team members', expected: 'team.list' },
+                { message: 'what are the prices', expected: 'pricing.official' },
+                { message: 'contact info', expected: 'contact.info' }
+            ];
+
+            addMessage('assistant', '🧪 Running handler tests...\n\n');
+
+            for (const test of tests) {
+                const detected = detectHandler(test.message);
+                const status = detected === test.expected ? '✅' : '❌';
+                addMessage('assistant', `${status} "${test.message}" → ${detected} (expected: ${test.expected})`);
+
+                if (detected === test.expected) {
+                    try {
+                        const params = buildParams(detected, test.message);
+                        const response = await callZantaraAPI(detected, params);
+                        if (response.ok) {
+                            addMessage('assistant', '✅ API call successful');
+                        }
+                    } catch (error) {
+                        addMessage('assistant', `❌ API error: ${error.message}`);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

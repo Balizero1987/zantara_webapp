@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZANTARA – Portal</title>
+  <link rel="icon" type="image/png" href="assets/logozantara.jpeg">
+  <meta http-equiv="refresh" content="0; url=login.html?v=prod5">
+  <style>
+    body { margin:0; display:grid; place-items:center; min-height:100vh; background:#0a0a0a; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif; }
+    .box { text-align:center; }
+  </style>
+  <script>
+    (function(){ try { if (!new URLSearchParams(location.search).get('v')) { location.replace('login.html?v=prod5'); } } catch(_){ location.href='login.html?v=prod5'; } })();
+  </script>
+</head>
+<body>
+  <div class="box">
+    <h1>ZANTARA</h1>
+    <p>Redirecting to sign in…</p>
+  </div>
+</body>
+</html>

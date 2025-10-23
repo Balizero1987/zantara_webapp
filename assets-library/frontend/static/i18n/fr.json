@@ -1,0 +1,33 @@
+{
+  "app_title": "ZANTARA - Assistant Intelligent",
+  "header_title": "ZANTARA Intelligence",
+  "header_subtitle": "Votre assistant IA avec accès aux connaissances, calendrier, e-mail, cartes et plus",
+
+  "welcome_greeting": "👋 Bonjour! Je suis ZANTARA, votre assistant intelligent.",
+  "welcome_can_help": "Je peux vous aider avec:",
+  "welcome_visas": "📚 Informations sur les visas et l'immigration",
+  "welcome_calendar": "📅 Gestion du calendrier et des e-mails",
+  "welcome_maps": "🗺️ Trouver des lieux et des itinéraires",
+  "welcome_memory": "💾 Stocker vos préférences",
+  "welcome_chat": "🤖 Conversation sur n'importe quel sujet",
+  "welcome_question": "Que puis-je faire pour vous?",
+
+  "suggestion_visa": "Quelles sont les exigences pour le Golden Visa?",
+  "suggestion_calendar": "Montrez-moi mes événements à venir",
+  "suggestion_restaurant": "Trouver des restaurants à Ubud",
+  "suggestion_email": "Montrez-moi mes derniers e-mails",
+
+  "input_placeholder": "Écrivez votre message en langage naturel...",
+  "send_button": "Envoyer",
+  "thinking": "Réflexion...",
+
+  "error_connection": "Erreur de connexion",
+  "error_unknown": "Erreur inconnue",
+  "error_occurred": "Une erreur s'est produite",
+
+  "sources_prefix": "📚 Sources:",
+  "sources_documents": "documents consultés",
+
+  "language": "Langue",
+  "select_language": "Sélectionner la Langue"
+}

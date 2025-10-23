@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Direct Send</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #0f0; }
+    .console { background: #000; border: 1px solid #0f0; padding: 10px; min-height: 200px; white-space: pre-wrap; }
+    button { background: #0f0; color: #000; padding: 10px; margin: 5px; cursor: pointer; }
+    input { width: 80%; padding: 8px; background: #111; color: #0f0; border: 1px solid #0f0; }
+  </style>
+</head>
+<body>
+  <h1>Direct API Test</h1>
+  <div class="console" id="console"></div>
+
+  <div>
+    <input type="text" id="message" value="Hello test" placeholder="Enter message">
+    <button onclick="testDirect()">Test Direct API</button>
+    <button onclick="testWithApp()">Test With App</button>
+    <button onclick="clearConsole()">Clear</button>
+  </div>
+
+  <script>
+    function log(msg) {
+      const c = document.getElementById('console');
+      c.textContent += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+    }
+
+    function clearConsole() {
+      document.getElementById('console').textContent = '';
+      log('Console cleared');
+    }
+
+    async function testDirect() {
+      const text = document.getElementById('message').value;
+      if (!text) {
+        log('❌ No message entered');
+        return;
+      }
+
+      log(`📤 Sending: "${text}"`);
+
+      // Try different endpoints
+      const endpoints = [
+        'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app/call',
+        '/api/call'
+      ];
+
+      for (const endpoint of endpoints) {
+        log(`\n🔗 Trying: ${endpoint}`);
+
+        try {
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-user-id': 'test@example.com'
+            },
+            body: JSON.stringify({
+              key: 'ai.chat',
+              params: { prompt: text }
+            })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            log(`✅ SUCCESS from ${endpoint}`);
+            log(`📥 Response: ${JSON.stringify(data, null, 2)}`);
+
+            // Extract reply
+            const reply = data.reply || data.message || data.text ||
+                         (data.data && data.data.response) ||
+                         JSON.stringify(data);
+            log(`💬 Reply: ${reply}`);
+            return;
+          } else {
+            log(`❌ HTTP ${response.status}: ${response.statusText}`);
+          }
+        } catch (err) {
+          log(`❌ Error: ${err.message}`);
+        }
+      }
+
+      log('\n❌ All endpoints failed');
+    }
+
+    function testWithApp() {
+      log('Testing with app...');
+
+      // Create iframe with syncra
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = '/syncra.html';
+      document.body.appendChild(iframe);
+
+      iframe.onload = function() {
+        setTimeout(() => {
+          try {
+            const win = iframe.contentWindow;
+
+            // Check if safeSend exists
+            if (win.safeSend) {
+              log('✅ safeSend function exists');
+
+              // Set message
+              const input = win.document.getElementById('message-input');
+              if (input) {
+                input.value = document.getElementById('message').value;
+                log(`✅ Set message: "${input.value}"`);
+              }
+
+              // Call safeSend
+              const result = win.safeSend();
+              log(`✅ Called safeSend(), returned: ${result}`);
+            } else {
+              log('❌ safeSend not found');
+            }
+
+            // Check app status
+            if (win.zantaraApp) {
+              log('✅ zantaraApp exists');
+            } else {
+              log('❌ zantaraApp not found');
+            }
+
+          } catch(e) {
+            log(`❌ Error: ${e.message}`);
+          }
+
+          document.body.removeChild(iframe);
+        }, 1000);
+      };
+    }
+
+    // Set default email
+    localStorage.setItem('zantara-user-email', 'test@example.com');
+    log('Test page ready');
+    log('Email set to: test@example.com');
+  </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ZANTARA – Chat</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#8B5CF6">
+  <style>
+    /* Safe build: force chat visible; remove any blockers */
+    #splash-screen{display:none!important}
+    #welcome-screen{display:none!important}
+    #chat-interface{display:flex!important}
+    /* Ensure nothing covers input */
+    .red-particles,.bg-wave,.logo-breakout,.parallax-logo{pointer-events:none!important;z-index:-1!important}
+  </style>
+  <link rel="stylesheet" href="styles/design-system.css">
+  <link rel="stylesheet" href="styles/zantara-theme-day.css?v=prod15">
+  <link rel="stylesheet" href="styles/zantara-theme-night-enhanced.css?v=prod15">
+  <link rel="stylesheet" href="styles/components.css?v=prod15">
+</head>
+<body>
+  <div id="app" class="app-container" aria-label="ZANTARA App">
+    <header class="app-header glass-card">
+      <div class="header-content">
+        <img src="assets/lotus-day.svg" class="lotus-logo logo-polish" alt="ZANTARA" style="width:40px;height:40px;">
+        <span class="app-title">ZANTARA</span>
+        <span id="conn-badge" class="conn-badge" title="Connection mode">Connected</span>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div id="chat-interface" class="chat-interface" aria-live="polite" aria-label="Chat interface" style="display:flex">
+        <div class="messages-container"></div>
+        <form id="chat-form" class="input-area glass-card" onsubmit="try{ if(window.zantaraApp&&window.zantaraApp.sendMessage){ window.zantaraApp.sendMessage(); } }catch(e){} return false;">
+          <button class="attach-button" aria-label="Attach file" type="button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+          <input type="text" id="message-input" name="message" class="message-input" placeholder="Type a message or use voice..." aria-label="Message input" enterkeyhint="send" inputmode="text" autocomplete="off">
+          <button id="voice-input" class="voice-input-button" aria-label="Start voice input" type="button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+          </button>
+          <button id="send-button" class="send-button" aria-label="Send message" type="button" onclick="return window.safeSend ? window.safeSend() : false;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <nav class="bottom-nav glass-card" aria-label="Primary">
+      <button class="nav-item active" data-view="chat"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2"/></svg><span>Chat</span></button>
+      <button class="nav-item" data-view="tools"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 3h6l6 6h6v6l-6 6H9l-6-6z" stroke="currentColor" stroke-width="2"/></svg><span>Tools</span></button>
+      <button class="nav-item" data-view="files"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" stroke="currentColor" stroke-width="2"/></svg><span>Files</span></button>
+      <button class="nav-item" data-view="settings"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/><path d="M12 1v6m0 6v6m4.22-13.22l-4.24 4.24m0 3.96l4.24 4.24M20 12h-6m-6 0H2" stroke="currentColor" stroke-width="2"/></svg><span>Settings</span></button>
+    </nav>
+  </div>
+
+  <!-- SAFE BUILD: no external JS needed for send -->
+  <script>
+    (function(){
+      // Ultra-compat fallback: works even if app.js/api helper fail to init on older WebViews
+      function qs(sel){ return document.querySelector(sel); }
+      function addBubble(sender, html){
+        var c=qs('.messages-container'); if(!c) return;
+        var d=document.createElement('div'); d.className='message '+sender;
+        var safe = html;
+        if (!/</.test(html)) { // treat plain text
+          safe = html.replace(/[&<>]/g,function(ch){return ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]);});
+        }
+        if (sender==='assistant') d.innerHTML='<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble">'+safe+'</div>';
+        else d.innerHTML='<div class="message-bubble">'+safe+'</div>';
+        c.appendChild(d); c.scrollTop=c.scrollHeight;
+        return d;
+      }
+      function typingOn(){ var c=qs('.messages-container'); if(!c) return; var d=document.createElement('div'); d.className='message assistant typing-message'; d.innerHTML='<div class="message-avatar"><img src="zantara_logo_transparent.png" alt="ZANTARA"></div><div class="message-bubble"><div class="typing-indicator"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div></div>'; c.appendChild(d); c.scrollTop=c.scrollHeight; }
+      function typingOff(){ var t=qs('.typing-message'); if(t) t.parentNode.removeChild(t); }
+      function extractReply(obj){ try{
+        if (!obj) return '';
+        if (typeof obj==='string'){ try{ return extractReply(JSON.parse(obj)); }catch(e){ return obj; } }
+        if (typeof obj.reply==='string') return obj.reply;
+        if (typeof obj.message==='string') return obj.message;
+        if (typeof obj.text==='string') return obj.text;
+        if (obj.data){ if (typeof obj.data.response==='string') return obj.data.response; if (typeof obj.data.reply==='string') return obj.data.reply; if (typeof obj.data.text==='string') return obj.data.text; }
+        if (obj.choices && obj.choices[0] && obj.choices[0].message && obj.choices[0].message.content) return obj.choices[0].message.content;
+        return JSON.stringify(obj);
+      }catch(e){ return 'OK.'; } }
+      function safeSend(){
+        try{
+          if (window.zantaraApp && window.zantaraApp.sendMessage) { window.zantaraApp.sendMessage(); return false; }
+          var inp=qs('#message-input'); if(!inp) return false; var text=(inp.value||'').replace(/^\s+|\s+$/g,''); if(!text) return false; inp.value='';
+          addBubble('user', text);
+          typingOn();
+          // Use BFF (Backend-for-Frontend) - API key hidden server-side
+          var endpoint='http://localhost:4000/call';
+          var user=''; try{ user=localStorage.getItem('zantara-user-email')||'anonymous@balizero.com'; }catch(e){ user='anonymous@balizero.com'; }
+          // Use AI chat with identity context for ZANTARA recognition
+          var body=JSON.stringify({
+            key:'ai.chat',
+            params:{
+              prompt: text,
+              userId: user,
+              context: {
+                userEmail: user,
+                userName: user.split('@')[0]
+              }
+            }
+          });
+          var xhr=new XMLHttpRequest();
+          xhr.open('POST', endpoint, true);
+          xhr.setRequestHeader('Content-Type','application/json');
+          // BFF handles API key server-side
+          if (user) xhr.setRequestHeader('x-user-id', user);
+          xhr.onreadystatechange=function(){
+            if (xhr.readyState===4){
+              typingOff();
+              console.log('XHR Response:', xhr.status, xhr.statusText, xhr.responseText);
+              try{
+                var res=JSON.parse(xhr.responseText||'{}');
+                var out=extractReply(res)||'OK.';
+                addBubble('assistant', out);
+              }catch(e){
+                console.error('Parse error:', e);
+                addBubble('assistant','Request failed. Status: '+xhr.status+'. Check console for details.');
+              }
+            }
+          };
+          xhr.onerror=function(e){
+            typingOff();
+            console.error('Network error:', e, xhr.status, xhr.statusText);
+            addBubble('assistant','Network error. Status: '+xhr.status+'. This is likely a CORS issue. Check console.');
+          };
+          xhr.send(body);
+        }catch(e){ try{ typingOff(); }catch(_){ } addBubble('assistant','Error. Please reload and try again.'); }
+        return false;
+      }
+      window.safeSend = safeSend;
+      // Wire form fallback if app not present
+      window.addEventListener('load', function(){ try{ var fm=document.getElementById('chat-form'); if(fm){ fm.onsubmit=function(){ return safeSend(); }; } var sb=document.getElementById('send-button'); if (sb) sb.onclick=function(){ return safeSend(); }; }catch(e){} });
+    })();
+  </script>
+  <script>
+    // Safety: ensure handlers exist
+    window.addEventListener('load', function(){
+      try {
+        var sb=document.getElementById('send-button'); if(sb) sb.onclick=function(){ if(window.zantaraApp&&window.zantaraApp.sendMessage){ window.zantaraApp.sendMessage(); }else if(window.safeSend){ window.safeSend(); } };
+        var fm=document.getElementById('chat-form'); if(fm){ fm.onsubmit=function(){ try{ if(window.zantaraApp&&window.zantaraApp.sendMessage){ window.zantaraApp.sendMessage(); }else if(window.safeSend){ window.safeSend(); } }catch(e){} return false; }; }
+        
+        // Add Enter key handler for message input
+        var inp=document.getElementById('message-input');
+        if(inp){
+          inp.addEventListener('keydown', function(e){
+            if(e.key==='Enter' && !e.shiftKey){
+              e.preventDefault();
+              if(window.zantaraApp && window.zantaraApp.sendMessage){
+                window.zantaraApp.sendMessage();
+              } else if(window.safeSend){
+                window.safeSend();
+              }
+            }
+          });
+          console.log('✅ Enter key handler attached to message input');
+        }
+
+        // Auto-detect Zero user or prompt for email
+        var storedEmail = localStorage.getItem('zantara-user-email');
+        if (!storedEmail) {
+          var email = prompt('Enter your email to start (or press Cancel for anonymous):', 'zero@balizero.com');
+          if (email && email.indexOf('@') > 0) {
+            localStorage.setItem('zantara-user-email', email);
+            console.log('✅ User email set:', email);
+          }
+        } else {
+          console.log('✅ Welcome back:', storedEmail);
+        }
+      } catch(e){ console.error('❌ Error in event handlers:', e); }
+    });
+  </script>
+</body>
+</html>

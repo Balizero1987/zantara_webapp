@@ -1,0 +1,13 @@
+{
+  "name": "ZANTARA",
+  "description": "AI Assistant for Bali Zero - Intelligent automation and chat support",
+  "avatarUrl": "https://ts-backend-production-568d.up.railway.app/assets/zantara-avatar.png",
+  "botUrl": "https://ts-backend-production-568d.up.railway.app/chatbot",
+  "interactive": true,
+  "addedToSpaceText": "🤖 *ZANTARA Bot Activated!*\n\nHello! I'm ZANTARA, your AI assistant. I can help you with:\n\n• 💬 Answer questions using GPT-4\n• 📁 Manage Google Drive files\n• 💾 Store and retrieve memories\n• 📊 System status updates\n\nType *@ZANTARA help* to see all commands!",
+  "removedFromSpaceText": "👋 ZANTARA has been removed from this space. Thanks for using our AI assistant!",
+  "permissions": [
+    "RECEIVE_MESSAGES",
+    "ADD_TO_SPACES"
+  ]
+}

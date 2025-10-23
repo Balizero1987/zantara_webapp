@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test zantara.balizero.com</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        #result {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.success { background: rgba(34, 197, 94, 0.8); }
+        .status.error { background: rgba(239, 68, 68, 0.8); }
+        .status.info { background: rgba(59, 130, 246, 0.8); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 ZANTARA Custom Domain Test</h1>
+
+        <div class="test-section">
+            <h3>Domain Status</h3>
+            <p>Current URL: <strong id="current-url"></strong></p>
+            <p>Status: <span id="domain-status" class="status info">Checking...</span></p>
+        </div>
+
+        <div class="test-section">
+            <h3>API Connection Test</h3>
+            <button onclick="testAPIHealth()">Test API Health</button>
+            <button onclick="testAPICall()">Test API Call</button>
+            <button onclick="testCORS()">Test CORS</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+
+        <div class="test-section">
+            <h3>Results</h3>
+            <pre id="result">Click a test button above to see results...</pre>
+        </div>
+    </div>
+
+    <script>
+        // Display current URL
+        document.getElementById('current-url').textContent = window.location.href;
+
+        // Check domain status
+        function checkDomainStatus() {
+            const hostname = window.location.hostname;
+            const statusEl = document.getElementById('domain-status');
+
+            if (hostname === 'zantara.balizero.com') {
+                statusEl.textContent = 'Custom Domain Active ✅';
+                statusEl.className = 'status success';
+            } else if (hostname.includes('github.io')) {
+                statusEl.textContent = 'GitHub Pages';
+                statusEl.className = 'status info';
+            } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                statusEl.textContent = 'Local Development';
+                statusEl.className = 'status info';
+            } else {
+                statusEl.textContent = 'Unknown Domain';
+                statusEl.className = 'status error';
+            }
+        }
+
+        function log(message, type = 'info') {
+            const result = document.getElementById('result');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+            result.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            result.scrollTop = result.scrollHeight;
+        }
+
+        function clearResults() {
+            document.getElementById('result').textContent = '';
+        }
+
+        async function testAPIHealth() {
+            log('Testing API Health...');
+
+            try {
+                const apiUrl = 'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app/health';
+
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`API Health Check SUCCESS: ${JSON.stringify(data)}`, 'success');
+                } else {
+                    log(`API Health Check FAILED: HTTP ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                log(`API Health Check ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAPICall() {
+            log('Testing API Call...');
+
+            try {
+                const apiUrl = 'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app/call';
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': 'zantara-internal-dev-key-2025'
+                    },
+                    body: JSON.stringify({
+                        key: 'ai.chat',
+                        params: {
+                            prompt: 'Hello from custom domain test!'
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`API Call SUCCESS: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    log(`API Call FAILED: HTTP ${response.status}\n${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(`API Call ERROR: ${error.message}`, 'error');
+                if (error.message.includes('CORS')) {
+                    log('CORS error detected - backend needs CORS configuration update', 'error');
+                }
+            }
+        }
+
+        async function testCORS() {
+            log('Testing CORS Configuration...');
+
+            try {
+                const apiUrl = 'https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app/call';
+
+                const preflightResponse = await fetch(apiUrl, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type, x-api-key'
+                    }
+                });
+
+                log(`Preflight Response: ${preflightResponse.status}`);
+
+                const corsHeaders = [
+                    'access-control-allow-origin',
+                    'access-control-allow-methods',
+                    'access-control-allow-headers'
+                ];
+
+                corsHeaders.forEach(header => {
+                    const value = preflightResponse.headers.get(header);
+                    if (value) {
+                        log(`${header}: ${value}`, 'success');
+                    } else {
+                        log(`Missing CORS header: ${header}`, 'error');
+                    }
+                });
+
+            } catch (error) {
+                log(`CORS Test ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize
+        checkDomainStatus();
+        log('Domain test page loaded successfully');
+        log(`Current domain: ${window.location.hostname}`);
+        log('Ready to test API connectivity');
+    </script>
+</body>
+</html>

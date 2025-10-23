@@ -1,0 +1,372 @@
+/* SYNCRA NIGHT MODE - Advanced Visual Effects */
+/* Inspired by the beautiful gradient glow design */
+
+/* Enhanced Night Mode Background - PURE BLACK */
+[data-theme="night"] body {
+  background: #000000 !important;
+  position: relative;
+}
+
+/* Main Glow Orb Effect - BIG AND BRIGHT */
+.syncra-glow-orb {
+  display: none;
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 900px;
+  background: radial-gradient(circle,
+    rgba(189, 0, 255, 1) 0%,
+    rgba(232, 64, 255, 0.9) 15%,
+    rgba(255, 100, 150, 0.7) 30%,
+    rgba(255, 140, 100, 0.5) 45%,
+    rgba(255, 165, 0, 0.3) 60%,
+    transparent 75%
+  );
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 1;
+  animation: syncra-pulse 6s ease-in-out infinite;
+}
+
+[data-theme="night"] .syncra-glow-orb {
+  display: block;
+}
+
+/* Concentric Rings Effect - BRIGHT */
+.syncra-rings {
+  display: none;
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 900px;
+  background:
+    radial-gradient(circle, transparent 30%, rgba(189, 0, 255, 0.3) 30%, transparent 31%),
+    radial-gradient(circle, transparent 40%, rgba(232, 64, 255, 0.25) 40%, transparent 41%),
+    radial-gradient(circle, transparent 50%, rgba(189, 0, 255, 0.2) 50%, transparent 51%),
+    radial-gradient(circle, transparent 60%, rgba(232, 64, 255, 0.15) 60%, transparent 61%),
+    radial-gradient(circle, transparent 70%, rgba(189, 0, 255, 0.1) 70%, transparent 71%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+  animation: syncra-rings 8s linear infinite;
+}
+
+[data-theme="night"] .syncra-rings {
+  display: block;
+}
+
+/* Pulse Animation */
+@keyframes syncra-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(-50%) scale(1.1);
+  }
+}
+
+/* Rings Animation */
+@keyframes syncra-rings {
+  0% {
+    transform: translateX(-50%) scale(1) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.05) rotate(180deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(-50%) scale(1) rotate(360deg);
+    opacity: 0.6;
+  }
+}
+
+/* Content Above Effects */
+[data-theme="night"] .app-container {
+  position: relative;
+  z-index: 10;
+}
+
+/* Enhanced Glass Cards for Night Mode */
+[data-theme="night"] .glass-card {
+  background: rgba(139, 92, 246, 0.08);
+  backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(189, 0, 255, 0.3);
+  box-shadow:
+    0 8px 32px rgba(189, 0, 255, 0.2),
+    0 0 80px rgba(189, 0, 255, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 10;
+}
+
+[data-theme="night"] .glass-card:hover {
+  border-color: rgba(189, 0, 255, 0.5);
+  box-shadow:
+    0 12px 48px rgba(189, 0, 255, 0.3),
+    0 0 100px rgba(189, 0, 255, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+/* Enhanced Header Glow */
+[data-theme="night"] .app-header {
+  background: rgba(10, 5, 20, 0.6);
+  backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(189, 0, 255, 0.3);
+  box-shadow:
+    0 4px 24px rgba(189, 0, 255, 0.2),
+    0 0 60px rgba(189, 0, 255, 0.1);
+}
+
+/* Enhanced Sidebar Glow */
+[data-theme="night"] .chat-history,
+[data-theme="night"] .articles-panel {
+  background: rgba(10, 5, 20, 0.6);
+  backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(189, 0, 255, 0.3);
+  box-shadow:
+    0 8px 32px rgba(189, 0, 255, 0.2),
+    0 0 80px rgba(189, 0, 255, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Article Cards with Gradient Glow */
+[data-theme="night"] .article-card {
+  background: rgba(20, 10, 40, 0.4);
+  border: 1px solid rgba(189, 0, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(189, 0, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+[data-theme="night"] .article-card:hover {
+  background: rgba(30, 15, 60, 0.6);
+  border-color: rgba(189, 0, 255, 0.5);
+  box-shadow:
+    0 8px 24px rgba(189, 0, 255, 0.3),
+    0 0 40px rgba(189, 0, 255, 0.15);
+  transform: translateY(-4px);
+}
+
+/* History Items with Purple Glow */
+[data-theme="night"] .history-item {
+  background: rgba(20, 10, 40, 0.4);
+  border: 1px solid rgba(189, 0, 255, 0.15);
+}
+
+[data-theme="night"] .history-item:hover {
+  background: rgba(30, 15, 60, 0.6);
+  border-color: rgba(189, 0, 255, 0.4);
+  box-shadow: 0 4px 16px rgba(189, 0, 255, 0.2);
+}
+
+/* Enhanced Theme Toggle for Night Mode */
+[data-theme="night"] .theme-toggle-header {
+  background: rgba(10, 5, 20, 0.8);
+  border: 1px solid rgba(189, 0, 255, 0.4);
+  box-shadow:
+    0 4px 16px rgba(189, 0, 255, 0.3),
+    0 0 40px rgba(189, 0, 255, 0.2);
+}
+
+[data-theme="night"] .theme-toggle-header:hover {
+  background: rgba(20, 10, 40, 0.9);
+  border-color: rgba(189, 0, 255, 0.6);
+  box-shadow:
+    0 6px 24px rgba(189, 0, 255, 0.4),
+    0 0 60px rgba(189, 0, 255, 0.3);
+}
+
+/* Segmented Control Night Enhancement */
+[data-theme="night"] .theme-segmented-control {
+  background: rgba(10, 5, 20, 0.8);
+  border: 1px solid rgba(189, 0, 255, 0.4);
+  box-shadow:
+    0 4px 16px rgba(189, 0, 255, 0.3),
+    0 0 40px rgba(189, 0, 255, 0.2);
+}
+
+[data-theme="night"] .theme-segment.active {
+  background: linear-gradient(135deg,
+    #BD00FF 0%,
+    #E840FF 30%,
+    #FF64AA 60%,
+    #00D9FF 100%
+  );
+  box-shadow:
+    0 4px 20px rgba(189, 0, 255, 0.6),
+    0 0 40px rgba(189, 0, 255, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+/* Input Area with Glow */
+[data-theme="night"] .input-area {
+  background: rgba(10, 5, 20, 0.8);
+  border: 1px solid rgba(189, 0, 255, 0.3);
+  box-shadow:
+    0 4px 20px rgba(189, 0, 255, 0.2),
+    0 0 40px rgba(189, 0, 255, 0.1);
+}
+
+[data-theme="night"] .input-area:focus-within {
+  border-color: rgba(189, 0, 255, 0.6);
+  box-shadow:
+    0 8px 32px rgba(189, 0, 255, 0.4),
+    0 0 60px rgba(189, 0, 255, 0.3);
+}
+
+/* Category Filters Gradient */
+[data-theme="night"] .category-filter.active {
+  background: linear-gradient(135deg,
+    #BD00FF 0%,
+    #E840FF 50%,
+    #00D9FF 100%
+  );
+  box-shadow:
+    0 4px 12px rgba(189, 0, 255, 0.5),
+    0 0 24px rgba(189, 0, 255, 0.3);
+}
+
+/* Bottom Nav Enhancement */
+[data-theme="night"] .bottom-nav {
+  background: rgba(10, 5, 20, 0.8);
+  backdrop-filter: blur(30px) saturate(180%);
+  border-top: 1px solid rgba(189, 0, 255, 0.3);
+  box-shadow:
+    0 -4px 24px rgba(189, 0, 255, 0.2),
+    0 0 60px rgba(189, 0, 255, 0.1);
+}
+
+[data-theme="night"] .nav-item.active {
+  color: #E840FF;
+  text-shadow: 0 0 20px rgba(232, 64, 255, 0.8);
+}
+
+/* Text Glow for Night Mode */
+[data-theme="night"] .app-title {
+  color: #FFFFFF;
+  text-shadow:
+    0 0 20px rgba(189, 0, 255, 0.6),
+    0 0 40px rgba(189, 0, 255, 0.3);
+}
+
+/* Hide particles in night mode - we have the glow orb instead */
+[data-theme="night"] .red-particles {
+  display: none !important;
+}
+
+/* Logo - Always Visible */
+.logo-3d {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Logo Glow for Night */
+[data-theme="night"] .logo-3d {
+  box-shadow:
+    0 0 30px rgba(189, 0, 255, 0.6),
+    0 0 60px rgba(189, 0, 255, 0.3),
+    0 8px 24px rgba(0, 0, 0, 0.4);
+  filter: brightness(1.1) saturate(1.3);
+}
+
+/* Scrollbar Styling for Night */
+[data-theme="night"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme="night"] ::-webkit-scrollbar-track {
+  background: rgba(10, 5, 20, 0.4);
+  border-radius: 4px;
+}
+
+[data-theme="night"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+    rgba(189, 0, 255, 0.6) 0%,
+    rgba(232, 64, 255, 0.6) 100%
+  );
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(189, 0, 255, 0.5);
+}
+
+[data-theme="night"] ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+    rgba(189, 0, 255, 0.8) 0%,
+    rgba(232, 64, 255, 0.8) 100%
+  );
+  box-shadow: 0 0 15px rgba(189, 0, 255, 0.8);
+}
+
+/* Urgent Badge Night Enhancement */
+[data-theme="night"] .badge-urgent {
+  background: linear-gradient(135deg,
+    rgba(189, 0, 255, 0.3) 0%,
+    rgba(232, 64, 255, 0.3) 100%
+  );
+  color: #E840FF;
+  box-shadow:
+    0 0 10px rgba(189, 0, 255, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Message Bubbles Enhancement */
+[data-theme="night"] .message-bubble {
+  background: rgba(20, 10, 40, 0.6);
+  border: 1px solid rgba(189, 0, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(189, 0, 255, 0.15);
+}
+
+/* Voice Button Enhancement */
+[data-theme="night"] .voice-button {
+  background: linear-gradient(135deg,
+    rgba(189, 0, 255, 0.2) 0%,
+    rgba(232, 64, 255, 0.15) 100%
+  );
+  border: 2px solid rgba(189, 0, 255, 0.4);
+  box-shadow:
+    0 8px 32px rgba(189, 0, 255, 0.3),
+    0 0 60px rgba(189, 0, 255, 0.2);
+}
+
+[data-theme="night"] .voice-button:hover {
+  background: linear-gradient(135deg,
+    rgba(189, 0, 255, 0.3) 0%,
+    rgba(232, 64, 255, 0.25) 100%
+  );
+  border-color: rgba(189, 0, 255, 0.6);
+  box-shadow:
+    0 12px 48px rgba(189, 0, 255, 0.5),
+    0 0 80px rgba(189, 0, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* Ambient Background Gradient Flow */
+@keyframes syncra-flow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+[data-theme="night"] .bg-wave {
+  background: linear-gradient(120deg,
+    rgba(189, 0, 255, 0.1) 0%,
+    rgba(232, 64, 255, 0.08) 25%,
+    rgba(255, 100, 150, 0.06) 50%,
+    rgba(0, 217, 255, 0.08) 75%,
+    rgba(189, 0, 255, 0.1) 100%
+  );
+  background-size: 200% 200%;
+  animation: syncra-flow 15s ease infinite;
+  opacity: 0.6;
+}

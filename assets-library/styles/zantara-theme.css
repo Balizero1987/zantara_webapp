@@ -1,0 +1,83 @@
+/* ZANTARA Syncra-Inspired Theme (Glass Morphism Purple) */
+:root {
+  --primary-gradient: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+  --purple-dark: #1E1B4B;
+  --purple-base: #8B5CF6;
+  --purple-light: #A78BFA;
+  --pink-accent: #EC4899;
+  --cyan-glow: #06B6D4;
+
+  --bg-primary: #0A0A0F;
+  --bg-secondary: rgba(30, 27, 75, 0.3);
+  --bg-glass: rgba(139, 92, 246, 0.1);
+  --bg-glass-hover: rgba(139, 92, 246, 0.15);
+
+  --text-primary: #F3F4F6;
+  --text-secondary: #9CA3AF;
+  --text-muted: #6B7280;
+
+  --glow-purple: 0 0 40px rgba(139, 92, 246, 0.4);
+  --glow-cyan: 0 0 30px rgba(6, 182, 212, 0.6);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  --focus-ring: 0 0 0 3px rgba(99, 102, 241, 0.35);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Animated Background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+  animation: backgroundPulse 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes backgroundPulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+
+.glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s var(--ease-smooth);
+}
+
+.glass-card:hover { background: var(--bg-glass-hover); transform: translateY(-2px); box-shadow: var(--glow-purple); }
+
+@keyframes lotusBloom {
+  0% { transform: scale(0.9) rotate(0deg); filter: brightness(0.8); }
+  50% { transform: scale(1.05) rotate(180deg); filter: brightness(1.2) drop-shadow(0 0 20px rgba(139, 92, 246, 0.8)); }
+  100% { transform: scale(1) rotate(360deg); filter: brightness(1); }
+}
+
+.lotus-logo { width: 48px; height: 48px; animation: lotusBloom 3s var(--ease-smooth) infinite; }
+.lotus-logo.thinking, .thinking { animation: lotusBloom 1s var(--ease-smooth) infinite; }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+a:focus-visible { outline: none; box-shadow: var(--z-focus, var(--focus-ring)); border-radius: 12px; }
+

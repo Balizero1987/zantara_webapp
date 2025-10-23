@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ZANTARA Quick Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #1e1e1e; color: #fff; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        input { padding: 10px; margin: 5px; width: 300px; }
+        #result { margin-top: 20px; padding: 20px; background: #2a2a2a; border-radius: 8px; }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+    </style>
+</head>
+<body>
+    <h1>🧪 ZANTARA Quick Test</h1>
+    
+    <h2>1. LOGIN</h2>
+    <input type="email" id="email" placeholder="zero@balizero.com" value="zero@balizero.com"><br>
+    <input type="password" id="pin" placeholder="010719" value="010719"><br>
+    <button onclick="testLogin()">LOGIN</button>
+    
+    <h2>2. CHAT</h2>
+    <input type="text" id="message" placeholder="Ciao Zantara!" value="Ciao! Chi sei?"><br>
+    <button onclick="testChat()">SEND MESSAGE</button>
+    
+    <h2>3. RESULTS</h2>
+    <div id="result"></div>
+    
+    <script>
+        const API_BASE = 'https://ts-backend-production-568d.up.railway.app';
+        const RAG_BASE = 'https://scintillating-kindness-production-47e3.up.railway.app';
+        
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const pin = document.getElementById('pin').value;
+            const result = document.getElementById('result');
+            
+            try {
+                result.innerHTML = '🔄 Logging in...';
+                
+                const response = await fetch(`${API_BASE}/team.login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, pin, name: 'Zero' })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Save to localStorage
+                    localStorage.setItem('zantara-auth-token', data.sessionId);
+                    localStorage.setItem('zantara-user', JSON.stringify(data.user));
+                    localStorage.setItem('zantara-user-email', data.user.email);
+                    localStorage.setItem('zantara-user-name', data.user.name);
+                    
+                    result.innerHTML = `<div class="success">
+                        ✅ LOGIN SUCCESS!<br>
+                        Name: ${data.user.name}<br>
+                        Email: ${data.user.email}<br>
+                        Role: ${data.user.role}<br>
+                        SessionId: ${data.sessionId}<br>
+                        <br>
+                        localStorage saved:<br>
+                        - zantara-auth-token: ${localStorage.getItem('zantara-auth-token')}<br>
+                        - zantara-user-name: ${localStorage.getItem('zantara-user-name')}
+                    </div>`;
+                } else {
+                    result.innerHTML = `<div class="error">❌ ${data.error}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+            }
+        }
+        
+        async function testChat() {
+            const message = document.getElementById('message').value;
+            const email = localStorage.getItem('zantara-user-email') || 'zero@balizero.com';
+            const result = document.getElementById('result');
+            
+            try {
+                result.innerHTML = '🔄 Sending message...';
+                
+                const response = await fetch(`${RAG_BASE}/bali-zero/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query: message,
+                        user_email: email,
+                        user_role: 'admin'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.innerHTML = `<div class="success">
+                        ✅ CHAT SUCCESS!<br><br>
+                        <strong>Zantara:</strong><br>
+                        ${data.response.substring(0, 500)}...<br><br>
+                        AI Used: ${data.ai_used}<br>
+                        Model: ${data.model_used}
+                    </div>`;
+                } else {
+                    result.innerHTML = `<div class="error">❌ Chat failed</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+            }
+        }
+        
+        // Auto-show localStorage on load
+        window.onload = () => {
+            const result = document.getElementById('result');
+            result.innerHTML = `<strong>Current localStorage:</strong><br>
+                - zantara-auth-token: ${localStorage.getItem('zantara-auth-token') || 'NOT SET'}<br>
+                - zantara-user-name: ${localStorage.getItem('zantara-user-name') || 'NOT SET'}<br>
+                - zantara-user-email: ${localStorage.getItem('zantara-user-email') || 'NOT SET'}`;
+        };
+    </script>
+</body>
+</html>
+

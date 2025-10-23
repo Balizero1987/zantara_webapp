@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zantara Bridge AI Command Center</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1 class="logo">
+                    <span class="logo-icon">⚡</span>
+                    ZANTARA AI OPS
+                </h1>
+                <div class="status-indicator">
+                    <span class="pulse-dot"></span>
+                    <span id="system-status">OPERATIONAL</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Uptime</span>
+                        <span class="stat-value" id="uptime">99.97%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">API Version</span>
+                        <span class="stat-value">v5.2.0</span>
+                    </div>
+                </div>
+                <button class="ai-assistant-btn">
+                    <span>🤖</span> AI Assistant
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Grid -->
+        <div class="dashboard-grid">
+
+            <!-- ChatGPT Monitor -->
+            <div class="card card-gpt-monitor">
+                <div class="card-header">
+                    <h2>🤖 ChatGPT Intelligence Hub</h2>
+                    <div class="card-controls">
+                        <span class="live-badge">LIVE</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="gpt-metrics">
+                        <div class="metric-box metric-conversations">
+                            <div class="metric-value" id="active-conversations">47</div>
+                            <div class="metric-label">Active Conversations</div>
+                            <div class="metric-trend trend-up">↑ 12%</div>
+                        </div>
+                        <div class="metric-box metric-actions">
+                            <div class="metric-value" id="actions-minute">124</div>
+                            <div class="metric-label">Actions/Min</div>
+                            <div class="metric-trend trend-up">↑ 8%</div>
+                        </div>
+                        <div class="metric-box metric-success">
+                            <div class="metric-value" id="success-rate">98.3%</div>
+                            <div class="metric-label">Success Rate</div>
+                            <div class="metric-trend trend-stable">→ 0%</div>
+                        </div>
+                    </div>
+                    <div class="action-heatmap">
+                        <h3>Top Actions (Last Hour)</h3>
+                        <div class="heatmap-grid" id="action-heatmap">
+                            <div class="heatmap-item hot" data-count="342">lead.save</div>
+                            <div class="heatmap-item warm" data-count="156">quote.generate</div>
+                            <div class="heatmap-item warm" data-count="98">contact.info</div>
+                            <div class="heatmap-item medium" data-count="67">visa.check</div>
+                            <div class="heatmap-item cool" data-count="34">company.setup</div>
+                            <div class="heatmap-item cool" data-count="12">document.process</div>
+                        </div>
+                    </div>
+                    <canvas id="conversation-flow-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- AI Predictions -->
+            <div class="card card-predictions">
+                <div class="card-header">
+                    <h2>🔮 AI Predictions & Anomalies</h2>
+                    <div class="card-controls">
+                        <button class="btn-icon" title="Configure">⚙️</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="prediction-alerts" id="prediction-alerts">
+                        <div class="alert-item alert-warning">
+                            <span class="alert-icon">⚠️</span>
+                            <div class="alert-content">
+                                <div class="alert-title">Traffic Spike Predicted</div>
+                                <div class="alert-desc">Expected 3x load in 45 minutes</div>
+                            </div>
+                            <button class="alert-action">Auto-Scale</button>
+                        </div>
+                        <div class="alert-item alert-info">
+                            <span class="alert-icon">💡</span>
+                            <div class="alert-content">
+                                <div class="alert-title">Pattern Detected</div>
+                                <div class="alert-desc">Visa queries increase 40% on Mondays</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="anomaly-detector">
+                        <canvas id="anomaly-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue Intelligence -->
+            <div class="card card-revenue">
+                <div class="card-header">
+                    <h2>💎 Revenue Intelligence</h2>
+                    <div class="time-selector">
+                        <button class="time-btn active">Today</button>
+                        <button class="time-btn">Week</button>
+                        <button class="time-btn">Month</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="revenue-summary">
+                        <div class="revenue-main">
+                            <div class="revenue-value">$12,847</div>
+                            <div class="revenue-change">+23.4% from yesterday</div>
+                        </div>
+                        <div class="revenue-breakdown">
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Visa Services</span>
+                                <div class="breakdown-bar">
+                                    <div class="bar-fill" style="width: 65%"></div>
+                                </div>
+                                <span class="breakdown-value">$8,350</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Company Setup</span>
+                                <div class="breakdown-bar">
+                                    <div class="bar-fill" style="width: 25%"></div>
+                                </div>
+                                <span class="breakdown-value">$3,212</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Consulting</span>
+                                <div class="breakdown-bar">
+                                    <div class="bar-fill" style="width: 10%"></div>
+                                </div>
+                                <span class="breakdown-value">$1,285</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ai-insights">
+                        <h3>🧠 AI Insights</h3>
+                        <ul class="insights-list">
+                            <li>📈 Visa revenue up 45% after ChatGPT integration</li>
+                            <li>🎯 Best conversion: Leads from WhatsApp (68%)</li>
+                            <li>💡 Recommended: Increase C2 visa pricing by 15%</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Matrix -->
+            <div class="card card-performance">
+                <div class="card-header">
+                    <h2>⚡ Performance Matrix</h2>
+                </div>
+                <div class="card-body">
+                    <div class="performance-grid">
+                        <div class="perf-item">
+                            <div class="perf-label">API Latency</div>
+                            <div class="perf-value">42ms</div>
+                            <div class="perf-bar">
+                                <div class="bar-progress" style="width: 15%"></div>
+                            </div>
+                        </div>
+                        <div class="perf-item">
+                            <div class="perf-label">Cache Hit Rate</div>
+                            <div class="perf-value">94.2%</div>
+                            <div class="perf-bar">
+                                <div class="bar-progress" style="width: 94%"></div>
+                            </div>
+                        </div>
+                        <div class="perf-item">
+                            <div class="perf-label">Error Rate</div>
+                            <div class="perf-value">0.03%</div>
+                            <div class="perf-bar error">
+                                <div class="bar-progress" style="width: 3%"></div>
+                            </div>
+                        </div>
+                        <div class="perf-item">
+                            <div class="perf-label">CPU Usage</div>
+                            <div class="perf-value">38%</div>
+                            <div class="perf-bar">
+                                <div class="bar-progress" style="width: 38%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <canvas id="performance-timeline"></canvas>
+                </div>
+            </div>
+
+            <!-- Live Feed -->
+            <div class="card card-live-feed">
+                <div class="card-header">
+                    <h2>📡 Live Activity Stream</h2>
+                    <button class="btn-pause" id="pause-feed">⏸️</button>
+                </div>
+                <div class="card-body">
+                    <div class="activity-feed" id="activity-feed">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Health -->
+            <div class="card card-health">
+                <div class="card-header">
+                    <h2>🛸 System Health</h2>
+                </div>
+                <div class="card-body">
+                    <div class="health-grid">
+                        <div class="health-item healthy">
+                            <span class="health-icon">✅</span>
+                            <span class="health-name">ChatGPT API</span>
+                            <span class="health-status">Healthy</span>
+                        </div>
+                        <div class="health-item healthy">
+                            <span class="health-icon">✅</span>
+                            <span class="health-name">Firebase</span>
+                            <span class="health-status">Healthy</span>
+                        </div>
+                        <div class="health-item healthy">
+                            <span class="health-icon">✅</span>
+                            <span class="health-name">Google Drive</span>
+                            <span class="health-status">Healthy</span>
+                        </div>
+                        <div class="health-item warning">
+                            <span class="health-icon">⚠️</span>
+                            <span class="health-name">Redis Cache</span>
+                            <span class="health-status">High Load</span>
+                        </div>
+                        <div class="health-item healthy">
+                            <span class="health-icon">✅</span>
+                            <span class="health-name">OAuth Service</span>
+                            <span class="health-status">Healthy</span>
+                        </div>
+                        <div class="health-item healthy">
+                            <span class="health-icon">✅</span>
+                            <span class="health-name">Webhook Server</span>
+                            <span class="health-status">Healthy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Assistant Modal -->
+        <div class="ai-assistant-modal" id="ai-assistant-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>🤖 Zantara AI Assistant</h3>
+                    <button class="modal-close" onclick="closeAIAssistant()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chat-messages"></div>
+                        <div class="chat-input">
+                            <input type="text" id="ai-input" placeholder="Ask me anything about your system...">
+                            <button onclick="sendAIMessage()">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

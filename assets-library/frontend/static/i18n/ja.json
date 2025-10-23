@@ -1,0 +1,33 @@
+{
+  "app_title": "ZANTARA - インテリジェントアシスタント",
+  "header_title": "ZANTARA Intelligence",
+  "header_subtitle": "知識、カレンダー、メール、地図などにアクセスできるAIアシスタント",
+
+  "welcome_greeting": "👋 こんにちは！私はZANTARA、あなたのインテリジェントアシスタントです。",
+  "welcome_can_help": "お手伝いできること：",
+  "welcome_visas": "📚 ビザと移民に関する情報",
+  "welcome_calendar": "📅 カレンダーとメールの管理",
+  "welcome_maps": "🗺️ 場所と道順を検索",
+  "welcome_memory": "💾 設定を保存",
+  "welcome_chat": "🤖 あらゆるトピックについての会話",
+  "welcome_question": "何かお手伝いできることはありますか？",
+
+  "suggestion_visa": "ゴールデンビザの要件は何ですか？",
+  "suggestion_calendar": "今後のカレンダーイベントを表示",
+  "suggestion_restaurant": "ウブドのレストランを検索",
+  "suggestion_email": "最新のメールを表示",
+
+  "input_placeholder": "自然言語でメッセージを入力してください...",
+  "send_button": "送信",
+  "thinking": "考え中...",
+
+  "error_connection": "接続エラー",
+  "error_unknown": "不明なエラー",
+  "error_occurred": "エラーが発生しました",
+
+  "sources_prefix": "📚 情報源：",
+  "sources_documents": "参照されたドキュメント",
+
+  "language": "言語",
+  "select_language": "言語を選択"
+}

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZANTARA - Bali Zero AI Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 900px;
+            height: 600px;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            background: #2d3748;
+            width: 250px;
+            padding: 30px 20px;
+            color: white;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .subtitle {
+            color: #a0aec0;
+            font-size: 12px;
+            margin-bottom: 30px;
+        }
+
+        .user-selector {
+            margin-bottom: 30px;
+        }
+
+        .user-selector label {
+            display: block;
+            margin-bottom: 10px;
+            color: #a0aec0;
+            font-size: 14px;
+        }
+
+        .user-selector select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #4a5568;
+            background: #374151;
+            color: white;
+            font-size: 14px;
+        }
+
+        .stats {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #4a5568;
+        }
+
+        .stat-item {
+            margin-bottom: 15px;
+        }
+
+        .stat-label {
+            color: #a0aec0;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f7fafc;
+        }
+
+        .chat-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .chat-status {
+            font-size: 12px;
+            color: #48bb78;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #48bb78;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .messages {
+            flex: 1;
+            padding: 20px 30px;
+            overflow-y: auto;
+            background: #ffffff;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .message.zantara .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .message.user .message-avatar {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.4;
+        }
+
+        .message.zantara .message-content {
+            background: #f7fafc;
+            color: #2d3748;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #a0aec0;
+            margin-top: 5px;
+        }
+
+        .input-area {
+            padding: 20px 30px;
+            border-top: 1px solid #e2e8f0;
+            background: #f7fafc;
+        }
+
+        .input-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 12px 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .send-button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .send-button:hover {
+            transform: scale(1.05);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px 20px;
+            color: #718096;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .info-message {
+            background: #bee3f8;
+            color: #2c5282;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">🤖</div>
+                <span>ZANTARA</span>
+            </div>
+            <div class="subtitle">Bali Zero AI Assistant</div>
+
+            <div class="user-selector">
+                <label>Identify Yourself:</label>
+                <select id="userSelect" onchange="identifyUser()">
+                    <option value="">Select user...</option>
+                    <option value="zero">Zero (Antonello)</option>
+                    <option value="amanda">Amanda</option>
+                    <option value="zainal">Zainal</option>
+                    <option value="angel">Angel</option>
+                    <option value="vino">Vino</option>
+                    <option value="krisna">Krisna</option>
+                    <option value="ruslana">Ruslana</option>
+                    <option value="test">Test User</option>
+                </select>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-label">Messages Today</div>
+                    <div class="stat-value" id="messageCount">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Response Time</div>
+                    <div class="stat-value" id="responseTime">0ms</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Server Status</div>
+                    <div class="stat-value" id="serverStatus">🟢 Online</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-area">
+            <div class="chat-header">
+                <div class="chat-title">ZANTARA Chat Interface</div>
+                <div class="chat-status">
+                    <span class="status-dot"></span>
+                    <span id="connectionStatus">Connected to local server</span>
+                </div>
+            </div>
+
+            <div class="messages" id="messages">
+                <div class="info-message">
+                    👋 Welcome! Please select your user from the sidebar to start chatting with ZANTARA.
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                ZANTARA is typing...
+            </div>
+
+            <div class="input-area">
+                <form class="input-form" onsubmit="sendMessage(event)">
+                    <input
+                        type="text"
+                        id="messageInput"
+                        class="input-field"
+                        placeholder="Type your message here..."
+                        disabled
+                    >
+                    <button type="submit" class="send-button" id="sendButton" disabled>
+                        Send
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'http://localhost:8080/call';
+        const API_KEY = 'zantara-internal-dev-key-2025';
+
+        let currentUser = null;
+        let messageCounter = 0;
+
+        // Check server connection on load
+        window.onload = async function() {
+            await checkServerConnection();
+        };
+
+        async function checkServerConnection() {
+            try {
+                const response = await fetch('http://localhost:8080/health');
+                if (response.ok) {
+                    document.getElementById('serverStatus').innerHTML = '🟢 Online';
+                    document.getElementById('connectionStatus').textContent = 'Connected to local server';
+                } else {
+                    document.getElementById('serverStatus').innerHTML = '🔴 Offline';
+                    document.getElementById('connectionStatus').textContent = 'Server not responding';
+                }
+            } catch (error) {
+                document.getElementById('serverStatus').innerHTML = '🔴 Offline';
+                document.getElementById('connectionStatus').textContent = 'Cannot connect to server';
+                addSystemMessage('⚠️ Cannot connect to ZANTARA server. Make sure the server is running on port 8080.', 'error');
+            }
+        }
+
+        function identifyUser() {
+            const select = document.getElementById('userSelect');
+            currentUser = select.value;
+
+            if (currentUser) {
+                // Enable chat
+                document.getElementById('messageInput').disabled = false;
+                document.getElementById('sendButton').disabled = false;
+
+                // Clear messages
+                document.getElementById('messages').innerHTML = '';
+
+                // Load user memory
+                loadUserMemory();
+
+                // Welcome message
+                addSystemMessage(`✅ Identified as ${currentUser}. Loading your profile...`, 'info');
+            } else {
+                // Disable chat
+                document.getElementById('messageInput').disabled = true;
+                document.getElementById('sendButton').disabled = true;
+
+                addSystemMessage('Please select a user to continue.', 'info');
+            }
+        }
+
+        async function loadUserMemory() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        key: 'user.memory.retrieve',
+                        params: {
+                            userId: currentUser
+                        }
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.ok && data.result.exists) {
+                    const profile = data.result.profile;
+                    addZantaraMessage(`Welcome back ${currentUser}! ${profile.summary || 'Ready to assist you.'}`);
+                } else {
+                    addZantaraMessage(`Hello ${currentUser}! This is your first time using ZANTARA. How can I help you today?`);
+                }
+            } catch (error) {
+                console.error('Error loading user memory:', error);
+                addZantaraMessage(`Hello ${currentUser}! How can I assist you today?`);
+            }
+        }
+
+        async function sendMessage(event) {
+            event.preventDefault();
+
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+
+            if (!message || !currentUser) return;
+
+            // Clear input
+            input.value = '';
+
+            // Add user message
+            addUserMessage(message);
+
+            // Show typing indicator
+            document.getElementById('typingIndicator').classList.add('active');
+
+            // Record start time
+            const startTime = Date.now();
+
+            try {
+                // Call ZANTARA API
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        key: 'ai.chat',
+                        params: {
+                            message: message,
+                            userId: currentUser
+                        }
+                    })
+                });
+
+                const data = await response.json();
+
+                // Calculate response time
+                const responseTime = Date.now() - startTime;
+                document.getElementById('responseTime').textContent = `${responseTime}ms`;
+
+                // Hide typing indicator
+                document.getElementById('typingIndicator').classList.remove('active');
+
+                if (data.ok && data.result) {
+                    addZantaraMessage(data.result.response || data.result.message || 'Received response but no message content.');
+                } else {
+                    addZantaraMessage('Sorry, I encountered an error processing your request. Please try again.');
+                }
+
+                // Update message counter
+                messageCounter++;
+                document.getElementById('messageCount').textContent = messageCounter;
+
+            } catch (error) {
+                console.error('Error calling ZANTARA:', error);
+                document.getElementById('typingIndicator').classList.remove('active');
+                addZantaraMessage('Sorry, I cannot connect to the server. Please check if ZANTARA is running.');
+            }
+        }
+
+        function addUserMessage(text) {
+            const messagesDiv = document.getElementById('messages');
+            const messageHtml = `
+                <div class="message user">
+                    <div class="message-avatar">${currentUser ? currentUser[0].toUpperCase() : 'U'}</div>
+                    <div class="message-content">
+                        ${text}
+                        <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                    </div>
+                </div>
+            `;
+            messagesDiv.insertAdjacentHTML('beforeend', messageHtml);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function addZantaraMessage(text) {
+            const messagesDiv = document.getElementById('messages');
+            const messageHtml = `
+                <div class="message zantara">
+                    <div class="message-avatar">Z</div>
+                    <div class="message-content">
+                        ${text}
+                        <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                    </div>
+                </div>
+            `;
+            messagesDiv.insertAdjacentHTML('beforeend', messageHtml);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function addSystemMessage(text, type = 'info') {
+            const messagesDiv = document.getElementById('messages');
+            const className = type === 'error' ? 'error-message' : 'info-message';
+            const messageHtml = `<div class="${className}">${text}</div>`;
+            messagesDiv.insertAdjacentHTML('beforeend', messageHtml);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // Auto-refresh server status every 30 seconds
+        setInterval(checkServerConnection, 30000);
+    </script>
+</body>
+</html>
