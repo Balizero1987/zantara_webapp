@@ -40,7 +40,20 @@ class SecureTeamLogin {
         this.token = data.sessionId;  // Use sessionId as token
         this.currentUser = data.user;
 
-        // Use unified storage manager (auto-save enabled)
+        // ALWAYS save to localStorage directly (critical for chat.html auth check)
+        localStorage.setItem('zantara-auth-token', this.token);
+        localStorage.setItem('zantara-user', JSON.stringify(this.currentUser));
+        localStorage.setItem('zantara-user-email', this.currentUser.email);
+        localStorage.setItem('zantara-user-name', this.currentUser.name);
+        localStorage.setItem('zantara-permissions', JSON.stringify(data.permissions || ['all']));
+        
+        console.log('✅ User data saved to localStorage:', {
+          token: this.token,
+          email: this.currentUser.email,
+          name: this.currentUser.name
+        });
+        
+        // Also use unified storage manager if available
         if (window.ZantaraStorage) {
           window.ZantaraStorage.setUser({
             email: this.currentUser.email,
@@ -53,12 +66,6 @@ class SecureTeamLogin {
             permissions: data.permissions || ['all'],
             language: this.currentUser.language || 'it'
           });
-        } else {
-          console.error('❌ ZantaraStorage not available! Using fallback.');
-          // Fallback to manual storage
-          localStorage.setItem('zantara-auth-token', this.token);
-          localStorage.setItem('zantara-user', JSON.stringify(this.currentUser));
-          localStorage.setItem('zantara-permissions', JSON.stringify(data.permissions || ['all']));
         }
 
         return {
