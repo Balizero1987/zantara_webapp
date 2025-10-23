@@ -16,12 +16,13 @@
   <script src="js/core/cache-manager.js?v=2025102104"></script>
   <script src="js/core/request-deduplicator.js?v=2025102104"></script>
   <script src="js/core/websocket-manager.js?v=2025102104"></script>
-  <script src="js/core/pwa-installer.js?v=2025102104"></script>
-  <script src="js/api-config.js?v=2025102104"></script>
-  <script src="js/sse-client.js?v=2025102104"></script>
-  <script src="js/storage-manager.js?v=2025102104"></script>
+  <script src="js/api-config-unified.js?v=2025102104"></script>
+  <script src="js/chat-input-fix.js?v=2025102104"></script>
+  <script src="js/send-message-updated.js?v=2025102104"></script>
+  <script src="js/jwt-login.js?v=2025102104"></script>
+  <script src="js/zantara-knowledge.js?v=2025102104"></script>
+  <script src="js/auto-login-demo.js?v=2025102104"></script>
   <script src="js/team-login.js?v=2025102104"></script>
-  <script src="js/conversation-persistence.js?v=2025102104"></script>
   <link rel="stylesheet" href="styles/design-tokens.css">
   <link rel="stylesheet" href="styles/chat.css">
   <link rel="stylesheet" href="styles/message-formatter.css">
@@ -34,6 +35,7 @@
   <script src="js/user-badges.js"></script>
   <script src="js/chat-enhancements.js"></script>
   <script src="js/zero-intelligent-analytics.js"></script>
+  <script src="js/zantara-thinking-indicator.js?v=2025102104"></script>
 
   <!-- 🔒 AUTH GUARD - Redirect to login if not authenticated -->
   <script>
@@ -698,8 +700,18 @@
       const aiMsg = document.createElement('div');
       aiMsg.className = 'ai-message streaming';
       aiMsg.id = 'streaming-msg';
-      aiMsg.textContent = '⏳ Zantara is thinking...';
       messagesDiv.appendChild(aiMsg);
+
+      // 🎨 NEW: Use elegant thinking indicator (ChatGPT/Claude style)
+      let thinkingIndicator = null;
+      if (window.ZantaraThinkingIndicator) {
+        thinkingIndicator = new window.ZantaraThinkingIndicator(aiMsg);
+        thinkingIndicator.start();
+      } else {
+        // Fallback to simple text if script not loaded
+        aiMsg.textContent = '⏳ Zantara is thinking...';
+      }
+
       scrollToBottom();
 
       try {
@@ -725,7 +737,12 @@
         window.ZANTARA_SSE
           .on('start', () => {
             console.log('🌊 [SSE Stream] Connected');
-            aiMsg.textContent = '';  // Clear "thinking" message
+            // Stop thinking animation and clear message
+            if (thinkingIndicator) {
+              thinkingIndicator.stop();
+            }
+            aiMsg.innerHTML = '';  // Clear thinking indicator
+            aiMsg.className = 'ai-message streaming';  // Reset class
           })
           .on('delta', ({chunk, message}) => {
             // ⚡ PERFORMANCE: Show plain text during streaming (fast!)
@@ -807,25 +824,34 @@
     }
 
     // Send on button click
-    sendBtn.addEventListener('click', sendMessage);
+    sendBtn.addEventListener('click', sendMessageUpdated);
 
-    // Send on Enter key (using keydown for better compatibility)
+    // Send on Enter key (ULTRA-ROBUST implementation)
+    // Using capture phase to intercept before any other handlers
     inputField.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault(); // Prevent default behavior
+        e.stopPropagation(); // Stop event bubbling
+        e.stopImmediatePropagation(); // Stop ALL other handlers
         console.log('✅ [Enter Key] Detected - sending message');
-        sendMessage();
+        
+        // Execute sendMessageUpdated in next tick to avoid conflicts
+        setTimeout(() => sendMessageUpdated(), 0);
+        return false;
       }
-    });
+    }, true); // TRUE = capture phase (runs FIRST)
 
     // Fallback for keypress event (in case keydown doesn't work on some browsers)
     inputField.addEventListener('keypress', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
         console.log('✅ [Enter Key Fallback] Detected via keypress - sending message');
-        sendMessage();
+        setTimeout(() => sendMessageUpdated(), 0);
+        return false;
       }
-    });
+    }, true); // TRUE = capture phase
 
     // 🎨 IMAGE GENERATION - Imagine.art Integration
     imageGenBtn.addEventListener('click', () => {
@@ -885,12 +911,28 @@
         clearInterval(progressInterval);
         progressBar.style.width = '100%';
 
+        // Get response text first for better error handling
+        const responseText = await response.text();
+        console.log('🔍 Raw response:', responseText);
+
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          let errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+          try {
+            const errorData = JSON.parse(responseText);
+            if (errorData.error) {
+              errorMsg += ` - ${errorData.error}`;
+            }
+          } catch (e) {
+            // If not JSON, use text
+            if (responseText) {
+              errorMsg += ` - ${responseText.substring(0, 200)}`;
+            }
+          }
+          throw new Error(errorMsg);
         }
 
-        const result = await response.json();
-        console.log('✅ Image generated:', result);
+        const result = JSON.parse(responseText);
+        console.log('✅ Image generation response:', result);
 
         // Backend returns: {ok: true, data: {image_url: "..."}}
         if (result.ok && result.data && result.data.image_url) {
@@ -905,13 +947,26 @@
           window._generatedImagePrompt = prompt;
         } else {
           console.error('❌ Invalid response structure:', result);
-          throw new Error('No image URL in response');
+          const errDetail = result.error || result.message || 'No image URL in response';
+          throw new Error(errDetail);
         }
       } catch (error) {
         console.error('❌ Image generation failed:', error);
         clearInterval(progressInterval);
-        alert('Failed to generate image: ' + error.message);
         document.getElementById('imageGenProgress').style.display = 'none';
+        
+        // Show user-friendly error message
+        const errorContainer = document.createElement('div');
+        errorContainer.style.cssText = 'color: #ef4444; padding: 15px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; margin: 10px 0;';
+        errorContainer.innerHTML = `
+          <strong>⚠️ Image Generation Failed</strong><br>
+          ${error.message}<br>
+          <small>Please try again or contact support if the problem persists.</small>
+        `;
+        document.querySelector('#imageGenModal .modal-body').appendChild(errorContainer);
+        
+        // Remove error message after 5 seconds
+        setTimeout(() => errorContainer.remove(), 5000);
       } finally {
         document.getElementById('generateImageBtn').disabled = false;
       }

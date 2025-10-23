@@ -15,20 +15,18 @@ class SecureTeamLogin {
   /**
    * 🔐 Login with email + PIN
    */
-  async login(email, pin) {
+  async login(email, pin, name = '') {
     try {
-      const response = await fetch(`${this.apiBase}/call`, {
+      // Use direct team.login endpoint (no API key needed with demo auth)
+      const response = await fetch(`${this.apiBase}/team.login`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': this.apiKey
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          key: 'team.login.secure',
-          params: {
-            email: email,
-            pin: pin
-          }
+          email: email,
+          pin: pin,
+          name: name || email.split('@')[0]  // Use email username if name not provided
         })
       });
 
@@ -38,10 +36,10 @@ class SecureTeamLogin {
 
       const data = await response.json();
 
-      if (data.ok && data.data.success) {
-        // Store JWT token and user data
-        this.token = data.data.token;
-        this.currentUser = data.data.user;
+      if (data.success) {
+        // Store session and user data (new format from team.login)
+        this.token = data.sessionId;  // Use sessionId as token
+        this.currentUser = data.user;
 
         // Use unified storage manager (auto-save enabled)
         if (window.ZantaraStorage) {
@@ -53,21 +51,21 @@ class SecureTeamLogin {
             badge: this.currentUser.badge,
             id: this.currentUser.id,
             token: this.token,
-            permissions: data.data.permissions,
-            language: this.currentUser.language
+            permissions: data.permissions || ['all'],
+            language: this.currentUser.language || 'it'
           });
         } else {
           console.error('❌ ZantaraStorage not available! Using fallback.');
           // Fallback to manual storage
           localStorage.setItem('zantara-auth-token', this.token);
           localStorage.setItem('zantara-user', JSON.stringify(this.currentUser));
-          localStorage.setItem('zantara-permissions', JSON.stringify(data.data.permissions));
+          localStorage.setItem('zantara-permissions', JSON.stringify(data.permissions || ['all']));
         }
 
         return {
           success: true,
           user: this.currentUser,
-          message: data.data.message
+          message: data.personalizedResponse || 'Login successful'
         };
       } else {
         return {

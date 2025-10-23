@@ -160,6 +160,50 @@
             color: #666;
         }
 
+        .tier-filters {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .tier-filters .filter-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tier-filters label {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 12px;
+            font-size: 13px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tier-filters input[type="checkbox"] {
+            margin-right: 5px;
+            cursor: pointer;
+        }
+
+        .tier-filters .tier-label-t1 {
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        .tier-filters .tier-label-t2 {
+            color: #FFC107;
+            font-weight: 600;
+        }
+
+        .tier-filters .tier-label-t3 {
+            color: #9E9E9E;
+            font-weight: 600;
+        }
+
         .blog-articles {
             flex: 1;
             overflow-y: auto;
@@ -322,6 +366,21 @@
             <div class="blog-header">
                 <h2>📰 Daily Intel Blog</h2>
                 <p class="date" id="blogDate">Loading...</p>
+                <div class="tier-filters">
+                    <div class="filter-title">Filter by Quality</div>
+                    <label>
+                        <input type="checkbox" id="filterT1" checked onchange="filterArticles()">
+                        <span class="tier-label-t1">T1 Premium</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="filterT2" checked onchange="filterArticles()">
+                        <span class="tier-label-t2">T2 Good</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="filterT3" checked onchange="filterArticles()">
+                        <span class="tier-label-t3">T3 Standard</span>
+                    </label>
+                </div>
             </div>
 
             <div class="blog-articles" id="blogArticles">
@@ -422,15 +481,63 @@
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
 
+        // Global variable to store all articles
+        let allArticles = [];
+
+        // Filter articles by tier
+        function filterArticles() {
+            const showT1 = document.getElementById('filterT1').checked;
+            const showT2 = document.getElementById('filterT2').checked;
+            const showT3 = document.getElementById('filterT3').checked;
+
+            const blogArticlesDiv = document.getElementById('blogArticles');
+            blogArticlesDiv.innerHTML = '';
+
+            const filtered = allArticles.filter(article => {
+                if (article.tier === 'T1' && !showT1) return false;
+                if (article.tier === 'T2' && !showT2) return false;
+                if (article.tier === 'T3' && !showT3) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                blogArticlesDiv.innerHTML = `
+                    <div class="empty-state">
+                        <p>No articles match the selected filters</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(article => {
+                const articleEl = document.createElement('div');
+                articleEl.className = 'blog-article';
+                articleEl.onclick = () => openArticle(article);
+
+                articleEl.innerHTML = `
+                    ${article.image_url ? `<img src="${article.image_url}" alt="${article.title}">` : ''}
+                    <span class="category">${article.category}</span>
+                    <h3>${article.title}</h3>
+                    <p class="summary">${article.summary}</p>
+                    <div class="meta">
+                        <span class="tier tier-${article.tier.replace('T', '')}">Tier ${article.tier}</span>
+                        <span>${article.source}</span>
+                    </div>
+                `;
+
+                blogArticlesDiv.appendChild(articleEl);
+            });
+        }
+
         // Load blog articles
         async function loadBlogArticles() {
             const blogArticlesDiv = document.getElementById('blogArticles');
 
             try {
                 // Fetch blog articles (mock data for now - replace with actual API)
-                const articles = await fetchBlogArticles();
+                allArticles = await fetchBlogArticles();
 
-                if (articles.length === 0) {
+                if (allArticles.length === 0) {
                     blogArticlesDiv.innerHTML = `
                         <div class="empty-state">
                             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -442,26 +549,8 @@
                     return;
                 }
 
-                blogArticlesDiv.innerHTML = '';
-
-                articles.forEach(article => {
-                    const articleEl = document.createElement('div');
-                    articleEl.className = 'blog-article';
-                    articleEl.onclick = () => openArticle(article);
-
-                    articleEl.innerHTML = `
-                        ${article.image_url ? `<img src="${article.image_url}" alt="${article.title}">` : ''}
-                        <span class="category">${article.category}</span>
-                        <h3>${article.title}</h3>
-                        <p class="summary">${article.summary}</p>
-                        <div class="meta">
-                            <span class="tier tier-${article.tier}">Tier ${article.tier}</span>
-                            <span>${article.source}</span>
-                        </div>
-                    `;
-
-                    blogArticlesDiv.appendChild(articleEl);
-                });
+                // Apply filters
+                filterArticles();
 
             } catch (error) {
                 console.error('Error loading blog articles:', error);
@@ -479,7 +568,7 @@
                     title: 'New E28A Investor Visa Processing Time Reduced',
                     summary: 'Kemenkumham announced a reduction in E28A processing time from 14 to 7 days, effective February 2025.',
                     image_url: 'https://via.placeholder.com/400x200/667eea/ffffff?text=Immigration+News',
-                    tier: '1',
+                    tier: 'T1',
                     source: 'Kemenkumham'
                 },
                 {
@@ -488,7 +577,7 @@
                     title: 'BPJS Health Insurance Fee Adjustments',
                     summary: 'New BPJS health insurance fees announced for 2025, affecting both local and expat workers in Bali.',
                     image_url: 'https://via.placeholder.com/400x200/764ba2/ffffff?text=Tax+Update',
-                    tier: '1',
+                    tier: 'T1',
                     source: 'Ditjen Pajak'
                 },
                 {
@@ -497,8 +586,17 @@
                     title: 'Bali Property Market Shows Strong Growth',
                     summary: 'Q4 2024 data reveals 23% increase in property transactions in Canggu and Ubud areas.',
                     image_url: 'https://via.placeholder.com/400x200/FFC107/333333?text=Real+Estate',
-                    tier: '2',
+                    tier: 'T2',
                     source: 'PropertyGuru'
+                },
+                {
+                    id: 4,
+                    category: 'Community',
+                    title: 'Reddit Users Share Bali Living Tips',
+                    summary: 'Popular thread on r/bali discusses best practices for expat life and local integration.',
+                    image_url: 'https://via.placeholder.com/400x200/9E9E9E/ffffff?text=Community',
+                    tier: 'T3',
+                    source: 'Reddit Bali'
                 }
             ];
         }
