@@ -55,12 +55,19 @@ const ZANTARA_API = {
   
   /**
    * Chat with Zantara (Haiku 4.5)
+   * Supports both regular and SSE streaming
    */
-  async chat(message, userEmail = null) {
+  async chat(message, userEmail = null, useSSE = false) {
     try {
       const email = userEmail || localStorage.getItem('zantara-email') || 'guest@zantara.com';
       const token = localStorage.getItem('zantara-token');
       
+      // If SSE requested and ZANTARA_SSE available, use streaming
+      if (useSSE && window.ZANTARA_SSE) {
+        return await window.ZANTARA_SSE.stream(message, email);
+      }
+      
+      // Otherwise use regular fetch
       // Build headers with JWT if available
       const headers = { 'Content-Type': 'application/json' };
       if (token) {
