@@ -7,20 +7,40 @@
  * - RAG-BACKEND: https://scintillating-kindness-production-47e3.up.railway.app
  * 
  * Auth: Demo auth middleware (no API key needed)
+ * Contracts: API versioning and fallback system
  */
 
 const ZANTARA_API = {
-  // Backend URLs
+  // Backend URLs (legacy - use API_CONTRACTS for new calls)
   backends: {
     ts: 'https://ts-backend-production-568d.up.railway.app',
     rag: 'https://scintillating-kindness-production-47e3.up.railway.app'
   },
   
   /**
-   * Team Login
+   * Team Login (with API Contracts fallback)
    */
   async teamLogin(email, pin, name) {
     try {
+      // Try with API Contracts first (resilient)
+      if (window.API_CONTRACTS) {
+        console.log('🔄 Using API Contracts for login...');
+        
+        const data = await window.API_CONTRACTS.callWithFallback('ts', '/team.login', {
+          method: 'POST',
+          body: JSON.stringify({ email, pin, name })
+        });
+        
+        if (data.success) {
+          this._saveLoginData(data);
+          return { success: true, user: data.user, message: data.personalizedResponse };
+        }
+        
+        return { success: false, error: 'Login failed' };
+      }
+      
+      // Fallback to direct call (legacy)
+      console.log('⚠️ Using legacy API call (no contracts)');
       const response = await fetch(`${this.backends.ts}/team.login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -34,15 +54,7 @@ const ZANTARA_API = {
       const data = await response.json();
       
       if (data.success) {
-        // Save to localStorage
-        localStorage.setItem('zantara-session', data.sessionId);
-        localStorage.setItem('zantara-token', data.token); // JWT token for API calls
-        localStorage.setItem('zantara-user', JSON.stringify(data.user));
-        localStorage.setItem('zantara-email', data.user.email);
-        localStorage.setItem('zantara-name', data.user.name);
-        
-        console.log('✅ Login successful:', data.user.name);
-        console.log('🔑 JWT Token saved');
+        this._saveLoginData(data);
         return { success: true, user: data.user, message: data.personalizedResponse };
       }
       
@@ -54,8 +66,22 @@ const ZANTARA_API = {
   },
   
   /**
+   * Save login data to localStorage
+   */
+  _saveLoginData(data) {
+    localStorage.setItem('zantara-session', data.sessionId);
+    localStorage.setItem('zantara-token', data.token); // JWT token for API calls
+    localStorage.setItem('zantara-user', JSON.stringify(data.user));
+    localStorage.setItem('zantara-email', data.user.email);
+    localStorage.setItem('zantara-name', data.user.name);
+    
+    console.log('✅ Login successful:', data.user.name);
+    console.log('🔑 JWT Token saved');
+  },
+  
+  /**
    * Chat with Zantara (Haiku 4.5)
-   * Supports both regular and SSE streaming
+   * Supports both regular and SSE streaming with API Contracts
    */
   async chat(message, userEmail = null, useSSE = false) {
     try {
@@ -67,8 +93,39 @@ const ZANTARA_API = {
         return await window.ZANTARA_SSE.stream(message, email);
       }
       
-      // Otherwise use regular fetch
-      // Build headers with JWT if available
+      // Try with API Contracts first (resilient)
+      if (window.API_CONTRACTS) {
+        console.log('🔄 Using API Contracts for chat...');
+        
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const data = await window.API_CONTRACTS.callWithFallback('rag', '/bali-zero/chat', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({
+            query: message,
+            user_email: email,
+            user_role: 'member'
+          })
+        });
+        
+        if (data.success) {
+          return {
+            success: true,
+            response: data.response,
+            model: data.model_used,
+            ai: data.ai_used
+          };
+        }
+        
+        return { success: false, error: 'Chat failed' };
+      }
+      
+      // Fallback to direct call (legacy)
+      console.log('⚠️ Using legacy API call (no contracts)');
       const headers = { 'Content-Type': 'application/json' };
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
