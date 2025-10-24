@@ -288,19 +288,46 @@
             sendBtn.innerHTML = '<div class="loading"></div>';
             
             try {
-                // Call Zantara
-                const result = await ZANTARA_API.chat(message);
+                // Check if SSE is available
+                const useSSE = window.ZANTARA_SSE ? true : false;
                 
-                if (result.success) {
-                    // Add AI response
+                if (useSSE) {
+                    // Use SSE streaming
                     const aiMsg = document.createElement('div');
                     aiMsg.className = 'message ai-message';
-                    aiMsg.innerHTML = `<strong>Zantara</strong>${result.response}`;
+                    aiMsg.innerHTML = '<strong>Zantara</strong>';
                     messagesDiv.appendChild(aiMsg);
                     
-                    console.log('✅ Response received from:', result.ai, result.model);
+                    // Setup SSE listeners
+                    window.ZANTARA_SSE
+                        .on('delta', (data) => {
+                            aiMsg.innerHTML = `<strong>Zantara</strong>${data.message}`;
+                            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                        })
+                        .on('complete', (data) => {
+                            console.log('✅ SSE streaming complete');
+                        })
+                        .on('error', (data) => {
+                            console.error('❌ SSE error:', data.error);
+                        });
+                    
+                    // Start streaming
+                    await window.ZANTARA_SSE.stream(message);
                 } else {
-                    throw new Error(result.error);
+                    // Fallback to regular fetch
+                    const result = await ZANTARA_API.chat(message);
+                    
+                    if (result.success) {
+                        // Add AI response
+                        const aiMsg = document.createElement('div');
+                        aiMsg.className = 'message ai-message';
+                        aiMsg.innerHTML = `<strong>Zantara</strong>${result.response}`;
+                        messagesDiv.appendChild(aiMsg);
+                        
+                        console.log('✅ Response received from:', result.ai, result.model);
+                    } else {
+                        throw new Error(result.error);
+                    }
                 }
             } catch (error) {
                 console.error('❌ Chat error:', error);
