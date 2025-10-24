@@ -36,11 +36,13 @@ const ZANTARA_API = {
       if (data.success) {
         // Save to localStorage
         localStorage.setItem('zantara-session', data.sessionId);
+        localStorage.setItem('zantara-token', data.token); // JWT token for API calls
         localStorage.setItem('zantara-user', JSON.stringify(data.user));
         localStorage.setItem('zantara-email', data.user.email);
         localStorage.setItem('zantara-name', data.user.name);
         
         console.log('✅ Login successful:', data.user.name);
+        console.log('🔑 JWT Token saved');
         return { success: true, user: data.user, message: data.personalizedResponse };
       }
       
@@ -57,10 +59,17 @@ const ZANTARA_API = {
   async chat(message, userEmail = null) {
     try {
       const email = userEmail || localStorage.getItem('zantara-email') || 'guest@zantara.com';
+      const token = localStorage.getItem('zantara-token');
+      
+      // Build headers with JWT if available
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
       
       const response = await fetch(`${this.backends.rag}/bali-zero/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
         body: JSON.stringify({
           query: message,
           user_email: email,
@@ -95,8 +104,9 @@ const ZANTARA_API = {
    */
   isLoggedIn() {
     const session = localStorage.getItem('zantara-session');
+    const token = localStorage.getItem('zantara-token');
     const user = localStorage.getItem('zantara-user');
-    return !!(session && user);
+    return !!(session && token && user);
   },
   
   /**
@@ -112,10 +122,18 @@ const ZANTARA_API = {
   },
   
   /**
+   * Get JWT token
+   */
+  getToken() {
+    return localStorage.getItem('zantara-token');
+  },
+  
+  /**
    * Logout
    */
   logout() {
     localStorage.removeItem('zantara-session');
+    localStorage.removeItem('zantara-token');
     localStorage.removeItem('zantara-user');
     localStorage.removeItem('zantara-email');
     localStorage.removeItem('zantara-name');
