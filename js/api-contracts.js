@@ -39,12 +39,12 @@ class APIContracts {
    * Get API endpoint with versioning
    */
   getEndpoint(backend, endpoint, version = null) {
-    const v = version || this.currentVersion;
     const baseUrl = this.backends[backend];
     
-    // For versioned endpoints
+    // FIXED: Backend doesn't use versioned endpoints
+    // Always use direct endpoint without versioning
     if (endpoint.startsWith('/')) {
-      return `${baseUrl}/${v}${endpoint}`;
+      return `${baseUrl}${endpoint}`;
     }
     
     // For legacy endpoints (no versioning)
