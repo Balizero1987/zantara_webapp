@@ -1,1 +1,2 @@
-window.ZANTARA_PROXY_BASE='https://zantara-v520-nuzantara-himaadsxua-ew.a.run.app';
+window.ZANTARA_PROXY_BASE='https://scintillating-kindness-production-47e3.up.railway.app';
+// Backend: Railway RAG (SSE streaming + full AI)
