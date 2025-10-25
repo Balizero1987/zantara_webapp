@@ -50,6 +50,16 @@ class ZantaraSSEClient {
     return this;
   }
 
+  // Clear all listeners for a specific event
+  removeAllListeners(event) {
+    if (event) {
+      this.listeners.delete(event);
+    } else {
+      this.listeners.clear();
+    }
+    return this;
+  }
+
   emit(event, data) {
     if (!this.listeners.has(event)) return;
     this.listeners.get(event).forEach(handler => {

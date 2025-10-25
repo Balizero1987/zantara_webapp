@@ -298,8 +298,14 @@
                     aiMsg.className = 'message ai-message';
                     aiMsg.innerHTML = '<strong>Zantara</strong>';
                     messagesDiv.appendChild(aiMsg);
-                    
-                    // Setup SSE listeners
+
+                    // CRITICAL FIX: Clear all previous listeners to prevent duplicates
+                    window.ZANTARA_SSE
+                        .removeAllListeners('delta')
+                        .removeAllListeners('complete')
+                        .removeAllListeners('error');
+
+                    // Setup SSE listeners (these will now be the ONLY listeners)
                     window.ZANTARA_SSE
                         .on('delta', (data) => {
                             // Format response with markdown-like styling
@@ -308,7 +314,7 @@
                                 .replace(/\*(.*?)\*/g, '<em>$1</em>')
                                 .replace(/• (.*?)(?=\n|$)/g, '• $1')
                                 .replace(/\n/g, '<br>');
-                            
+
                             aiMsg.innerHTML = `<strong>Zantara</strong>${formattedMessage}`;
                             messagesDiv.scrollTop = messagesDiv.scrollHeight;
                         })
@@ -318,7 +324,7 @@
                         .on('error', (data) => {
                             console.error('❌ SSE error:', data.error);
                         });
-                    
+
                     // Start streaming (FIX: pass user email explicitly)
                     const userEmail = localStorage.getItem('zantara-email');
                     await window.ZANTARA_SSE.stream(message, userEmail);
