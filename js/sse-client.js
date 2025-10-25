@@ -87,8 +87,8 @@ class ZantaraSSEClient {
       if (userEmail) {
         url.searchParams.append('user_email', userEmail);
       } else {
-        // Try to get from localStorage
-        const storedEmail = localStorage.getItem('zantara-user-email');
+        // Try to get from localStorage (FIX: use correct key 'zantara-email' not 'zantara-user-email')
+        const storedEmail = localStorage.getItem('zantara-email') || localStorage.getItem('zantara-user-email');
         if (storedEmail && storedEmail !== 'undefined' && storedEmail !== 'null') {
           url.searchParams.append('user_email', storedEmail);
         }
