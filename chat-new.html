@@ -95,10 +95,43 @@
             align-self: flex-start;
         }
 
-        .ai-message strong {
+        .ai-message .ai-label {
             color: #10b981;
-            display: block;
+            font-weight: 600;
             margin-bottom: 8px;
+            display: inline;
+        }
+
+        .ai-message .ai-content {
+            display: inline;
+        }
+
+        /* Ensure content text (including bold) stays WHITE, not green */
+        .ai-message .ai-content strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .ai-message .ai-content em {
+            color: #fff;
+        }
+
+        /* Thinking state */
+        .thinking-dots {
+            display: inline-block;
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+
+        .thinking-dots::after {
+            content: '...';
+            animation: thinking 1.4s infinite;
+        }
+
+        @keyframes thinking {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
         }
 
         /* INPUT AREA */
@@ -293,11 +326,20 @@
                 const useSSE = window.ZANTARA_SSE ? true : false;
                 
                 if (useSSE) {
-                    // Use SSE streaming
+                    // Use SSE streaming with premium UI/UX
                     const aiMsg = document.createElement('div');
                     aiMsg.className = 'message ai-message';
-                    aiMsg.innerHTML = '<strong>Zantara</strong>';
+
+                    // Create structure: Label (green) + Content (white)
+                    aiMsg.innerHTML = `
+                        <span class="ai-label">Zantara:</span>
+                        <span class="ai-content"><span class="thinking-dots"></span></span>
+                    `;
                     messagesDiv.appendChild(aiMsg);
+
+                    // Get content element for updates
+                    const contentEl = aiMsg.querySelector('.ai-content');
+                    let isFirstChunk = true;
 
                     // CRITICAL FIX: Clear all previous listeners to prevent duplicates
                     window.ZANTARA_SSE
@@ -308,14 +350,28 @@
                     // Setup SSE listeners (these will now be the ONLY listeners)
                     window.ZANTARA_SSE
                         .on('delta', (data) => {
+                            // Remove thinking dots on first chunk
+                            if (isFirstChunk) {
+                                isFirstChunk = false;
+                            }
+
                             // Format response with markdown-like styling
-                            const formattedMessage = data.message
+                            let formattedMessage = data.message
+                                // Bold text
                                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                // Italic text
                                 .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                // Bullet points
                                 .replace(/• (.*?)(?=\n|$)/g, '• $1')
+                                // Collapse multiple newlines (max 2)
+                                .replace(/\n{3,}/g, '\n\n')
+                                // Remove leading/trailing whitespace per line
+                                .split('\n').map(line => line.trim()).join('\n')
+                                // Convert newlines to breaks
                                 .replace(/\n/g, '<br>');
 
-                            aiMsg.innerHTML = `<strong>Zantara</strong>${formattedMessage}`;
+                            // Update ONLY content, label stays green
+                            contentEl.innerHTML = formattedMessage;
                             messagesDiv.scrollTop = messagesDiv.scrollHeight;
                         })
                         .on('complete', (data) => {
@@ -323,30 +379,43 @@
                         })
                         .on('error', (data) => {
                             console.error('❌ SSE error:', data.error);
+                            contentEl.innerHTML = '<em style="color: #ef4444;">Unable to respond. Try again.</em>';
                         });
 
                     // Start streaming (FIX: pass user email explicitly)
                     const userEmail = localStorage.getItem('zantara-email');
                     await window.ZANTARA_SSE.stream(message, userEmail);
                 } else {
-                    // Fallback to regular fetch
+                    // Fallback to regular fetch (same premium UI/UX)
                     const result = await ZANTARA_API.chat(message);
-                    
+
                     if (result.success) {
                         // Add AI response with formatting
                         const aiMsg = document.createElement('div');
                         aiMsg.className = 'message ai-message';
-                        
+
                         // Format response with markdown-like styling
-                        const formattedResponse = result.response
+                        let formattedResponse = result.response
+                            // Bold text
                             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            // Italic text
                             .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                            // Bullet points
                             .replace(/• (.*?)(?=\n|$)/g, '• $1')
+                            // Collapse multiple newlines (max 2)
+                            .replace(/\n{3,}/g, '\n\n')
+                            // Remove leading/trailing whitespace per line
+                            .split('\n').map(line => line.trim()).join('\n')
+                            // Convert newlines to breaks
                             .replace(/\n/g, '<br>');
-                        
-                        aiMsg.innerHTML = `<strong>Zantara</strong>${formattedResponse}`;
+
+                        // Same structure: Label (green) + Content (white)
+                        aiMsg.innerHTML = `
+                            <span class="ai-label">Zantara:</span>
+                            <span class="ai-content">${formattedResponse}</span>
+                        `;
                         messagesDiv.appendChild(aiMsg);
-                        
+
                         console.log('✅ Response received from:', result.ai, result.model);
                     } else {
                         throw new Error(result.error);
@@ -354,11 +423,14 @@
                 }
             } catch (error) {
                 console.error('❌ Chat error:', error);
-                
-                // Show error message
+
+                // Show error message (same premium UI/UX)
                 const errorMsg = document.createElement('div');
                 errorMsg.className = 'message ai-message';
-                errorMsg.innerHTML = `<strong>Errore</strong>Non riesco a rispondere. Riprova tra poco.`;
+                errorMsg.innerHTML = `
+                    <span class="ai-label">Zantara:</span>
+                    <span class="ai-content"><em style="color: #ef4444;">Unable to respond. Try again in a moment.</em></span>
+                `;
                 messagesDiv.appendChild(errorMsg);
             }
             
