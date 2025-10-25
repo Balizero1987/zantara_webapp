@@ -302,7 +302,14 @@
                     // Setup SSE listeners
                     window.ZANTARA_SSE
                         .on('delta', (data) => {
-                            aiMsg.innerHTML = `<strong>Zantara</strong>${data.message}`;
+                            // Format response with markdown-like styling
+                            const formattedMessage = data.message
+                                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                .replace(/• (.*?)(?=\n|$)/g, '• $1')
+                                .replace(/\n/g, '<br>');
+                            
+                            aiMsg.innerHTML = `<strong>Zantara</strong>${formattedMessage}`;
                             messagesDiv.scrollTop = messagesDiv.scrollHeight;
                         })
                         .on('complete', (data) => {
@@ -319,10 +326,18 @@
                     const result = await ZANTARA_API.chat(message);
                     
                     if (result.success) {
-                        // Add AI response
+                        // Add AI response with formatting
                         const aiMsg = document.createElement('div');
                         aiMsg.className = 'message ai-message';
-                        aiMsg.innerHTML = `<strong>Zantara</strong>${result.response}`;
+                        
+                        // Format response with markdown-like styling
+                        const formattedResponse = result.response
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                            .replace(/• (.*?)(?=\n|$)/g, '• $1')
+                            .replace(/\n/g, '<br>');
+                        
+                        aiMsg.innerHTML = `<strong>Zantara</strong>${formattedResponse}`;
                         messagesDiv.appendChild(aiMsg);
                         
                         console.log('✅ Response received from:', result.ai, result.model);
