@@ -319,8 +319,9 @@
                             console.error('❌ SSE error:', data.error);
                         });
                     
-                    // Start streaming
-                    await window.ZANTARA_SSE.stream(message);
+                    // Start streaming (FIX: pass user email explicitly)
+                    const userEmail = localStorage.getItem('zantara-email');
+                    await window.ZANTARA_SSE.stream(message, userEmail);
                 } else {
                     // Fallback to regular fetch
                     const result = await ZANTARA_API.chat(message);
