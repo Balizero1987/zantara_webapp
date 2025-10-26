@@ -250,20 +250,84 @@
             margin-left: 12px;
         }
 
-        .user-badge {
-            background: var(--off-white);
-            color: var(--black);
-            padding: 8px 20px;
-            border-radius: 24px;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
-            box-shadow: 0 0 20px rgba(245, 245, 245, 0.3);
+        /* Header Action Buttons */
+        .header-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
         }
 
-        .user-badge:hover {
+        .header-action-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .header-action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Price Calculator Button - Red */
+        #priceCalcBtn {
+            background: var(--red);
+            color: var(--off-white);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        #priceCalcBtn:hover {
+            background: #ff3333;
+        }
+
+        /* Export Button - White */
+        #exportBtn {
+            background: var(--off-white);
+            color: var(--black);
+            box-shadow: 0 0 20px rgba(245, 245, 245, 0.3);
+            padding: 0;
+            border-radius: 50%;
+        }
+
+        #exportBtn:hover {
             background: var(--gold);
-            transform: scale(1.05);
+        }
+
+        /* User Avatar Button - Red (or photo when uploaded) */
+        .user-avatar-btn {
+            background: var(--red);
+            color: var(--off-white);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-avatar-btn:hover {
+            background: #ff3333;
+        }
+
+        .user-avatar-btn.has-photo {
+            background: transparent;
+            padding: 0;
+        }
+
+        .user-avatar-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .user-avatar-btn .initials {
+            font-size: 18px;
+            font-weight: 700;
         }
 
         /* MESSAGES AREA */
@@ -1226,7 +1290,7 @@
         <!-- Conversation History Sidebar -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-title">Conversazioni</div>
+                <div class="sidebar-title">Chat</div>
                 <button class="new-chat-btn" id="newChatBtn">+ Nuova</button>
             </div>
             <div class="conversation-list" id="conversationList">
@@ -1246,9 +1310,13 @@
                     <span class="tagline">From Zero to <span class="infinity">Infinity ∞</span></span>
                     <img src="assets/zantara_logo_transparent.png" class="logo-zantara" alt="ZANTARA" onerror="this.style.display='none'">
                 </div>
-                <div style="display: flex; gap: 12px; align-items: center;">
-                    <button id="exportBtn" title="Export chat">📥 Export</button>
-                    <div class="user-badge" id="userBadge">Login</div>
+                <div class="header-actions">
+                    <button class="header-action-btn" id="priceCalcBtn" title="Price Calculator">💰</button>
+                    <button class="header-action-btn" id="exportBtn" title="Export chat">📥</button>
+                    <div class="header-action-btn user-avatar-btn" id="userAvatarBtn" title="Profile">
+                        <span class="initials">U</span>
+                        <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                    </div>
                 </div>
             </div>
 
@@ -1297,8 +1365,19 @@
         const user = ZANTARA_API.getUser();
         const userName = user ? user.name : 'User';
         if (user) {
-            document.getElementById('userBadge').textContent = userName;
-            console.log('✅ User loaded:', userName);
+            // Set user initials in avatar button
+            const initials = getUserInitials(userName);
+            document.querySelector('#userAvatarBtn .initials').textContent = initials;
+            console.log('✅ User loaded:', userName, '| Initials:', initials);
+
+            // Load saved avatar if exists
+            const savedAvatar = localStorage.getItem('zantara-avatar');
+            if (savedAvatar) {
+                const avatarBtn = document.getElementById('userAvatarBtn');
+                avatarBtn.classList.add('has-photo');
+                avatarBtn.innerHTML = `<img src="${savedAvatar}" alt="${userName}">
+                    <input type="file" id="avatarUpload" accept="image/*" style="display: none;">`;
+            }
         }
 
         // Helper: Format timestamp
@@ -1702,6 +1781,42 @@
                     sendMessage();
                 });
             });
+        });
+
+        // Price Calculator Button - Toggle existing pricing widget
+        document.getElementById('priceCalcBtn').addEventListener('click', () => {
+            const widget = document.querySelector('.pricing-calculator-widget');
+            if (widget) {
+                widget.classList.toggle('expanded');
+            }
+        });
+
+        // Avatar Upload Functionality
+        document.getElementById('userAvatarBtn').addEventListener('click', () => {
+            document.getElementById('avatarUpload').click();
+        });
+
+        document.getElementById('avatarUpload').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const avatarDataUrl = event.target.result;
+                    // Save to localStorage
+                    localStorage.setItem('zantara-avatar', avatarDataUrl);
+                    // Update UI
+                    const avatarBtn = document.getElementById('userAvatarBtn');
+                    avatarBtn.classList.add('has-photo');
+                    avatarBtn.innerHTML = `<img src="${avatarDataUrl}" alt="${userName}">
+                        <input type="file" id="avatarUpload" accept="image/*" style="display: none;">`;
+                    // Re-attach event listener
+                    document.getElementById('userAvatarBtn').addEventListener('click', () => {
+                        document.getElementById('avatarUpload').click();
+                    });
+                    document.getElementById('avatarUpload').addEventListener('change', arguments.callee);
+                };
+                reader.readAsDataURL(file);
+            }
         });
     </script>
 </body>
