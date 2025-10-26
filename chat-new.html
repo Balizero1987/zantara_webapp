@@ -89,10 +89,123 @@
 
         .app {
             display: flex;
-            flex-direction: column;
             height: 100vh;
             position: relative;
             z-index: 1;
+        }
+
+        /* CONVERSATION HISTORY SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: rgba(26, 31, 58, 0.95);
+            border-right: 1px solid var(--cream);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(232, 213, 183, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .new-chat-btn {
+            background: var(--red);
+            color: var(--black);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .new-chat-btn:hover {
+            background: var(--gold);
+            transform: scale(1.05);
+        }
+
+        .conversation-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .conversation-item {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .conversation-item:hover {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: var(--gold);
+        }
+
+        .conversation-item.active {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: var(--gold);
+        }
+
+        .conversation-title {
+            font-size: 13px;
+            color: var(--off-white);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .conversation-date {
+            font-size: 11px;
+            color: var(--cream);
+            opacity: 0.6;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--navy);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--gold);
+            color: var(--black);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         /* HEADER - Bali Zero Style */
@@ -162,35 +275,150 @@
         .messages {
             flex: 1;
             overflow-y: auto;
+            scroll-behavior: smooth;
             padding: 24px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 24px;
+            position: relative;
+            align-items: center;
+        }
+
+        .message-container {
+            width: 100%;
+            max-width: 700px;
+            display: flex;
+            gap: 12px;
             position: relative;
         }
 
+        .message-container:hover .message-actions {
+            opacity: 1;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .message-avatar.ai-avatar {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--cream) 100%);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .message-avatar.user-avatar {
+            background: linear-gradient(135deg, var(--red) 0%, #ff4444 100%);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            color: var(--black);
+            font-weight: 700;
+        }
+
+        .message-content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
         .message {
-            max-width: 80%;
-            padding: 14px 18px;
+            padding: 16px 20px;
             border-radius: 16px;
             line-height: 1.7;
             font-size: 15px;
+            position: relative;
         }
 
         .user-message {
             background: var(--red);
             color: var(--black);
-            align-self: flex-end;
-            margin-left: auto;
             font-weight: 500;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
         }
 
         .ai-message {
             background: var(--navy);
             color: var(--off-white);
-            align-self: flex-start;
             border: 1px solid rgba(232, 213, 183, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .message-timestamp {
+            font-size: 11px;
+            color: var(--cream);
+            opacity: 0.6;
+            font-weight: 400;
+        }
+
+        .message-actions {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .message-action-btn {
+            background: var(--navy);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .message-action-btn:hover {
+            background: var(--gold);
+            color: var(--black);
+            transform: scale(1.1);
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 6px;
+            padding: 16px 20px;
+            align-items: center;
+        }
+
+        .typing-indicator .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gold);
+            animation: typing-bounce 1.4s infinite;
+        }
+
+        .typing-indicator .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing-bounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.7;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
         }
 
         .ai-message .ai-label {
@@ -267,18 +495,26 @@
             border-top: 1px solid var(--cream);
             padding: 20px 24px;
             display: flex;
-            gap: 16px;
-            align-items: center;
+            gap: 12px;
+            align-items: flex-end;
             position: relative;
             z-index: 10;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
         }
 
         #chatInput {
-            flex: 1;
+            width: 100%;
             background: rgba(26, 31, 58, 0.5);
             border: 2px solid var(--cream);
             border-radius: 28px;
-            padding: 14px 24px;
+            padding: 14px 56px 14px 24px;
             color: var(--off-white);
             font-size: 15px;
             font-family: 'Inter', sans-serif;
@@ -299,9 +535,47 @@
             opacity: 0.5;
         }
 
+        .input-actions {
+            position: absolute;
+            right: 12px;
+            bottom: 14px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-action-btn {
+            background: transparent;
+            border: none;
+            color: var(--cream);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.2s;
+            font-size: 18px;
+        }
+
+        .input-action-btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--gold);
+        }
+
+        #voiceBtn.recording {
+            color: var(--red);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
         #sendBtn {
             background: var(--red);
-            color: var(--black);
+            color: var(--off-white);
             border: none;
             border-radius: 50%;
             width: 52px;
@@ -310,10 +584,11 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             transition: all 0.3s;
             box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            flex-shrink: 0;
         }
 
         #sendBtn:hover {
@@ -328,16 +603,48 @@
             box-shadow: none;
         }
 
+        #exportBtn {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 12px 20px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        #exportBtn:hover {
+            background: var(--gold);
+            color: var(--black);
+        }
+
         /* WELCOME MESSAGE - Bali Zero Style */
         .welcome {
             text-align: center;
             padding: 60px 24px;
             color: var(--cream);
+            max-width: 700px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .welcome h2 {
             font-family: 'Playfair Display', serif;
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
             margin-bottom: 16px;
             color: var(--gold);
@@ -348,6 +655,44 @@
             font-size: 16px;
             color: var(--cream);
             opacity: 0.8;
+            margin-bottom: 32px;
+        }
+
+        .suggested-questions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .suggested-question {
+            background: rgba(26, 31, 58, 0.6);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .suggested-question:hover {
+            background: rgba(26, 31, 58, 0.8);
+            border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+        }
+
+        .suggested-question-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--off-white);
+            margin-bottom: 6px;
+        }
+
+        .suggested-question-subtitle {
+            font-size: 12px;
+            color: var(--cream);
+            opacity: 0.7;
         }
 
         /* LOADING - Red Spinner */
@@ -430,37 +775,157 @@
 </head>
 <body>
     <div class="app">
-        <!-- Header - Bali Zero + ZANTARA Unified -->
-        <div class="header">
-            <div class="header-left">
-                <img src="assets/balizero-logo-3d.png" class="logo-balizero" alt="Bali Zero" onerror="this.style.display='none'">
-                <span class="tagline">From Zero to <span class="infinity">Infinity ∞</span></span>
-                <img src="assets/zantara_logo_transparent.png" class="logo-zantara" alt="ZANTARA" onerror="this.style.display='none'">
+        <!-- Conversation History Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Conversazioni</div>
+                <button class="new-chat-btn" id="newChatBtn">+ Nuova</button>
             </div>
-            <div class="user-badge" id="userBadge">Login</div>
-        </div>
-        
-        <!-- Messages -->
-        <div class="messages" id="messages">
-            <div class="welcome">
-                <h2>🪷 Benvenuto su Zantara</h2>
-                <p>L'anima intelligente di Bali Zero</p>
+            <div class="conversation-list" id="conversationList">
+                <!-- Conversations will be added here dynamically -->
             </div>
         </div>
-        
-        <!-- Input Area -->
-        <div class="input-area">
-            <textarea id="chatInput" placeholder="Scrivi un messaggio..." rows="1"></textarea>
-            <button id="sendBtn">→</button>
+
+        <!-- Sidebar Toggle Button -->
+        <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Header - Bali Zero + ZANTARA Unified -->
+            <div class="header">
+                <div class="header-left">
+                    <img src="assets/balizero-logo-3d.png" class="logo-balizero" alt="Bali Zero" onerror="this.style.display='none'">
+                    <span class="tagline">From Zero to <span class="infinity">Infinity ∞</span></span>
+                    <img src="assets/zantara_logo_transparent.png" class="logo-zantara" alt="ZANTARA" onerror="this.style.display='none'">
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <button id="exportBtn" title="Export chat">📥 Export</button>
+                    <div class="user-badge" id="userBadge">Login</div>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="messages" id="messages">
+                <div class="welcome">
+                    <h2>🪷 Benvenuto su Zantara</h2>
+                    <p>L'anima intelligente di Bali Zero</p>
+                    <div class="suggested-questions">
+                        <div class="suggested-question" data-question="Come posso ottenere una E23 Freelance KITAS?">
+                            <div class="suggested-question-title">📋 E23 Freelance KITAS</div>
+                            <div class="suggested-question-subtitle">Documenti, costi e timeline</div>
+                        </div>
+                        <div class="suggested-question" data-question="Quanto costa aprire una PT company in Indonesia?">
+                            <div class="suggested-question-title">🏢 PT Company Setup</div>
+                            <div class="suggested-question-subtitle">Costi e requisiti completi</div>
+                        </div>
+                        <div class="suggested-question" data-question="Quali sono le opzioni di visto per investitori?">
+                            <div class="suggested-question-title">💼 Visti Investitori</div>
+                            <div class="suggested-question-subtitle">E28A, E33A e confronto</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea id="chatInput" placeholder="Scrivi un messaggio..." rows="1"></textarea>
+                    <div class="input-actions">
+                        <button class="input-action-btn" id="voiceBtn" title="Voice input">🎤</button>
+                    </div>
+                </div>
+                <button id="sendBtn" title="Send message">✈️</button>
+            </div>
         </div>
     </div>
 
     <script>
+        // Global state
+        let conversationHistory = [];
+        let currentConversationId = Date.now().toString();
+        let isRecording = false;
+
         // Load user info
         const user = ZANTARA_API.getUser();
+        const userName = user ? user.name : 'User';
         if (user) {
-            document.getElementById('userBadge').textContent = user.name;
-            console.log('✅ User loaded:', user.name);
+            document.getElementById('userBadge').textContent = userName;
+            console.log('✅ User loaded:', userName);
+        }
+
+        // Helper: Format timestamp
+        function formatTimestamp(date = new Date()) {
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        // Helper: Get user initials
+        function getUserInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        // Helper: Create message container with avatar
+        function createMessageContainer(type, content, timestamp = new Date()) {
+            const container = document.createElement('div');
+            container.className = 'message-container';
+
+            const avatar = document.createElement('div');
+            avatar.className = `message-avatar ${type}-avatar`;
+            avatar.textContent = type === 'ai' ? '🤖' : getUserInitials(userName);
+
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'message-content-wrapper';
+
+            const message = document.createElement('div');
+            message.className = `message ${type}-message`;
+
+            if (type === 'ai') {
+                message.innerHTML = `<span class="ai-label">Zantara:</span><span class="ai-content">${content}</span>`;
+            } else {
+                message.textContent = content;
+            }
+
+            const timestampEl = document.createElement('div');
+            timestampEl.className = 'message-timestamp';
+            timestampEl.textContent = formatTimestamp(timestamp);
+
+            // Message actions (for AI messages)
+            if (type === 'ai') {
+                const actions = document.createElement('div');
+                actions.className = 'message-actions';
+                actions.innerHTML = `
+                    <button class="message-action-btn copy-btn" title="Copy">📋</button>
+                    <button class="message-action-btn regenerate-btn" title="Regenerate">🔄</button>
+                    <button class="message-action-btn share-btn" title="Share">🔗</button>
+                `;
+                message.appendChild(actions);
+
+                // Add click handlers
+                const copyBtn = actions.querySelector('.copy-btn');
+                copyBtn.addEventListener('click', () => copyMessage(message));
+            }
+
+            contentWrapper.appendChild(message);
+            contentWrapper.appendChild(timestampEl);
+
+            container.appendChild(avatar);
+            container.appendChild(contentWrapper);
+
+            return { container, message, contentWrapper };
+        }
+
+        // Copy message to clipboard
+        function copyMessage(messageEl) {
+            const content = messageEl.querySelector('.ai-content');
+            const text = content ? content.textContent : messageEl.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                // Visual feedback
+                const btn = messageEl.querySelector('.copy-btn');
+                const original = btn.textContent;
+                btn.textContent = '✅';
+                setTimeout(() => btn.textContent = original, 1500);
+            });
         }
 
         // Send message function
@@ -478,36 +943,35 @@
             // Remove welcome if present
             const welcome = messagesDiv.querySelector('.welcome');
             if (welcome) welcome.remove();
-            
-            // Add user message
-            const userMsg = document.createElement('div');
-            userMsg.className = 'message user-message';
-            userMsg.textContent = message;
-            messagesDiv.appendChild(userMsg);
-            
+
+            // Add user message with new structure
+            const { container: userContainer } = createMessageContainer('user', message);
+            messagesDiv.appendChild(userContainer);
+
+            // Save to conversation history
+            conversationHistory.push({ role: 'user', content: message, timestamp: new Date() });
+
             // Clear input
             input.value = '';
-            
+
             // Scroll to bottom
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            
+
             // Disable send button
             sendBtn.disabled = true;
             sendBtn.innerHTML = '<div class="loading"></div>';
-            
+
             try {
                 // Get user email
                 const userEmail = localStorage.getItem('zantara-email');
-                
-                // Use ZANTARA_SSE for streaming if available, otherwise fallback to regular API
+
+                // Use ZANTARA_SSE for streaming if available
                 if (window.ZANTARA_SSE && window.ZANTARA_SSE.stream) {
                     console.log('🌊 Using SSE streaming...');
-                    
-                    // Create AI message for streaming
-                    const aiMsg = document.createElement('div');
-                    aiMsg.className = 'message ai-message';
-                    aiMsg.innerHTML = '<span class="ai-label">Zantara:</span><span class="ai-content">⏳ Thinking...</span>';
-                    messagesDiv.appendChild(aiMsg);
+
+                    // Create AI message container with typing indicator
+                    const { container: aiContainer, message: aiMsg, contentWrapper } = createMessageContainer('ai', '<div class="typing-indicator"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>');
+                    messagesDiv.appendChild(aiContainer);
 
                     // Clean up old listeners to prevent duplicates (BEFORE setting new ones)
                     if (window.ZANTARA_SSE.removeAllListeners) {
@@ -682,6 +1146,109 @@
         document.getElementById('chatInput').addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // Sidebar toggle
+        document.getElementById('sidebarToggle').addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+        });
+
+        // Suggested questions click
+        document.querySelectorAll('.suggested-question').forEach(q => {
+            q.addEventListener('click', function() {
+                const question = this.dataset.question;
+                document.getElementById('chatInput').value = question;
+                sendMessage();
+            });
+        });
+
+        // Voice input (placeholder - requires Web Speech API)
+        document.getElementById('voiceBtn').addEventListener('click', function() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert('Voice input not supported in this browser');
+                return;
+            }
+
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'it-IT';
+            recognition.continuous = false;
+
+            this.classList.add('recording');
+            isRecording = true;
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('chatInput').value = transcript;
+                this.classList.remove('recording');
+                isRecording = false;
+            };
+
+            recognition.onerror = () => {
+                this.classList.remove('recording');
+                isRecording = false;
+            };
+
+            recognition.onend = () => {
+                this.classList.remove('recording');
+                isRecording = false;
+            };
+
+            recognition.start();
+        });
+
+        // Export chat
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            const messages = Array.from(document.querySelectorAll('.message-container')).map(container => {
+                const isUser = container.querySelector('.user-message');
+                const content = isUser
+                    ? container.querySelector('.user-message').textContent
+                    : container.querySelector('.ai-content').textContent;
+                const timestamp = container.querySelector('.message-timestamp').textContent;
+                return `[${timestamp}] ${isUser ? userName : 'Zantara'}: ${content}`;
+            }).join('\n\n');
+
+            const blob = new Blob([messages], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `zantara-chat-${currentConversationId}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // New chat button
+        document.getElementById('newChatBtn').addEventListener('click', () => {
+            conversationHistory = [];
+            currentConversationId = Date.now().toString();
+            document.getElementById('messages').innerHTML = `
+                <div class="welcome">
+                    <h2>🪷 Benvenuto su Zantara</h2>
+                    <p>L'anima intelligente di Bali Zero</p>
+                    <div class="suggested-questions">
+                        <div class="suggested-question" data-question="Come posso ottenere una E23 Freelance KITAS?">
+                            <div class="suggested-question-title">📋 E23 Freelance KITAS</div>
+                            <div class="suggested-question-subtitle">Documenti, costi e timeline</div>
+                        </div>
+                        <div class="suggested-question" data-question="Quanto costa aprire una PT company in Indonesia?">
+                            <div class="suggested-question-title">🏢 PT Company Setup</div>
+                            <div class="suggested-question-subtitle">Costi e requisiti completi</div>
+                        </div>
+                        <div class="suggested-question" data-question="Quali sono le opzioni di visto per investitori?">
+                            <div class="suggested-question-title">💼 Visti Investitori</div>
+                            <div class="suggested-question-subtitle">E28A, E33A e confronto</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            // Re-attach suggested question listeners
+            document.querySelectorAll('.suggested-question').forEach(q => {
+                q.addEventListener('click', function() {
+                    const question = this.dataset.question;
+                    document.getElementById('chatInput').value = question;
+                    sendMessage();
+                });
+            });
         });
     </script>
 </body>
