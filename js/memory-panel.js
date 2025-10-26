@@ -31,8 +31,10 @@ const MemoryPanel = (() => {
     
     // Add keyboard shortcut (Ctrl/Cmd + H)
     document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+      // Accept both 'h' and 'H' for cross-platform compatibility
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'h' || e.key === 'H')) {
         e.preventDefault();
+        console.log('[MemoryPanel] Keyboard shortcut triggered');
         toggle();
       }
     });
