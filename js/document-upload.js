@@ -85,7 +85,7 @@ const DocumentUpload = (() => {
             <div class="document-upload-content">
                 <div class="document-upload-header">
                     <h2>📄 Carica Documento</h2>
-                    <button class="close-btn" onclick="DocumentUpload.hide()">×</button>
+                    <button class="close-btn" id="docUploadCloseBtn" onclick="DocumentUpload.hide()">×</button>
                 </div>
 
                 <div class="document-upload-body">
