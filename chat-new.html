@@ -25,6 +25,7 @@
     <script src="js/pricing-calculator.js"></script>
     <script src="js/clarification-prompts.js"></script>
     <script src="js/memory-panel.js"></script>
+    <script src="js/image-creator.js"></script>
 
     <!-- Auth Guard -->
     <script>
@@ -1631,6 +1632,446 @@
         .memory-history-btn:hover {
             transform: translateY(-5px) scale(1.1);
             box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5);
+        }
+
+        /* ============================================
+           IMAGE CREATOR - Premium Feature
+           ============================================ */
+        .image-creator-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10001;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-creator-panel.active {
+            pointer-events: all;
+            opacity: 1;
+        }
+
+        .image-creator-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+        }
+
+        .image-creator-container {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 900px;
+            max-width: 95vw;
+            max-height: 90vh;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--black) 100%);
+            border: 3px solid var(--gold);
+            border-radius: 20px;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .image-creator-panel.active .image-creator-container {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .image-creator-header {
+            background: linear-gradient(135deg, var(--red) 0%, var(--navy) 100%);
+            padding: 25px;
+            border-bottom: 3px solid var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .image-creator-header h2 {
+            flex: 1;
+            color: var(--gold);
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .image-creator-badge {
+            background: var(--gold);
+            color: var(--black);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .image-creator-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--gold);
+            color: var(--cream);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .image-creator-close:hover {
+            background: var(--red);
+            transform: rotate(90deg);
+        }
+
+        .image-creator-input-section {
+            padding: 30px;
+        }
+
+        .image-creator-input-section label {
+            display: block;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .image-prompt-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--gold);
+            border-radius: 10px;
+            padding: 15px;
+            color: var(--cream);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+
+        .image-prompt-input:focus {
+            outline: none;
+            border-color: var(--red);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .image-style-presets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .style-preset-btn {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--black) 100%);
+            border: 2px solid var(--gold);
+            color: var(--cream);
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .style-preset-btn:hover,
+        .style-preset-btn.active {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--navy) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .image-advanced-options {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid var(--gold);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .image-advanced-options summary {
+            color: var(--gold);
+            font-weight: 600;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .image-advanced-options summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .advanced-options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .option-group label {
+            display: block;
+            color: var(--cream);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .option-group select,
+        .option-group input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            color: var(--cream);
+            font-size: 0.95rem;
+        }
+
+        .image-generate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--red) 0%, var(--gold) 100%);
+            border: none;
+            color: white;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .image-generate-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5);
+        }
+
+        .image-generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .image-creator-result {
+            padding: 30px;
+            min-height: 300px;
+        }
+
+        .image-result-placeholder {
+            text-align: center;
+            color: var(--cream);
+            opacity: 0.5;
+            padding: 80px 20px;
+            font-size: 1.2rem;
+        }
+
+        .image-generating {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .image-generating .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(212, 175, 55, 0.2);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .image-generating p {
+            color: var(--gold);
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+
+        .generating-detail {
+            color: var(--cream);
+            opacity: 0.7;
+            font-size: 0.9rem !important;
+        }
+
+        .generated-image {
+            width: 100%;
+            border-radius: 15px;
+            border: 3px solid var(--gold);
+            margin: 20px 0;
+        }
+
+        .image-metadata {
+            color: var(--cream);
+            font-size: 0.9rem;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .image-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 150px;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--black) 100%);
+            border: 2px solid var(--gold);
+            color: var(--cream);
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--navy) 100%);
+            transform: translateY(-2px);
+        }
+
+        .image-error {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .image-error p {
+            color: var(--red);
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+
+        .error-detail {
+            color: var(--cream);
+            opacity: 0.7;
+            font-size: 0.9rem !important;
+        }
+
+        .retry-btn {
+            background: var(--red);
+            border: 2px solid var(--gold);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        .image-mock-notice {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--gold);
+            border-radius: 10px;
+        }
+
+        .image-mock-notice p {
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        .image-creator-history {
+            padding: 30px;
+            border-top: 2px solid var(--gold);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .image-creator-history h3 {
+            color: var(--gold);
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+
+        .image-history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .history-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid var(--gold);
+            transition: all 0.3s;
+        }
+
+        .history-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .history-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .history-item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 10px;
+            color: white;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .history-item:hover .history-item-overlay {
+            opacity: 1;
+        }
+
+        .image-history-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--cream);
+            opacity: 0.5;
+            padding: 40px;
+        }
+
+        .image-creator-btn {
+            position: fixed;
+            bottom: 170px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--red) 0%, var(--gold) 100%);
+            border: 2px solid var(--gold);
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+            transition: all 0.3s;
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-creator-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5);
         }
     </style>
 </head>
