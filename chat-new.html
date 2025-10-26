@@ -23,6 +23,7 @@
     <script src="js/smart-suggestions.js"></script>
     <script src="js/citations-module.js"></script>
     <script src="js/pricing-calculator.js"></script>
+    <script src="js/clarification-prompts.js"></script>
 
     <!-- Auth Guard -->
     <script>
@@ -274,17 +275,6 @@
         .header-action-btn:hover {
             transform: scale(1.1);
             box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
-        }
-
-        /* Price Calculator Button - Red */
-        #priceCalcBtn {
-            background: var(--red);
-            color: var(--off-white);
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
-        }
-
-        #priceCalcBtn:hover {
-            background: #ff3333;
         }
 
         /* Export Button - White */
@@ -1283,6 +1273,89 @@
                 font-size: 14px;
             }
         }
+
+        /* ============================================
+           CLARIFICATION PROMPTS - Feature 7
+           ============================================ */
+        .clarification-prompt {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid var(--gold);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            animation: slideIn 0.3s ease;
+            transition: all 0.3s ease;
+        }
+
+        .clarification-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            color: var(--gold);
+        }
+
+        .clarification-icon {
+            font-size: 1.8rem;
+            animation: pulse 2s infinite;
+        }
+
+        .clarification-text {
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .clarification-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .clarification-button {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--black) 100%);
+            border: 2px solid var(--gold);
+            color: var(--cream);
+            padding: 12px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .clarification-button:hover {
+            background: linear-gradient(135deg, var(--red) 0%, var(--navy) 100%);
+            border-color: var(--red);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .clarification-footer {
+            text-align: center;
+            color: var(--cream);
+            font-size: 0.85rem;
+            margin-top: 15px;
+            opacity: 0.7;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -1311,7 +1384,6 @@
                     <img src="assets/zantara_logo_transparent.png" class="logo-zantara" alt="ZANTARA" onerror="this.style.display='none'">
                 </div>
                 <div class="header-actions">
-                    <button class="header-action-btn" id="priceCalcBtn" title="Price Calculator">💰</button>
                     <button class="header-action-btn" id="exportBtn" title="Export chat">📥</button>
                     <div class="header-action-btn user-avatar-btn" id="userAvatarBtn" title="Profile">
                         <span class="initials">U</span>
