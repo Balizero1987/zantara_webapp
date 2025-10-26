@@ -88,6 +88,7 @@ class ZantaraSSEClient {
     return new Promise((resolve, reject) => {
       this.isStreaming = true;
       this.currentMessage = '';
+      this.currentSources = null;  // ← CITATIONS: Collect sources from SSE
 
       // Build URL with query parameters
       const url = new URL(`${this.baseUrl}/bali-zero/chat-stream`);
@@ -123,10 +124,21 @@ class ZantaraSSEClient {
         try {
           const data = JSON.parse(event.data);
 
+          // ← CITATIONS: Capture sources before done signal
+          if (data.sources) {
+            this.currentSources = data.sources;
+            console.log('[SSE] Received sources:', data.sources.length, 'documents');
+            this.emit('sources', { sources: data.sources });
+          }
+
           // Check if stream is done
           if (data.done) {
             this.stop();
-            this.emit('complete', { message: this.currentMessage });
+            // ← CITATIONS: Include sources in complete event
+            this.emit('complete', {
+              message: this.currentMessage,
+              sources: this.currentSources
+            });
             resolve(this.currentMessage);
             return;
           }
