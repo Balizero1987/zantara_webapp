@@ -9,6 +9,18 @@ const ImageCreator = (() => {
   const IMAGINEART_API_URL = 'https://api.imagineapi.dev/v1/generations';
   const IMAGINEART_API_KEY = 'YOUR_IMAGINEAPI_KEY'; // TODO: Move to env variable
   
+  // FREE/LOW-COST MODELS (Zero or minimal credits)
+  // Reference: https://docs.imagineapi.dev/models
+  const FREE_MODELS = {
+    'imagine-v1': { name: 'Imagine V1', credits: 0, description: 'Basic model - FREE' },
+    'imagine-v3': { name: 'Imagine V3', credits: 0, description: 'Improved quality - FREE' },
+    'imagine-v4.1': { name: 'Imagine V4.1', credits: 1, description: 'Good balance - 1 credit' },
+    'sdxl': { name: 'Stable Diffusion XL', credits: 1, description: 'Industry standard - 1 credit' }
+  };
+  
+  // Default to FREE model
+  const DEFAULT_MODEL = 'imagine-v3';
+  
   // Privileged users with image creation access
   const PRIVILEGED_USERS = [
     'zero@balizero.com',      // Zero Master - L3
@@ -21,6 +33,7 @@ const ImageCreator = (() => {
   let currentUserEmail = null;
   let isAuthorized = false;
   let generationHistory = [];
+  let selectedModel = DEFAULT_MODEL;
 
   /**
    * Initialize the image creator
@@ -95,9 +108,22 @@ const ImageCreator = (() => {
             </div>
 
             <!-- Advanced Options -->
-            <details class="image-advanced-options">
-              <summary>⚙️ Opzioni Avanzate</summary>
+            <details class="image-advanced-options" open>
+              <summary>⚙️ Opzioni Avanzate (Modelli FREE)</summary>
               <div class="advanced-options-grid">
+                <div class="option-group">
+                  <label>🆓 AI Model (FREE/Low-cost):</label>
+                  <select id="imageModel" onchange="ImageCreator.updateModelInfo()">
+                    ${Object.entries(FREE_MODELS).map(([key, model]) => `
+                      <option value="${key}" ${key === DEFAULT_MODEL ? 'selected' : ''}>
+                        ${model.name} - ${model.credits === 0 ? '🆓 FREE' : `${model.credits} credit`}
+                      </option>
+                    `).join('')}
+                  </select>
+                  <small id="modelInfo" class="model-info">
+                    ${FREE_MODELS[DEFAULT_MODEL].description}
+                  </small>
+                </div>
                 <div class="option-group">
                   <label>Aspect Ratio:</label>
                   <select id="imageAspectRatio">
@@ -108,11 +134,11 @@ const ImageCreator = (() => {
                   </select>
                 </div>
                 <div class="option-group">
-                  <label>Quality:</label>
-                  <select id="imageQuality">
-                    <option value="standard">Standard</option>
-                    <option value="hd" selected>HD</option>
-                    <option value="ultra">Ultra HD</option>
+                  <label>Style Strength:</label>
+                  <select id="imageStyleStrength">
+                    <option value="low">Low (più simile al prompt)</option>
+                    <option value="medium" selected>Medium (bilanciato)</option>
+                    <option value="high">High (più creativo)</option>
                   </select>
                 </div>
                 <div class="option-group">
@@ -121,8 +147,12 @@ const ImageCreator = (() => {
                     type="text" 
                     id="imageNegativePrompt" 
                     placeholder="Cosa evitare (es: blurry, low quality)"
+                    value="blurry, low quality, distorted, ugly"
                   />
                 </div>
+              </div>
+              <div class="free-credits-notice">
+                💡 <strong>Tutti i modelli disponibili sono GRATUITI o costano 1 credito massimo!</strong>
               </div>
             </details>
 
@@ -239,7 +269,8 @@ const ImageCreator = (() => {
   async function generate() {
     const promptInput = document.getElementById('imagePrompt');
     const aspectRatioSelect = document.getElementById('imageAspectRatio');
-    const qualitySelect = document.getElementById('imageQuality');
+    const modelSelect = document.getElementById('imageModel');
+    const styleStrengthSelect = document.getElementById('imageStyleStrength');
     const negativePromptInput = document.getElementById('imageNegativePrompt');
     const resultDiv = document.getElementById('imageCreatorResult');
     const generateBtn = document.querySelector('.image-generate-btn');
@@ -252,6 +283,10 @@ const ImageCreator = (() => {
       return;
     }
 
+    // Get selected FREE model
+    selectedModel = modelSelect?.value || DEFAULT_MODEL;
+    const modelInfo = FREE_MODELS[selectedModel];
+
     // Show loading
     generateBtn.disabled = true;
     generateBtn.innerHTML = '<span class="btn-icon">⏳</span><span class="btn-text">Generazione in corso...</span>';
@@ -259,19 +294,23 @@ const ImageCreator = (() => {
     resultDiv.innerHTML = `
       <div class="image-generating">
         <div class="spinner"></div>
-        <p>✨ Generazione immagine in corso...</p>
-        <p class="generating-detail">Questo può richiedere 10-30 secondi</p>
+        <p>✨ Generazione immagine con <strong>${modelInfo.name}</strong></p>
+        <p class="generating-detail">
+          ${modelInfo.credits === 0 ? '🆓 Modello GRATUITO' : `💰 Costo: ${modelInfo.credits} credit`}
+        </p>
+        <p class="generating-detail">Tempo stimato: 10-30 secondi</p>
       </div>
     `;
 
     try {
-      console.log('[ImageCreator] Generating image:', {
+      console.log('[ImageCreator] Generating image with FREE model:', {
+        model: selectedModel,
+        credits: modelInfo.credits,
         prompt,
-        aspectRatio: aspectRatioSelect?.value,
-        quality: qualitySelect?.value
+        aspectRatio: aspectRatioSelect?.value
       });
 
-      // Call ImagineArt API
+      // Call ImagineArt API with FREE/LOW-COST model
       const response = await fetch(IMAGINEART_API_URL, {
         method: 'POST',
         headers: {
@@ -280,11 +319,13 @@ const ImageCreator = (() => {
         },
         body: JSON.stringify({
           prompt: prompt,
-          negative_prompt: negativePromptInput?.value || 'blurry, low quality, distorted',
+          negative_prompt: negativePromptInput?.value || 'blurry, low quality, distorted, ugly',
           aspect_ratio: aspectRatioSelect?.value || '16:9',
-          quality: qualitySelect?.value || 'hd',
-          model: 'imagine-v5',
-          user_email: currentUserEmail
+          style_type: styleStrengthSelect?.value || 'medium',
+          model: selectedModel, // Use selected FREE model
+          user_email: currentUserEmail,
+          cfg_scale: 7, // Creativity scale (7 is balanced)
+          steps: 30 // Generation steps (30 is good quality/speed balance)
         })
       });
 
@@ -296,18 +337,37 @@ const ImageCreator = (() => {
       const result = await response.json();
       
       // Display result
-      displayGeneratedImage(result, prompt);
+      displayGeneratedImage(result, prompt, modelInfo);
       
       // Add to history
-      addToHistory(result, prompt);
+      addToHistory(result, prompt, modelInfo);
 
-      console.log('[ImageCreator] Image generated successfully');
+      console.log('[ImageCreator] Image generated successfully with', selectedModel);
 
     } catch (error) {
       console.error('[ImageCreator] Generation error:', error);
       
       // Show error with mock result for testing
       resultDiv.innerHTML = `
+        <div class="image-error">
+          <p>⚠️ Errore durante la generazione</p>
+          <p class="error-detail">${error.message}</p>
+          <button onclick="ImageCreator.generate()" class="retry-btn">🔄 Riprova</button>
+        </div>
+        <div class="image-mock-notice">
+          <p>🎨 <strong>Demo Mode:</strong> Mostrando immagine di esempio</p>
+          <p class="generating-detail">Modello: ${modelInfo.name} (${modelInfo.credits === 0 ? 'FREE' : modelInfo.credits + ' credit'})</p>
+          <img src="https://picsum.photos/800/450" alt="Mock generated image" class="generated-image" />
+          <div class="image-actions">
+            <button onclick="ImageCreator.downloadImage('https://picsum.photos/800/450')" class="action-btn">
+              ⬇️ Download
+            </button>
+            <button onclick="ImageCreator.insertToChat('${escapeHtml(prompt)}')" class="action-btn">
+              💬 Inserisci in Chat
+            </button>
+          </div>
+        </div>
+      `;
         <div class="image-error">
           <p>⚠️ Errore durante la generazione</p>
           <p class="error-detail">${error.message}</p>
@@ -336,18 +396,22 @@ const ImageCreator = (() => {
   /**
    * Display generated image
    */
-  function displayGeneratedImage(result, prompt) {
+  function displayGeneratedImage(result, prompt, modelInfo = null) {
     const resultDiv = document.getElementById('imageCreatorResult');
     if (!resultDiv) return;
 
     const imageUrl = result.data?.url || result.url || 'https://picsum.photos/800/450';
+    const model = modelInfo || FREE_MODELS[selectedModel];
 
     resultDiv.innerHTML = `
       <div class="image-result-success">
         <p class="result-success-text">✅ Immagine generata con successo!</p>
+        <div class="model-used-badge">
+          🤖 ${model.name} ${model.credits === 0 ? '(🆓 FREE)' : `(${model.credits} credit)`}
+        </div>
         <img src="${imageUrl}" alt="Generated image" class="generated-image" />
         <div class="image-metadata">
-          <span>📝 Prompt: ${escapeHtml(prompt.substring(0, 100))}${prompt.length > 100 ? '...' : ''}</span>
+          <span>📝 <strong>Prompt:</strong> ${escapeHtml(prompt.substring(0, 100))}${prompt.length > 100 ? '...' : ''}</span>
         </div>
         <div class="image-actions">
           <button onclick="ImageCreator.downloadImage('${imageUrl}')" class="action-btn">
@@ -367,12 +431,15 @@ const ImageCreator = (() => {
   /**
    * Add to generation history
    */
-  function addToHistory(result, prompt) {
+  function addToHistory(result, prompt, modelInfo = null) {
     const imageUrl = result.data?.url || result.url || 'https://picsum.photos/200/200';
+    const model = modelInfo || FREE_MODELS[selectedModel];
     
     generationHistory.unshift({
       prompt,
       imageUrl,
+      model: model.name,
+      credits: model.credits,
       timestamp: new Date().toISOString()
     });
 
@@ -467,6 +534,26 @@ const ImageCreator = (() => {
   }
 
   /**
+   * Update model info display when model is changed
+   */
+  function updateModelInfo() {
+    const modelSelect = document.getElementById('imageModel');
+    const modelInfoSpan = document.getElementById('modelInfo');
+    
+    if (!modelSelect || !modelInfoSpan) return;
+    
+    const selectedModelKey = modelSelect.value;
+    const model = FREE_MODELS[selectedModelKey];
+    
+    if (model) {
+      selectedModel = selectedModelKey;
+      modelInfoSpan.textContent = `${model.description} - ${model.credits === 0 ? '🆓 GRATIS' : `💰 ${model.credits} credit`}`;
+      modelInfoSpan.style.color = model.credits === 0 ? '#10b981' : '#f59e0b';
+      console.log('[ImageCreator] Model changed to:', selectedModelKey);
+    }
+  }
+
+  /**
    * Check if user is authorized
    */
   function isUserAuthorized() {
@@ -481,6 +568,7 @@ const ImageCreator = (() => {
     toggle,
     applyStyle,
     generate,
+    updateModelInfo,
     viewHistoryItem,
     downloadImage,
     insertToChat,
