@@ -28,6 +28,7 @@
     <script src="js/image-creator.js"></script>
     <script src="js/document-upload.js"></script>
     <script src="js/i18n.js"></script>
+    <script src="js/language-selector.js"></script>
 
     <!-- Auth Guard -->
     <script>
@@ -2651,6 +2652,192 @@
                 width: 45px;
                 height: 45px;
                 font-size: 1.3rem;
+            }
+        }
+
+        /* ============================================
+           LANGUAGE SELECTOR STYLES
+           ============================================ */
+
+        .language-selector {
+            position: relative;
+            display: inline-block;
+        }
+
+        .language-selector-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--cream);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .language-selector-btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: var(--red);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .current-lang-flag {
+            font-size: 1.3rem;
+        }
+
+        .current-lang-code {
+            font-weight: bold;
+            color: var(--gold);
+        }
+
+        .selector-arrow {
+            font-size: 0.8rem;
+            transition: transform 0.3s;
+        }
+
+        .language-dropdown.open + .language-selector-btn .selector-arrow {
+            transform: rotate(180deg);
+        }
+
+        .language-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: linear-gradient(135deg, var(--black) 0%, rgba(34, 34, 34, 0.98) 100%);
+            border: 3px solid var(--gold);
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            min-width: 250px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10001;
+            overflow: hidden;
+        }
+
+        .language-dropdown.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .language-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 18px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: left;
+        }
+
+        .language-option:last-child {
+            border-bottom: none;
+        }
+
+        .language-option:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .language-option.active {
+            background: rgba(212, 175, 55, 0.15);
+            border-left: 4px solid var(--gold);
+        }
+
+        .lang-flag {
+            font-size: 1.8rem;
+        }
+
+        .lang-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .lang-name {
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .lang-native {
+            color: var(--cream);
+            opacity: 0.7;
+            font-size: 0.85rem;
+        }
+
+        .lang-check {
+            color: var(--gold);
+            font-size: 1.2rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .language-option.active .lang-check {
+            opacity: 1;
+        }
+
+        .language-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, var(--black) 0%, rgba(34, 34, 34, 0.95) 100%);
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            z-index: 10002;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .language-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-flag {
+            font-size: 1.5rem;
+        }
+
+        .toast-text {
+            color: var(--cream);
+            font-size: 1rem;
+        }
+
+        .toast-text strong {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .language-dropdown {
+                right: -10px;
+                min-width: 220px;
+            }
+
+            .language-selector-btn {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+
+            .current-lang-flag {
+                font-size: 1.1rem;
             }
         }
     </style>

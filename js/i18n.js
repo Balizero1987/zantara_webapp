@@ -1,10 +1,84 @@
 /**
  * ZANTARA Internationalization (i18n)
- * Supporta IT (Italiano) e ID (Bahasa Indonesia)
+ * Supports EN (English - DEFAULT), IT (Italian), ID (Indonesian)
+ * 
+ * @version 2.0.0
+ * Features:
+ * - English as primary/default language
+ * - Language selector UI with flags
+ * - Auto-detect from browser (fallback to EN)
+ * - Persistent language preference
+ * - Real-time translation updates
  */
 
 const ZANTARA_I18N = {
   translations: {
+    en: {
+      // Header
+      tagline: 'From Zero to Infinity ∞',
+
+      // Sidebar
+      conversations: 'Conversations',
+      newChat: '+ New',
+
+      // Welcome
+      welcomeTitle: 'Welcome to Zantara',
+      welcomeSubtitle: 'The Intelligent Soul of Bali Zero',
+
+      // Suggested questions
+      suggestedQuestions: {
+        kitas: {
+          title: '📋 E23 Freelance KITAS',
+          subtitle: 'Documents, costs and timeline',
+          question: 'How can I get an E23 Freelance KITAS?'
+        },
+        company: {
+          title: '🏢 PT Company Setup',
+          subtitle: 'Complete costs and requirements',
+          question: 'How much does it cost to open a PT company in Indonesia?'
+        },
+        investor: {
+          title: '💼 Investor Visas',
+          subtitle: 'E28A, E33A and comparison',
+          question: 'What are the visa options for investors?'
+        }
+      },
+
+      // Input area
+      inputPlaceholder: 'Write a message...',
+      voiceInputTitle: 'Voice input',
+      sendButtonTitle: 'Send message',
+
+      // Buttons
+      exportBtn: '📥 Export',
+
+      // AI label
+      aiLabel: 'Zantara:',
+
+      // Messages
+      typing: 'Typing',
+      errorMessage: 'Unable to respond. Try again in a moment.',
+
+      // Citations
+      citationsBadge: '📚 Sources',
+      sources: 'sources',
+
+      // Alerts
+      voiceNotSupported: 'Voice input not supported in this browser',
+
+      // Login
+      loginName: 'Name',
+      loginEmail: 'Company email',
+      loginPin: 'PIN (6 digits)',
+      loginButton: 'Join Team',
+      loginTitle: 'Welcome to Zantara',
+      loginSubtitle: 'The Intelligent Soul of Bali Zero',
+
+      // Language Selector
+      languageSelector: 'Language',
+      changeLanguage: 'Change Language'
+    },
+
     it: {
       // Header
       tagline: 'From Zero to Infinity ∞',
@@ -64,7 +138,11 @@ const ZANTARA_I18N = {
       loginPin: 'PIN (6 cifre)',
       loginButton: 'Accedi al Team',
       loginTitle: 'Benvenuto su Zantara',
-      loginSubtitle: "L'anima intelligente di Bali Zero"
+      loginSubtitle: "L'anima intelligente di Bali Zero",
+
+      // Language Selector
+      languageSelector: 'Lingua',
+      changeLanguage: 'Cambia Lingua'
     },
 
     id: {
@@ -126,40 +204,121 @@ const ZANTARA_I18N = {
       loginPin: 'PIN (6 digit)',
       loginButton: 'Masuk ke Tim',
       loginTitle: 'Selamat Datang di Zantara',
-      loginSubtitle: 'Jiwa Cerdas dari Bali Zero'
+      loginSubtitle: 'Jiwa Cerdas dari Bali Zero',
+
+      // Language Selector
+      languageSelector: 'Bahasa',
+      changeLanguage: 'Ubah Bahasa'
+    }
+  },
+
+  // Supported languages with metadata
+  supportedLanguages: {
+    en: {
+      code: 'en',
+      name: 'English',
+      flag: '🇬🇧',
+      nativeName: 'English'
+    },
+    it: {
+      code: 'it',
+      name: 'Italian',
+      flag: '🇮🇹',
+      nativeName: 'Italiano'
+    },
+    id: {
+      code: 'id',
+      name: 'Indonesian',
+      flag: '🇮🇩',
+      nativeName: 'Bahasa Indonesia'
     }
   },
 
   /**
+   * Detect browser language
+   * @returns {string} Language code (en, it, id)
+   */
+  detectBrowserLanguage() {
+    const browserLang = navigator.language || navigator.userLanguage;
+    const langCode = browserLang.split('-')[0].toLowerCase();
+
+    // Map to supported languages
+    if (langCode === 'it') return 'it';
+    if (langCode === 'id') return 'id';
+    
+    // Default to English for all other languages
+    return 'en';
+  },
+
+  /**
    * Get user's preferred language from localStorage
-   * Default: 'it' (italiano)
+   * Priority: 1) Saved preference, 2) Browser language, 3) English (default)
    */
   getUserLanguage() {
     try {
-      const userStr = localStorage.getItem('zantara-user');
-      if (!userStr) return 'it';
+      // Check localStorage preference
+      const savedLang = localStorage.getItem('zantara-language');
+      if (savedLang && this.supportedLanguages[savedLang]) {
+        return savedLang;
+      }
 
-      const user = JSON.parse(userStr);
-      return user.language || user.preferredLanguage || 'it';
+      // Check user object (legacy support)
+      const userStr = localStorage.getItem('zantara-user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        const userLang = user.language || user.preferredLanguage;
+        if (userLang && this.supportedLanguages[userLang]) {
+          return userLang;
+        }
+      }
+
+      // Auto-detect from browser
+      const detected = this.detectBrowserLanguage();
+      
+      // Save detected language
+      this.setUserLanguage(detected, false);
+      
+      return detected;
     } catch {
-      return 'it';
+      return 'en'; // Fallback to English
     }
   },
 
   /**
    * Set user's preferred language
+   * @param {string} lang - Language code (en, it, id)
+   * @param {boolean} reload - Whether to reload translations (default: true)
    */
-  setUserLanguage(lang) {
+  setUserLanguage(lang, reload = true) {
     try {
+      if (!this.supportedLanguages[lang]) {
+        console.warn(`⚠️ Unsupported language: ${lang}, using English`);
+        lang = 'en';
+      }
+
+      // Save to localStorage
+      localStorage.setItem('zantara-language', lang);
+
+      // Update user object if exists (legacy support)
       const userStr = localStorage.getItem('zantara-user');
-      if (!userStr) return;
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        user.language = lang;
+        user.preferredLanguage = lang;
+        localStorage.setItem('zantara-user', JSON.stringify(user));
+      }
 
-      const user = JSON.parse(userStr);
-      user.language = lang;
-      user.preferredLanguage = lang;
-      localStorage.setItem('zantara-user', JSON.stringify(user));
+      console.log(`✅ Language set to: ${lang} (${this.supportedLanguages[lang].name})`);
 
-      console.log(`✅ Language set to: ${lang}`);
+      // Reload translations
+      if (reload) {
+        this.applyTranslations();
+      }
+
+      // Dispatch event for other components
+      window.dispatchEvent(new CustomEvent('zantara:languageChanged', { 
+        detail: { language: lang } 
+      }));
     } catch (error) {
       console.error('Failed to set language:', error);
     }
