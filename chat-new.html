@@ -40,14 +40,32 @@
     </script>
 
     <style>
-        /* Bali Zero Official Color Palette */
+        /* ChatGPT/Claude-inspired Neutral Color Palette */
         :root {
-            --black: #090920;          /* Vivid Black */
-            --red: #FF0000;            /* Bold Red */
-            --cream: #e8d5b7;          /* Cream */
-            --gold: #D4AF37;           /* Gold */
-            --navy: #1a1f3a;           /* Navy */
-            --off-white: #f5f5f5;      /* Off-white */
+            /* Light Mode (default) */
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F7F7F8;
+            --bg-tertiary: #ECECEC;
+            --text-primary: #2D2D2D;
+            --text-secondary: #6B6B6B;
+            --border-light: #E5E5E5;
+            --user-bubble: #2F7BD6;
+            --hover-bg: #F0F0F0;
+            --button-primary: #2D2D2D;
+
+            /* Dark Mode */
+            --bg-primary-dark: #1E1E1E;
+            --bg-secondary-dark: #2A2A2A;
+            --text-primary-dark: #ECECEC;
+            --border-dark: #3A3A3A;
+
+            /* Legacy compatibility (map old vars to new) */
+            --black: var(--text-primary);
+            --red: var(--user-bubble);
+            --cream: var(--text-secondary);
+            --gold: var(--button-primary);
+            --navy: var(--bg-secondary);
+            --off-white: var(--bg-primary);
         }
 
         /* Conversation History Actions */
@@ -320,44 +338,15 @@
         }
 
         html, body {
-            background: var(--black);
-            color: var(--off-white);
+            background: var(--bg-primary);
+            color: var(--text-primary);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             height: 100vh;
             overflow: hidden;
             position: relative;
         }
 
-        /* Batik Pattern Background */
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background:
-                radial-gradient(ellipse at 50% 0%, rgba(20, 20, 50, 0.4) 0%, transparent 50%),
-                var(--black);
-            z-index: 0;
-        }
-
-        body::after {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background-image:
-                radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.06) 2%, transparent 0%),
-                radial-gradient(circle at 75% 75%, rgba(232, 213, 183, 0.06) 2%, transparent 0%),
-                radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.03) 1%, transparent 0%);
-            background-size: 60px 60px, 80px 80px, 40px 40px;
-            background-position: 0 0, 20px 20px, 40px 40px;
-            animation: batik-flow 8s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        @keyframes batik-flow {
-            0%, 100% { opacity: 0.03; }
-            50% { opacity: 0.06; }
-        }
+        /* Clean background - no patterns */
 
         .app {
             display: flex;
@@ -636,71 +625,49 @@
             margin-left: 12px;
         }
 
-        /* Header Action Buttons */
+        /* Header Action Buttons - Clean Text Style */
         .header-actions {
             display: flex;
-            gap: 16px;
+            gap: 8px;
             align-items: center;
         }
 
         .header-action-btn {
-            width: 48px;
-            height: 48px;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .header-action-btn:hover {
+            background: var(--hover-bg);
+            border-color: var(--text-secondary);
+        }
+
+        /* User Avatar Button */
+        .user-avatar-btn {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-            font-size: 20px;
+            font-size: 13px;
             font-weight: 600;
-        }
-
-        .header-action-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
-        }
-
-        /* Price Calculator Button - Gold */
-        #priceCalcBtn {
-            background: linear-gradient(135deg, var(--gold), #b8860b);
-            color: var(--black);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
-            padding: 0;
-            border-radius: 50%;
-        }
-
-        #priceCalcBtn:hover {
-            background: linear-gradient(135deg, #d4af37, var(--gold));
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
-        }
-
-        /* Export Button - White */
-        #exportBtn {
-            background: var(--off-white);
-            color: var(--black);
-            box-shadow: 0 0 20px rgba(245, 245, 245, 0.3);
-            padding: 0;
-            border-radius: 50%;
-        }
-
-        #exportBtn:hover {
-            background: var(--gold);
-        }
-
-        /* User Avatar Button - Red (or photo when uploaded) */
-        .user-avatar-btn {
-            background: var(--red);
-            color: var(--off-white);
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
             position: relative;
             overflow: hidden;
+            padding: 0;
         }
 
         .user-avatar-btn:hover {
-            background: #ff3333;
+            background: var(--bg-tertiary);
         }
 
         .user-avatar-btn.has-photo {
@@ -3253,13 +3220,7 @@
             <div class="sidebar-header">
                 <div class="sidebar-title" data-i18n="conversations">Chat</div>
                 <div class="sidebar-actions">
-                    <button id="exportConversationsBtn" class="conversation-action-btn" title="Export conversations">
-                        📤
-                    </button>
-                    <button id="importConversationsBtn" class="conversation-action-btn" title="Import conversations">
-                        📥
-                    </button>
-                    <button class="new-chat-btn" id="newChatBtn" data-i18n="newChat">+ Nuova</button>
+                    <button class="new-chat-btn" id="newChatBtn" data-i18n="newChat">+ New</button>
                 </div>
             </div>
             <div class="conversation-list" id="conversationList">
@@ -3272,16 +3233,14 @@
 
         <!-- Main Content Area -->
         <div class="main-content">
-            <!-- Header - Bali Zero + ZANTARA Unified -->
+            <!-- Header - Clean Minimal Style -->
             <div class="header">
                 <div class="header-left">
-                    <img src="assets/balizero-logo-3d.png" class="logo-balizero" alt="Bali Zero" onerror="this.style.display='none'">
-                    <span class="tagline">From Zero to <span class="infinity">Infinity ∞</span></span>
-                    <img src="assets/zantara_logo_transparent.png" class="logo-zantara" alt="ZANTARA" onerror="this.style.display='none'">
+                    <h1 class="logo-text">ZANTARA</h1>
                 </div>
                 <div class="header-actions">
-                    <button class="header-action-btn" id="priceCalcBtn" title="Price Calculator">💰</button>
-                    <button class="header-action-btn" id="exportBtn" title="Export chat">📥</button>
+                    <button class="header-action-btn" id="priceCalcBtn" title="Price Calculator">Calculator</button>
+                    <button class="header-action-btn" id="exportBtn" title="Export chat">Export</button>
                     <div class="header-action-btn user-avatar-btn" id="userAvatarBtn" title="Profile">
                         <span class="initials">U</span>
                         <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
@@ -3292,29 +3251,28 @@
             <!-- Conversation History -->
             <div class="sidebar-section">
                 <div class="sidebar-header">
-                    <h3>📜 Conversations</h3>
+                    <h3>Conversations</h3>
                 </div>
-                
+
                 <!-- Conversation Actions -->
                 <div class="conversation-actions">
                     <button id="exportConversationsBtn" class="conversation-action-btn" title="Export conversations">
-                        📤 Export
+                        Export
                     </button>
                     <button id="importConversationsBtn" class="conversation-action-btn" title="Import conversations">
-                        📥 Import
+                        Import
                     </button>
                     <button id="clearConversationsBtn" class="conversation-action-btn" title="Clear all conversations">
-                        🗑️ Clear
+                        Clear
                     </button>
                     <button id="favoriteConversationsBtn" class="conversation-action-btn" title="Show favorite conversations">
-                        ⭐ Favorites
+                        Favorites
                     </button>
                 </div>
-                
+
                 <!-- Search -->
                 <div class="search-container">
                     <input type="text" id="conversationSearch" placeholder="Search conversations..." oninput="ConversationHistory.searchConversations(this.value)">
-                    <span class="search-icon">🔍</span>
                 </div>
             </div>
 
@@ -3325,15 +3283,15 @@
                     <p data-i18n="welcomeSubtitle">L'anima intelligente di Bali Zero</p>
                     <div class="suggested-questions">
                         <div class="suggested-question" data-question-id="kitas" data-question="Come posso ottenere una E23 Freelance KITAS?">
-                            <div class="suggested-question-title">📋 E23 Freelance KITAS</div>
+                            <div class="suggested-question-title">E23 Freelance KITAS</div>
                             <div class="suggested-question-subtitle">Documenti, costi e timeline</div>
                         </div>
                         <div class="suggested-question" data-question-id="company" data-question="Quanto costa aprire una PT company in Indonesia?">
-                            <div class="suggested-question-title">🏢 PT Company Setup</div>
+                            <div class="suggested-question-title">PT Company Setup</div>
                             <div class="suggested-question-subtitle">Costi e requisiti completi</div>
                         </div>
                         <div class="suggested-question" data-question-id="investor" data-question="Quali sono le opzioni di visto per investitori?">
-                            <div class="suggested-question-title">💼 Visti Investitori</div>
+                            <div class="suggested-question-title">Investor Visas</div>
                             <div class="suggested-question-subtitle">E28A, E33A e confronto</div>
                         </div>
                     </div>
@@ -3343,17 +3301,14 @@
             <!-- Input Area -->
             <div class="input-area">
                 <div class="input-wrapper">
-                    <textarea id="chatInput" data-i18n="inputPlaceholder" placeholder="Scrivi un messaggio..." rows="1"></textarea>
-                    <div class="input-actions">
-                        <button class="input-action-btn" id="voiceBtn" data-i18n="voiceInputTitle" title="Voice input">🎤</button>
-                    </div>
+                    <textarea id="chatInput" data-i18n="inputPlaceholder" placeholder="Message ZANTARA..." rows="1"></textarea>
                 </div>
-                <button id="sendBtn" data-i18n="sendButtonTitle" title="Send message">→</button>
+                <button id="sendBtn" data-i18n="sendButtonTitle" title="Send message">↑</button>
             </div>
         </div>
 
         <!-- Floating Action Buttons -->
-        <button class="document-upload-btn" onclick="DocumentUpload.show()" title="Upload Document">📄</button>
+        <button class="document-upload-btn" onclick="DocumentUpload.show()" title="Upload Document">Upload</button>
     </div>
 
     <script>
@@ -3428,9 +3383,8 @@
                 const actions = document.createElement('div');
                 actions.className = 'message-actions';
                 actions.innerHTML = `
-                    <button class="message-action-btn copy-btn" title="Copy">📋</button>
-                    <button class="message-action-btn regenerate-btn" title="Regenerate">🔄</button>
-                    <button class="message-action-btn share-btn" title="Share">🔗</button>
+                    <button class="message-action-btn copy-btn" title="Copy">Copy</button>
+                    <button class="message-action-btn regenerate-btn" title="Regenerate">Regenerate</button>
                 `;
                 message.appendChild(actions);
 
@@ -3770,15 +3724,15 @@
                     <p data-i18n="welcomeSubtitle">L'anima intelligente di Bali Zero</p>
                     <div class="suggested-questions">
                         <div class="suggested-question" data-question-id="kitas" data-question="Come posso ottenere una E23 Freelance KITAS?">
-                            <div class="suggested-question-title">📋 E23 Freelance KITAS</div>
+                            <div class="suggested-question-title">E23 Freelance KITAS</div>
                             <div class="suggested-question-subtitle">Documenti, costi e timeline</div>
                         </div>
                         <div class="suggested-question" data-question-id="company" data-question="Quanto costa aprire una PT company in Indonesia?">
-                            <div class="suggested-question-title">🏢 PT Company Setup</div>
+                            <div class="suggested-question-title">PT Company Setup</div>
                             <div class="suggested-question-subtitle">Costi e requisiti completi</div>
                         </div>
                         <div class="suggested-question" data-question-id="investor" data-question="Quali sono le opzioni di visto per investitori?">
-                            <div class="suggested-question-title">💼 Visti Investitori</div>
+                            <div class="suggested-question-title">Investor Visas</div>
                             <div class="suggested-question-subtitle">E28A, E33A e confronto</div>
                         </div>
                     </div>
