@@ -419,6 +419,21 @@
                                 showSimilarity: true,
                                 showTier: true
                             });
+                        } else if (window.Citations && !sources) {
+                            // SSE didn't provide sources - fetch them from API as fallback
+                            console.log('[Citations] SSE missing sources, fetching from API...');
+                            ZANTARA_API.chat(message, userEmail)
+                                .then(response => {
+                                    if (window.Citations && window.Citations.hasCitations(response)) {
+                                        const apiCitations = window.Citations.extract(response);
+                                        window.Citations.render(apiCitations, aiMsg, {
+                                            maxCitations: 3,
+                                            showSimilarity: true,
+                                            showTier: true
+                                        });
+                                    }
+                                })
+                                .catch(err => console.log('[Citations] API fallback failed:', err));
                         }
 
                         // ✨ SMART SUGGESTIONS INTEGRATION
