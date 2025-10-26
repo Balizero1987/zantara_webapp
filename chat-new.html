@@ -48,6 +48,11 @@
     <script src="js/message-scheduling.js"></script>
     <script src="js/ai-summarization.js"></script>
     <script src="js/custom-avatars.js"></script>
+    <script src="js/quick-polls.js"></script>
+    <script src="js/message-translation.js"></script>
+    <script src="js/chat-themes.js"></script>
+    <script src="js/message-reactions.js"></script>
+    <script src="js/chat-mentions.js"></script>
 
     <!-- Auth Guard -->
     <script>
@@ -2531,6 +2536,7 @@
             align-items: center;
         }
 
+                      
         .memory-panel-header h2 {
             color: var(--gold);
             font-size: 1.5rem;
@@ -3262,7 +3268,7 @@
             position: absolute;
             top: calc(100% + 10px);
             right: 0;
-            background: linear-gradient(135deg, var(--black) 0%, rgba(34, 34, 34, 0.98) 100%);
+            background: linear-gradient(135deg, var(--black) 0%, rgba(34, 34, 34, 0.95) 100%);
             border: 3px solid var(--gold);
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
@@ -3550,6 +3556,70 @@
             color: #ffcc00;
             padding: 2px 6px;
             margin-right: 6px;
+        }
+
+        /* ============================================
+           ENHANCEMENT 29: QUICK POLLS STYLES
+           ============================================ */
+        .poll-panel {
+            background: #222;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+        }
+        .poll-option {
+            background: #ffcc00;
+            color: #222;
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin: 2px 0;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        .poll-option.selected {
+            background: #4fc3f7;
+            color: #222;
+        }
+        /* ============================================
+           ENHANCEMENT 30: MESSAGE TRANSLATION STYLES
+           ============================================ */
+        .translated {
+            color: #4fc3f7;
+            font-size: 0.9em;
+            margin-top: 4px;
+        }
+        /* ============================================
+           ENHANCEMENT 31: CHAT THEMES STYLES
+           ============================================ */
+        [data-theme="light"] {
+            background: #fff;
+            color: #222;
+        }
+        [data-theme="dark"] {
+            background: #222;
+            color: #fff;
+        }
+        /* ============================================
+           ENHANCEMENT 32: MESSAGE REACTIONS STYLES
+           ============================================ */
+        .reaction {
+            font-size: 1.2em;
+            margin-left: 6px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .reaction:hover {
+            transform: scale(1.2);
+        }
+        /* ============================================
+           ENHANCEMENT 33: CHAT MENTIONS STYLES
+           ============================================ */
+        .mention {
+            color: #ffcc00;
+            font-weight: bold;
+            background: #222;
+            border-radius: 4px;
+            padding: 2px 6px;
         }
     </style>
     
