@@ -27,6 +27,7 @@
     <script src="js/memory-panel.js"></script>
     <script src="js/image-creator.js"></script>
     <script src="js/document-upload.js"></script>
+    <script src="js/conversation-history.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/language-selector.js"></script>
 
@@ -153,19 +154,134 @@
             padding: 12px;
         }
 
+        .conversation-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--cream);
+            opacity: 0.6;
+        }
+
+        .conversation-empty p {
+            margin: 8px 0;
+        }
+
+        .empty-hint {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .conversation-group {
+            margin-bottom: 24px;
+        }
+
+        .conversation-group-title {
+            color: var(--gold);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+        }
+
         .conversation-item {
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 10px;
             margin-bottom: 8px;
             cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid transparent;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            background: rgba(212, 175, 55, 0.03);
         }
 
         .conversation-item:hover {
-            background: rgba(212, 175, 55, 0.1);
-            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.12);
+            border-color: rgba(212, 175, 55, 0.4);
+            transform: translateX(5px);
         }
+
+        .conversation-item.active {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: var(--gold);
+            border-left: 4px solid var(--gold);
+        }
+
+        .conversation-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            gap: 8px;
+        }
+
+        .conversation-title {
+            color: var(--cream);
+            font-weight: 600;
+            font-size: 0.95rem;
+            flex: 1;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
+        .conversation-delete {
+            background: transparent;
+            border: none;
+            color: var(--cream);
+            opacity: 0;
+            cursor: pointer;
+            font-size: 1.5rem;
+            line-height: 1;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .conversation-item:hover .conversation-delete {
+            opacity: 0.6;
+        }
+
+        .conversation-delete:hover {
+            opacity: 1 !important;
+            background: var(--red);
+            color: white;
+        }
+
+        .conversation-preview {
+            color: var(--cream);
+            opacity: 0.7;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .conversation-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--cream);
+            opacity: 0.6;
+        }
+
+        .message-count {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .conversation-time {
+            font-weight: 500;
+        }
+
 
         .conversation-item.active {
             background: rgba(212, 175, 55, 0.15);
@@ -3043,6 +3159,11 @@
             // Save to conversation history
             conversationHistory.push({ role: 'user', content: message, timestamp: new Date() });
 
+            // Dispatch event for ConversationHistory module
+            window.dispatchEvent(new CustomEvent('zantara:messageAdded', {
+                detail: { message: message, isUser: true }
+            }));
+
             // Clear input
             input.value = '';
 
@@ -3144,6 +3265,11 @@
                                 sendMessage();
                             });
                         }
+
+                        // Dispatch event for ConversationHistory module
+                        window.dispatchEvent(new CustomEvent('zantara:messageAdded', {
+                            detail: { message: fullMessage, isUser: false }
+                        }));
 
                         messagesDiv.scrollTop = messagesDiv.scrollHeight;
                     });
