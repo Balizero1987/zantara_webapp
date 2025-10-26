@@ -14,6 +14,8 @@ window.Citations = (function() {
    * @param {Object} options - Display options
    */
   function render(citations, container, options = {}) {
+    console.log('[Citations] render() called with:', {citations, citationsLength: citations?.length, container: container?.className, options});
+
     if (!citations || citations.length === 0) {
       console.log('[Citations] No citations to render');
       return;

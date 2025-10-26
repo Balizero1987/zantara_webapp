@@ -411,6 +411,7 @@
 
                         console.log('[SSE complete] Message length:', fullMessage.length);
                         console.log('[SSE complete] Sources from SSE:', sources);
+                        console.log('[SSE complete] Sources type:', typeof sources, 'length:', sources?.length);
 
                         // ✨ RENDER CITATIONS FROM SSE (using Citations module)
                         if (window.Citations && sources && sources.length > 0) {

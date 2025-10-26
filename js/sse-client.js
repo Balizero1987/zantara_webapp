@@ -135,6 +135,7 @@ class ZantaraSSEClient {
           if (data.done) {
             this.stop();
             // ← CITATIONS: Include sources in complete event
+            console.log('[SSE] Complete event - currentSources:', this.currentSources ? this.currentSources.length : 'null/undefined');
             this.emit('complete', {
               message: this.currentMessage,
               sources: this.currentSources
