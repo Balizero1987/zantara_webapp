@@ -388,16 +388,13 @@
                     aiMsg.className = 'message ai-message';
                     aiMsg.innerHTML = '<span class="ai-label">Zantara:</span><span class="ai-content">⏳ Thinking...</span>';
                     messagesDiv.appendChild(aiMsg);
-                    
-                    // Start streaming
-                    await window.ZANTARA_SSE.stream(message, userEmail);
 
-                    // Clean up old listeners to prevent duplicates
+                    // Clean up old listeners to prevent duplicates (BEFORE setting new ones)
                     if (window.ZANTARA_SSE.removeAllListeners) {
                         window.ZANTARA_SSE.removeAllListeners();
                     }
 
-                    // Listen for streaming events
+                    // Listen for streaming events (BEFORE starting stream)
                     window.ZANTARA_SSE.on('start', () => {
                         aiMsg.innerHTML = '<span class="ai-label">Zantara:</span><span class="ai-content"></span>';
                     });
@@ -475,7 +472,10 @@
                         const content = aiMsg.querySelector('.ai-content');
                         content.innerHTML = '<em style="color: #ef4444;">Unable to respond. Try again in a moment.</em>';
                     });
-                    
+
+                    // Start streaming AFTER all listeners are set up
+                    await window.ZANTARA_SSE.stream(message, userEmail);
+
                 } else {
                     // Fallback to regular API call
                     console.log('🔄 Using regular API...');
