@@ -310,11 +310,18 @@
         .message-avatar.ai-avatar {
             background: linear-gradient(135deg, var(--gold) 0%, var(--cream) 100%);
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            padding: 6px;
+        }
+
+        .message-avatar.ai-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .message-avatar.user-avatar {
-            background: linear-gradient(135deg, var(--red) 0%, #ff4444 100%);
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            background: var(--off-white);
+            box-shadow: 0 0 20px rgba(245, 245, 245, 0.3);
             color: var(--black);
             font-weight: 700;
         }
@@ -335,10 +342,10 @@
         }
 
         .user-message {
-            background: var(--red);
+            background: var(--off-white);
             color: var(--black);
             font-weight: 500;
-            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(245, 245, 245, 0.2);
         }
 
         .ai-message {
@@ -574,8 +581,8 @@
         }
 
         #sendBtn {
-            background: var(--red);
-            color: var(--off-white);
+            background: var(--off-white);
+            color: var(--black);
             border: none;
             border-radius: 50%;
             width: 52px;
@@ -587,12 +594,13 @@
             font-size: 20px;
             font-weight: 700;
             transition: all 0.3s;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            box-shadow: 0 0 20px rgba(245, 245, 245, 0.3);
             flex-shrink: 0;
         }
 
         #sendBtn:hover {
             background: var(--gold);
+            color: var(--black);
             transform: scale(1.08);
             box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
         }
@@ -988,7 +996,12 @@
 
             const avatar = document.createElement('div');
             avatar.className = `message-avatar ${type}-avatar`;
-            avatar.textContent = type === 'ai' ? '🤖' : getUserInitials(userName);
+
+            if (type === 'ai') {
+                avatar.innerHTML = '<img src="assets/zantara_logo_transparent.png" alt="Zantara">';
+            } else {
+                avatar.textContent = getUserInitials(userName);
+            }
 
             const contentWrapper = document.createElement('div');
             contentWrapper.className = 'message-content-wrapper';
