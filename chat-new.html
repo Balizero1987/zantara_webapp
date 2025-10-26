@@ -412,8 +412,12 @@
                         const content = aiMsg.querySelector('.ai-content');
                         content.textContent = fullMessage;
 
+                        console.log('[SSE complete] Message length:', fullMessage.length);
+                        console.log('[SSE complete] Sources from SSE:', sources);
+
                         // ✨ RENDER CITATIONS FROM SSE (using Citations module)
                         if (window.Citations && sources && sources.length > 0) {
+                            console.log('[Citations] Rendering from SSE sources:', sources.length);
                             window.Citations.render(sources, aiMsg, {
                                 maxCitations: 3,
                                 showSimilarity: true,
@@ -421,25 +425,36 @@
                             });
                         } else if (window.Citations && !sources) {
                             // SSE didn't provide sources - fetch them from API as fallback
-                            console.log('[Citations] SSE missing sources, fetching from API...');
+                            console.log('[Citations] SSE missing sources, fetching from API fallback...');
                             const RAG_BACKEND = 'https://scintillating-kindness-production-47e3.up.railway.app';
                             fetch(`${RAG_BACKEND}/bali-zero/chat`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ query: message, user_email: userEmail })
                             })
-                                .then(res => res.json())
+                                .then(res => {
+                                    console.log('[Citations API] Response status:', res.status);
+                                    return res.json();
+                                })
                                 .then(response => {
+                                    console.log('[Citations API] Response received:', response.response?.substring(0, 100));
+                                    console.log('[Citations API] Sources in response:', response.sources);
                                     if (window.Citations && window.Citations.hasCitations(response)) {
+                                        console.log('[Citations] hasCitations returned true, extracting...');
                                         const apiCitations = window.Citations.extract(response);
+                                        console.log('[Citations] Extracted citations:', apiCitations.length);
                                         window.Citations.render(apiCitations, aiMsg, {
                                             maxCitations: 3,
                                             showSimilarity: true,
                                             showTier: true
                                         });
+                                    } else {
+                                        console.log('[Citations] hasCitations returned false, no rendering');
                                     }
                                 })
-                                .catch(err => console.log('[Citations] API fallback failed:', err));
+                                .catch(err => console.error('[Citations] API fallback failed:', err));
+                        } else {
+                            console.log('[Citations] No Citations module or sources, skipping');
                         }
 
                         // ✨ SMART SUGGESTIONS INTEGRATION
