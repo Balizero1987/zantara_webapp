@@ -22,6 +22,7 @@
     <script src="js/message-formatter.js"></script>
     <script src="js/smart-suggestions.js"></script>
     <script src="js/citations-module.js"></script>
+    <script src="js/pricing-calculator.js"></script>
 
     <!-- Auth Guard -->
     <script>
@@ -124,7 +125,7 @@
         }
 
         .new-chat-btn {
-            background: var(--red);
+            background: var(--off-white);
             color: var(--black);
             border: none;
             padding: 8px 16px;
@@ -250,20 +251,14 @@
         }
 
         .user-badge {
-            background: var(--red);
+            background: var(--off-white);
             color: var(--black);
             padding: 8px 20px;
             border-radius: 24px;
             font-size: 14px;
             font-weight: 600;
             transition: all 0.3s;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
-            animation: red-glow-pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes red-glow-pulse {
-            0%, 100% { box-shadow: 0 0 15px rgba(255, 0, 0, 0.3); }
-            50% { box-shadow: 0 0 30px rgba(255, 0, 0, 0.5); }
+            box-shadow: 0 0 20px rgba(245, 245, 245, 0.3);
         }
 
         .user-badge:hover {
@@ -894,6 +889,335 @@
         .citation-date {
             color: rgba(245, 241, 231, 0.5);
             font-size: 10px;
+        }
+
+        /* PRICING CALCULATOR WIDGET */
+        .pricing-calculator-widget {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-toggle-btn {
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            border: 2px solid var(--gold);
+            color: var(--black);
+            padding: 14px 24px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(212, 175, 55, 0.6);
+        }
+
+        .pricing-toggle-btn .icon {
+            font-size: 20px;
+        }
+
+        .pricing-panel {
+            display: none;
+            position: fixed;
+            right: 24px;
+            bottom: 90px;
+            width: 420px;
+            max-height: 600px;
+            background: var(--black);
+            border: 2px solid var(--gold);
+            border-radius: 16px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+
+        .pricing-calculator-widget.expanded .pricing-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pricing-header {
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pricing-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--black);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: var(--black);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+            transition: transform 0.2s;
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg);
+        }
+
+        .pricing-services {
+            padding: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .service-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(245, 241, 231, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .service-item:hover {
+            background: rgba(245, 241, 231, 0.1);
+            border-color: var(--gold);
+        }
+
+        .service-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--gold);
+        }
+
+        .service-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .service-name {
+            font-weight: 600;
+            color: var(--off-white);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .service-icon {
+            font-size: 18px;
+        }
+
+        .service-details {
+            font-size: 12px;
+            color: rgba(245, 241, 231, 0.7);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .service-timeline {
+            font-size: 11px;
+            color: var(--gold);
+        }
+
+        .service-price {
+            font-weight: 700;
+            color: var(--gold);
+            font-size: 14px;
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .recurring-badge, .recurring-badge-small {
+            background: var(--red);
+            color: var(--black);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .recurring-badge-small {
+            font-size: 8px;
+            padding: 1px 6px;
+        }
+
+        .pricing-summary {
+            padding: 16px;
+            border-top: 2px solid rgba(212, 175, 55, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .summary-header {
+            font-weight: 700;
+            color: var(--gold);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .summary-content {
+            min-height: 80px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: rgba(245, 241, 231, 0.5);
+            font-size: 13px;
+        }
+
+        .summary-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .item-icon {
+            font-size: 16px;
+        }
+
+        .item-name {
+            flex: 1;
+            margin-left: 8px;
+            color: var(--cream);
+        }
+
+        .item-price {
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .recurring-info {
+            margin-top: 12px;
+            padding: 8px;
+            background: rgba(255, 0, 0, 0.1);
+            border-left: 3px solid var(--red);
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--cream);
+        }
+
+        .summary-total {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 2px solid var(--gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .summary-total .amount {
+            color: var(--gold);
+            font-size: 20px;
+        }
+
+        .pricing-actions {
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            background: var(--black);
+        }
+
+        .pricing-actions button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary {
+            background: rgba(245, 241, 231, 0.1);
+            color: var(--cream);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(245, 241, 231, 0.2);
+            border-color: var(--gold);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            color: var(--black);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .pricing-panel {
+                width: calc(100vw - 48px);
+                right: 24px;
+                left: 24px;
+            }
+
+            .pricing-calculator-widget {
+                right: 16px;
+                bottom: 16px;
+            }
+
+            .pricing-toggle-btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
