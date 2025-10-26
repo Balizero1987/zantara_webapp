@@ -19,6 +19,7 @@
     <script src="js/api-contracts.js"></script>
     <script src="js/zantara-api.js"></script>
     <script src="js/sse-client.js"></script>
+    <script src="js/message-formatter.js"></script>
     <script src="js/smart-suggestions.js"></script>
     <script src="js/citations-module.js"></script>
 
@@ -214,6 +215,32 @@
         .ai-message .ai-content em {
             color: var(--cream);
             font-style: italic;
+        }
+
+        /* Message Formatter Styling */
+        .ai-content .regular-response,
+        .ai-content .structured-response {
+            display: block;
+        }
+
+        .ai-content .response-paragraph {
+            margin-bottom: 12px;
+            line-height: 1.7;
+        }
+
+        .ai-content .response-paragraph:last-child {
+            margin-bottom: 0;
+        }
+
+        .ai-content ul {
+            margin: 8px 0;
+            padding-left: 24px;
+            list-style-type: disc;
+        }
+
+        .ai-content li {
+            margin-bottom: 4px;
+            line-height: 1.6;
         }
 
         /* Thinking state */
@@ -492,15 +519,19 @@
                         aiMsg.innerHTML = '<span class="ai-label">Zantara:</span><span class="ai-content"></span>';
                     });
 
-                    window.ZANTARA_SSE.on('delta', ({message: chunk}) => {
+                    window.ZANTARA_SSE.on('delta', ({chunk, message}) => {
                         const content = aiMsg.querySelector('.ai-content');
-                        content.textContent = chunk;
+                        // Format message with markdown/newlines support
+                        const formatted = MessageFormatter.formatRegularMessage(message);
+                        content.innerHTML = formatted;
                         messagesDiv.scrollTop = messagesDiv.scrollHeight;
                     });
 
                     window.ZANTARA_SSE.on('complete', ({message: fullMessage, sources}) => {
                         const content = aiMsg.querySelector('.ai-content');
-                        content.textContent = fullMessage;
+                        // Final formatting with markdown/newlines
+                        const formatted = MessageFormatter.formatRegularMessage(fullMessage);
+                        content.innerHTML = formatted;
 
                         console.log('[SSE complete] Message length:', fullMessage.length);
                         console.log('[SSE complete] Sources from SSE:', sources);
