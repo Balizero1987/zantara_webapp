@@ -3,18 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#10b981">
+    <meta name="theme-color" content="#090920">
     <title>ZANTARA - Login</title>
-    
+
     <!-- PWA Support -->
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-    
+
+    <!-- Google Fonts - Bali Zero Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
     <!-- API Layer -->
     <script src="js/api-contracts.js"></script>
     <script src="js/zantara-api.js"></script>
-    
+
     <style>
+        :root {
+            --black: #090920;          /* Vivid Black */
+            --red: #FF0000;            /* Bold Red */
+            --cream: #e8d5b7;          /* Cream */
+            --gold: #D4AF37;           /* Gold */
+            --navy: #1a1f3a;           /* Navy */
+            --off-white: #f5f5f5;      /* Off-white */
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -22,15 +36,79 @@
         }
 
         html, body {
-            background: #1e1e1e;
-            color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--black);
+            color: var(--off-white);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             min-height: 100vh;
+            position: relative;
+        }
+
+        /* Batik Pattern Background Animation */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.06) 2%, transparent 0%),
+                radial-gradient(circle at 75% 75%, rgba(232, 213, 183, 0.06) 2%, transparent 0%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.03) 1%, transparent 0%);
+            background-size: 60px 60px, 80px 80px, 40px 40px;
+            animation: batik-flow 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes batik-flow {
+            0%, 100% { opacity: 0.03; }
+            50% { opacity: 0.06; }
         }
 
         body.day-mode {
-            background: #ffffff;
-            color: #000;
+            background: var(--off-white);
+            color: var(--black);
+        }
+
+        body.day-mode::after {
+            opacity: 0.5;
+        }
+
+        /* Dual Logo Header */
+        .header-logos {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            padding: 16px;
+            background: linear-gradient(to bottom, rgba(9, 9, 32, 0.95) 0%, rgba(9, 9, 32, 0) 100%);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        body.day-mode .header-logos {
+            background: linear-gradient(to bottom, rgba(245, 245, 245, 0.95) 0%, rgba(245, 245, 245, 0) 100%);
+        }
+
+        .header-logo {
+            height: 48px;
+            width: auto;
+            filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.4));
+            transition: all 0.3s;
+        }
+
+        .header-logo:hover {
+            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.6));
+            transform: scale(1.05);
+        }
+
+        .logo-divider {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, transparent, var(--gold), transparent);
         }
 
         .login-wrapper {
@@ -38,45 +116,71 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 100px 20px 20px;
+            position: relative;
+            z-index: 1;
         }
 
         .login-card {
-            background: #252525;
-            border: 1px solid #3a3a3a;
+            background: rgba(26, 31, 58, 0.95);
+            border: 1px solid rgba(212, 175, 55, 0.3);
             border-radius: 20px;
             padding: 48px;
             max-width: 480px;
             width: 100%;
             text-align: center;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(212, 175, 55, 0.1);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         body.day-mode .login-card {
-            background: #ffffff;
-            border: 2px solid #e0e0e0;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 60px rgba(212, 175, 55, 0.15);
         }
 
         .logo-center {
             width: 120px;
             height: 120px;
             margin: 0 auto 20px;
-            filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.4));
+            filter: drop-shadow(0 0 40px rgba(212, 175, 55, 0.5));
         }
 
         h1 {
-            font-size: 28px;
-            font-weight: 600;
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
             margin-bottom: 8px;
+            color: var(--gold);
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        body.day-mode h1 {
+            color: var(--black);
+            text-shadow: none;
         }
 
         .powered-by {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--cream);
             font-size: 14px;
             margin-bottom: 32px;
+            font-weight: 400;
         }
 
         body.day-mode .powered-by {
-            color: rgba(0, 0, 0, 0.5);
+            color: rgba(0, 0, 0, 0.6);
         }
 
         .message {
@@ -84,18 +188,19 @@
             border-radius: 8px;
             margin: 16px 0;
             font-size: 14px;
+            font-weight: 500;
         }
 
         .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--gold);
+            border: 1px solid var(--gold);
         }
 
         .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: rgba(255, 0, 0, 0.2);
+            color: var(--red);
+            border: 1px solid var(--red);
         }
 
         .form-group {
@@ -107,81 +212,136 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--cream);
+            font-size: 14px;
         }
 
         body.day-mode .form-label {
-            color: rgba(0, 0, 0, 0.8);
+            color: var(--black);
         }
 
         .form-input {
             width: 100%;
             padding: 12px 16px;
             border-radius: 8px;
-            border: 1px solid #3a3a3a;
-            background: #2a2a2a;
-            color: #fff;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(9, 9, 32, 0.6);
+            color: var(--off-white);
             font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
         }
 
         body.day-mode .form-input {
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            color: #000;
+            background: rgba(245, 245, 245, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: var(--black);
         }
 
         .form-input:focus {
             outline: none;
-            border-color: #6B46C1;
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: rgba(232, 213, 183, 0.4);
+        }
+
+        body.day-mode .form-input::placeholder {
+            color: rgba(0, 0, 0, 0.3);
         }
 
         .btn-primary {
             width: 100%;
-            padding: 12px 24px;
-            background: #6B46C1;
-            color: #fff;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, var(--red) 0%, #cc0000 100%);
+            color: var(--off-white);
             border: none;
             border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.2));
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .btn-primary:hover {
-            background: #5a38a3;
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, #ff3333 0%, var(--red) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+        }
+
+        .btn-primary:hover::before {
+            opacity: 1;
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .btn-primary:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
         .theme-toggle {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #2a2a2a;
-            border: 1px solid #3a3a3a;
+            top: 24px;
+            right: 24px;
+            background: rgba(26, 31, 58, 0.9);
+            border: 1px solid rgba(212, 175, 55, 0.3);
             border-radius: 8px;
             padding: 8px 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
-            color: #fff;
+            color: var(--cream);
             font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            z-index: 101;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(26, 31, 58, 1);
+            border-color: var(--gold);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
         }
 
         body.day-mode .theme-toggle {
-            background: #f5f5f5;
-            border-color: #ddd;
-            color: #000;
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(212, 175, 55, 0.4);
+            color: var(--black);
+        }
+
+        body.day-mode .theme-toggle:hover {
+            background: rgba(255, 255, 255, 1);
         }
     </style>
 </head>
 <body>
+    <!-- Dual Logo Header -->
+    <div class="header-logos">
+        <img src="assets/balizero-logo-3d.png" alt="Bali Zero" class="header-logo">
+        <div class="logo-divider"></div>
+        <img src="assets/zantara_logo_transparent.png" alt="Zantara" class="header-logo">
+    </div>
+
     <!-- Theme Toggle -->
     <div class="theme-toggle" onclick="toggleTheme()">
         <span id="themeIcon">🌙</span>
@@ -191,9 +351,9 @@
     <div class="login-wrapper">
         <div class="login-card">
             <img src="assets/logoscon.png" class="logo-center" alt="ZANTARA">
-            
-            <h1>Welcome to Zantara</h1>
-            <p class="powered-by">powered by Zero AI</p>
+
+            <h1>🪷 Benvenuto su Zantara</h1>
+            <p class="powered-by">L'anima intelligente di Bali Zero</p>
             
             <!-- Message Area -->
             <div id="message" style="display: none;"></div>
