@@ -69,7 +69,8 @@ window.PricingCalculator = (function() {
    */
   function createWidget() {
     // Check if widget already exists
-    if (document.querySelector('.pricing-calculator-widget')) {
+    widget = document.querySelector('.pricing-calculator-widget');
+    if (widget) {
       console.log('[PricingCalculator] Widget already exists');
       return;
     }

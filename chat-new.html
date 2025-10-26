@@ -110,14 +110,14 @@
 
         /* Conversation Item Styles */
         .conversation-item.favorited {
-            border-left: 3px solid #FFD700;
-            background: rgba(255, 215, 0, 0.05);
+            border-left: 3px solid var(--gold);
+            background: rgba(255, 204, 0, 0.05);
         }
 
         .conversation-favorite {
             background: none;
             border: none;
-            color: #FFD700;
+            color: var(--gold);
             cursor: pointer;
             font-size: 16px;
             padding: 0 5px;
@@ -319,7 +319,7 @@
         }
 
         .template-use:hover {
-            background: #cc0000;
+            background: var(--color-estate-end);
         }
 
         .template-preview {
@@ -642,9 +642,9 @@
         }
 
         .conversation-tag {
-            background: rgba(212, 175, 55, 0.2);
-            color: #D4AF37;
-            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(255, 204, 0, 0.2);
+            color: var(--gold);
+            border: 1px solid rgba(255, 204, 0, 0.3);
             border-radius: 3px;
             padding: 2px 6px;
             font-size: 10px;
@@ -1571,17 +1571,17 @@
         }
 
         .citation-tier.tier-t1 {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, var(--color-company-start), var(--color-company-end));
             color: white;
         }
 
         .citation-tier.tier-t2 {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            background: linear-gradient(135deg, var(--color-visa-start), var(--color-visa-end));
             color: white;
         }
 
         .citation-tier.tier-t3 {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            background: linear-gradient(135deg, var(--color-tax-start), var(--color-tax-end));
             color: white;
         }
 
@@ -2041,10 +2041,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 99998;
+            z-index: 99999;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s ease;
+            display: block !important;
         }
 
         .memory-panel.active {
@@ -3173,28 +3174,28 @@
         }
 
         .tier-badge.tier-S {
-            background: linear-gradient(135deg, #ff0000, #ffd700);
+            background: linear-gradient(135deg, var(--color-estate-start), var(--color-estate-end));
             color: white;
         }
 
         .tier-badge.tier-A {
-            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            background: linear-gradient(135deg, var(--color-tax-start), var(--color-tax-end));
             color: white;
         }
 
         .tier-badge.tier-B {
-            background: linear-gradient(135deg, #4169e1, #1e90ff);
+            background: linear-gradient(135deg, var(--color-visa-start), var(--color-visa-end));
             color: white;
         }
 
         .tier-badge.tier-C {
-            background: linear-gradient(135deg, #32cd32, #00ff00);
+            background: linear-gradient(135deg, var(--color-company-start), var(--color-company-end));
             color: white;
         }
 
         .tier-badge.tier-D {
-            background: linear-gradient(135deg, #808080, #a9a9a9);
-            color: white;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+            color: var(--text-secondary);
         }
 
         .upload-another-btn {

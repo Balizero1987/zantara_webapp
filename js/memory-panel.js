@@ -143,6 +143,9 @@ const MemoryPanel = (() => {
    * Toggle panel open/close
    */
   function toggle() {
+    console.log('[MemoryPanel] Toggle called, isOpen:', isOpen);
+    const panel = document.getElementById('memoryPanel');
+    console.log('[MemoryPanel] Panel element:', panel);
     if (isOpen) {
       close();
     } else {
