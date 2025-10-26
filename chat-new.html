@@ -280,6 +280,21 @@
             box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
         }
 
+        /* Price Calculator Button - Gold */
+        #priceCalcBtn {
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            color: var(--black);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+            padding: 0;
+            border-radius: 50%;
+        }
+
+        #priceCalcBtn:hover {
+            background: linear-gradient(135deg, #d4af37, var(--gold));
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+        }
+
         /* Export Button - White */
         #exportBtn {
             background: var(--off-white);
@@ -2134,6 +2149,7 @@
                     <img src="assets/zantara_logo_transparent.png" class="logo-zantara" alt="ZANTARA" onerror="this.style.display='none'">
                 </div>
                 <div class="header-actions">
+                    <button class="header-action-btn" id="priceCalcBtn" title="Price Calculator">💰</button>
                     <button class="header-action-btn" id="exportBtn" title="Export chat">📥</button>
                     <div class="header-action-btn user-avatar-btn" id="userAvatarBtn" title="Profile">
                         <span class="initials">U</span>
