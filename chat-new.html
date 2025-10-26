@@ -34,6 +34,7 @@
     <script src="js/conversation-export.js"></script>
     <script src="js/theme-toggle.js"></script>
     <script src="js/typing-indicators.js"></script>
+    <script src="js/smart-reply.js"></script>
 
     <!-- Auth Guard -->
     <script>
@@ -638,6 +639,119 @@
             }
             50% {
                 transform: scale(1.1);
+            }
+        }
+
+        /* ============================================
+           SMART REPLY SUGGESTIONS - Enhancement 14
+           ============================================ */
+        .smart-reply-container {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.3) 100%);
+            border-top: 2px solid var(--gold);
+            border-bottom: 2px solid var(--gold);
+            margin-bottom: 10px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .smart-reply-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .smart-reply-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .smart-reply-icon {
+            font-size: 1.2rem;
+        }
+
+        .smart-reply-title {
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 0.95rem;
+            flex: 1;
+        }
+
+        .smart-reply-close {
+            background: transparent;
+            border: none;
+            color: var(--cream);
+            font-size: 1.3rem;
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            opacity: 0.7;
+        }
+
+        .smart-reply-close:hover {
+            background: rgba(212, 175, 55, 0.2);
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+
+        .smart-reply-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .smart-reply-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--navy) 0%, rgba(0, 0, 0, 0.8) 100%);
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            padding: 10px 18px;
+            color: var(--cream);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .smart-reply-chip:hover {
+            background: linear-gradient(135deg, var(--gold) 0%, rgba(212, 175, 55, 0.8) 100%);
+            color: var(--black);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .chip-text {
+            flex: 1;
+        }
+
+        .chip-icon {
+            font-size: 1rem;
+            opacity: 0.8;
+            transition: transform 0.3s;
+        }
+
+        .smart-reply-chip:hover .chip-icon {
+            transform: translateX(3px);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .smart-reply-container {
+                padding: 12px 15px;
+            }
+
+            .smart-reply-chip {
+                font-size: 0.85rem;
+                padding: 8px 14px;
             }
         }
 
