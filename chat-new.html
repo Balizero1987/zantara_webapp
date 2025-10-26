@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#FF0000">
+    <meta name="theme-color" content="#000000">
     <title>ZANTARA Chat - Bali Zero Intelligence</title>
 
     <!-- PWA Support -->
@@ -43,32 +43,38 @@
     </script>
 
     <style>
-        /* ChatGPT/Claude-inspired Neutral Color Palette */
+        /* Bali Zero - Welcome.balizero.com Inspired Design */
         :root {
-            /* Light Mode (default) */
-            --bg-primary: #FFFFFF;
-            --bg-secondary: #F7F7F8;
-            --bg-tertiary: #ECECEC;
-            --text-primary: #2D2D2D;
-            --text-secondary: #6B6B6B;
-            --border-light: #E5E5E5;
-            --user-bubble: #2F7BD6;
-            --hover-bg: #F0F0F0;
-            --button-primary: #2D2D2D;
+            /* Primary Colors - Pure Black & White */
+            --bg-primary: #000000;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #FFFFFF;
+            --text-secondary: #a0a0a0;
+            --border-light: #333333;
+            --user-bubble: #0D6EFD;
+            --hover-bg: #2a2a2a;
+            --button-primary: #FFFFFF;
 
-            /* Dark Mode */
-            --bg-primary-dark: #1E1E1E;
-            --bg-secondary-dark: #2A2A2A;
-            --text-primary-dark: #ECECEC;
-            --border-dark: #3A3A3A;
+            /* Service Colors - Bali Zero Brand Palette */
+            --color-visa: #0D6EFD;
+            --color-company: #10B981;
+            --color-tax: #FDB813;
+            --color-estate: #DC2626;
 
-            /* Legacy compatibility (map old vars to new) */
-            --black: var(--text-primary);
-            --red: var(--user-bubble);
+            /* Dark Mode (same as light mode for consistency) */
+            --bg-primary-dark: #000000;
+            --bg-secondary-dark: #1a1a1a;
+            --text-primary-dark: #FFFFFF;
+            --border-dark: #333333;
+
+            /* Legacy compatibility */
+            --black: #000000;
+            --red: #DC2626;
             --cream: var(--text-secondary);
-            --gold: var(--button-primary);
+            --gold: #FDB813;
             --navy: var(--bg-secondary);
-            --off-white: var(--bg-primary);
+            --off-white: #FFFFFF;
         }
 
         /* Conversation History Actions */
@@ -3519,13 +3525,13 @@
             cursor: pointer;
             padding: 4px;
             border-radius: 4px;
-            color: #666;
+            color: var(--text-secondary);
             transition: all 0.2s ease;
         }
         
         .conversation-action-btn:hover {
-            background-color: #f0f0f0;
-            color: #333;
+            background-color: var(--hover-bg);
+            color: var(--text-primary);
         }
     </style>
 </head>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#090920">
+    <meta name="theme-color" content="#000000">
     <title>ZANTARA - Login</title>
 
     <!-- PWA Support -->
@@ -22,12 +22,13 @@
 
     <style>
         :root {
-            --black: #090920;          /* Vivid Black */
-            --red: #FF0000;            /* Bold Red */
-            --cream: #e8d5b7;          /* Cream */
-            --gold: #D4AF37;           /* Gold */
-            --navy: #1a1f3a;           /* Navy */
-            --off-white: #f5f5f5;      /* Off-white */
+            /* Bali Zero - Pure Black & White Design */
+            --black: #000000;          /* Pure Black */
+            --red: #DC2626;            /* Elegant Red */
+            --cream: #a0a0a0;          /* Text Secondary */
+            --gold: #FDB813;           /* Bali Zero Gold */
+            --navy: #1a1a1a;           /* Dark Background */
+            --off-white: #FFFFFF;      /* Pure White */
         }
 
         * {
@@ -85,13 +86,13 @@
             justify-content: center;
             gap: 24px;
             padding: 16px;
-            background: linear-gradient(to bottom, rgba(9, 9, 32, 0.95) 0%, rgba(9, 9, 32, 0) 100%);
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0) 100%);
             backdrop-filter: blur(10px);
             z-index: 100;
         }
 
         body.day-mode .header-logos {
-            background: linear-gradient(to bottom, rgba(245, 245, 245, 0.95) 0%, rgba(245, 245, 245, 0) 100%);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 100%);
         }
 
         .header-logo {
@@ -123,15 +124,15 @@
         }
 
         .login-card {
-            background: rgba(26, 31, 58, 0.95);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 20px;
+            background: rgba(26, 26, 26, 0.95);
+            border: 1px solid rgba(51, 51, 51, 0.5);
+            border-radius: 16px;
             padding: 48px;
             max-width: 480px;
             width: 100%;
             text-align: center;
             backdrop-filter: blur(20px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(212, 175, 55, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
             animation: fadeIn 0.5s ease-out;
         }
 
@@ -225,8 +226,8 @@
             width: 100%;
             padding: 12px 16px;
             border-radius: 8px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            background: rgba(9, 9, 32, 0.6);
+            border: 1px solid rgba(51, 51, 51, 0.5);
+            background: rgba(0, 0, 0, 0.4);
             color: var(--off-white);
             font-size: 15px;
             font-family: 'Inter', sans-serif;
@@ -234,29 +235,29 @@
         }
 
         body.day-mode .form-input {
-            background: rgba(245, 245, 245, 0.8);
-            border: 1px solid rgba(212, 175, 55, 0.4);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(200, 200, 200, 0.5);
             color: var(--black);
         }
 
         .form-input:focus {
             outline: none;
-            border-color: var(--gold);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+            border-color: rgba(160, 160, 160, 0.8);
+            background: rgba(0, 0, 0, 0.6);
         }
 
         .form-input::placeholder {
-            color: rgba(232, 213, 183, 0.4);
+            color: rgba(160, 160, 160, 0.5);
         }
 
         body.day-mode .form-input::placeholder {
-            color: rgba(0, 0, 0, 0.3);
+            color: rgba(0, 0, 0, 0.4);
         }
 
         .btn-primary {
             width: 100%;
             padding: 14px 24px;
-            background: linear-gradient(135deg, var(--red) 0%, #cc0000 100%);
+            background: var(--red);
             color: var(--off-white);
             border: none;
             border-radius: 8px;
@@ -264,7 +265,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
             position: relative;
             overflow: hidden;
         }
@@ -273,15 +273,14 @@
             content: "";
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.2));
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1));
             opacity: 0;
             transition: opacity 0.3s;
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #ff3333 0%, var(--red) 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+            background: #B91C1C;
+            transform: translateY(-1px);
         }
 
         .btn-primary:hover::before {
@@ -302,8 +301,8 @@
             position: fixed;
             top: 24px;
             right: 24px;
-            background: rgba(26, 31, 58, 0.9);
-            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(26, 26, 26, 0.9);
+            border: 1px solid rgba(51, 51, 51, 0.5);
             border-radius: 8px;
             padding: 8px 16px;
             cursor: pointer;
@@ -319,19 +318,18 @@
         }
 
         .theme-toggle:hover {
-            background: rgba(26, 31, 58, 1);
-            border-color: var(--gold);
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+            background: rgba(42, 42, 42, 1);
+            border-color: rgba(160, 160, 160, 0.5);
         }
 
         body.day-mode .theme-toggle {
             background: rgba(255, 255, 255, 0.9);
-            border-color: rgba(212, 175, 55, 0.4);
+            border-color: rgba(200, 200, 200, 0.5);
             color: var(--black);
         }
 
         body.day-mode .theme-toggle:hover {
-            background: rgba(255, 255, 255, 1);
+            background: rgba(245, 245, 245, 1);
         }
     </style>
 </head>
@@ -345,7 +343,6 @@
 
     <!-- Theme Toggle -->
     <div class="theme-toggle" onclick="toggleTheme()">
-        <span id="themeIcon">🌙</span>
         <span id="themeText">Night</span>
     </div>
 
@@ -390,14 +387,11 @@
         // Theme toggle
         function toggleTheme() {
             document.body.classList.toggle('day-mode');
-            const icon = document.getElementById('themeIcon');
             const text = document.getElementById('themeText');
-            
+
             if (document.body.classList.contains('day-mode')) {
-                icon.textContent = '☀️';
                 text.textContent = 'Day';
             } else {
-                icon.textContent = '🌙';
                 text.textContent = 'Night';
             }
         }
@@ -416,29 +410,29 @@
             // Show loading
             messageDiv.style.display = 'block';
             messageDiv.className = 'message';
-            messageDiv.textContent = '🔄 Logging in...';
+            messageDiv.textContent = 'Logging in...';
             loginBtn.disabled = true;
-            
+
             try {
                 // Call API
                 const result = await ZANTARA_API.teamLogin(email, pin, name);
-                
+
                 if (result.success) {
                     messageDiv.className = 'message success';
-                    messageDiv.textContent = '✅ ' + result.message;
-                    
+                    messageDiv.textContent = result.message;
+
                     // Redirect to chat
                     setTimeout(() => {
                         window.location.href = 'chat-new.html';
                     }, 1000);
                 } else {
                     messageDiv.className = 'message error';
-                    messageDiv.textContent = '❌ ' + result.error;
+                    messageDiv.textContent = result.error;
                     loginBtn.disabled = false;
                 }
             } catch (error) {
                 messageDiv.className = 'message error';
-                messageDiv.textContent = '❌ Errore: ' + error.message;
+                messageDiv.textContent = 'Error: ' + error.message;
                 loginBtn.disabled = false;
             }
         });
