@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#000">
     <title>ZANTARA - Login</title>
 
     <!-- PWA Support -->
@@ -22,13 +22,17 @@
 
     <style>
         :root {
-            /* Bali Zero - Pure Black & White Design */
-            --black: #000000;          /* Pure Black */
-            --red: #DC2626;            /* Elegant Red */
-            --cream: #a0a0a0;          /* Text Secondary */
-            --gold: #FDB813;           /* Bali Zero Gold */
-            --navy: #1a1a1a;           /* Dark Background */
-            --off-white: #FFFFFF;      /* Pure White */
+            /* Bali Zero - EXACT colors from welcome.balizero.com */
+            --black: #000;             /* Pure Black */
+            --red: #ff0000;            /* EXACT Red from welcome */
+            --cream: rgba(255,255,255,0.7);  /* Text Secondary */
+            --gold: #ffcc00;           /* EXACT Gold from welcome */
+            --navy: #000;              /* Pure Black Background */
+            --off-white: #fff;         /* Pure White */
+
+            /* Borders - EXACT from welcome.balizero.com */
+            --border-subtle: rgba(255,255,255,0.1);
+            --border-medium: rgba(255,255,255,0.3);
         }
 
         * {
@@ -124,8 +128,8 @@
         }
 
         .login-card {
-            background: rgba(26, 26, 26, 0.95);
-            border: 1px solid rgba(51, 51, 51, 0.5);
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid var(--border-subtle);
             border-radius: 16px;
             padding: 48px;
             max-width: 480px;
@@ -226,8 +230,8 @@
             width: 100%;
             padding: 12px 16px;
             border-radius: 8px;
-            border: 1px solid rgba(51, 51, 51, 0.5);
-            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-subtle);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--off-white);
             font-size: 15px;
             font-family: 'Inter', sans-serif;
@@ -236,18 +240,18 @@
 
         body.day-mode .form-input {
             background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(200, 200, 200, 0.5);
+            border: 1px solid var(--border-medium);
             color: var(--black);
         }
 
         .form-input:focus {
             outline: none;
-            border-color: rgba(160, 160, 160, 0.8);
-            background: rgba(0, 0, 0, 0.6);
+            border-color: var(--border-medium);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .form-input::placeholder {
-            color: rgba(160, 160, 160, 0.5);
+            color: var(--cream);
         }
 
         body.day-mode .form-input::placeholder {
@@ -257,7 +261,7 @@
         .btn-primary {
             width: 100%;
             padding: 14px 24px;
-            background: var(--red);
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
             color: var(--off-white);
             border: none;
             border-radius: 8px;
@@ -279,7 +283,7 @@
         }
 
         .btn-primary:hover {
-            background: #B91C1C;
+            background: linear-gradient(135deg, #ff3333 0%, #ff0000 100%);
             transform: translateY(-1px);
         }
 
@@ -301,8 +305,8 @@
             position: fixed;
             top: 24px;
             right: 24px;
-            background: rgba(26, 26, 26, 0.9);
-            border: 1px solid rgba(51, 51, 51, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
             border-radius: 8px;
             padding: 8px 16px;
             cursor: pointer;
@@ -318,18 +322,18 @@
         }
 
         .theme-toggle:hover {
-            background: rgba(42, 42, 42, 1);
-            border-color: rgba(160, 160, 160, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border-medium);
         }
 
         body.day-mode .theme-toggle {
             background: rgba(255, 255, 255, 0.9);
-            border-color: rgba(200, 200, 200, 0.5);
+            border-color: var(--border-medium);
             color: var(--black);
         }
 
         body.day-mode .theme-toggle:hover {
-            background: rgba(245, 245, 245, 1);
+            background: rgba(255, 255, 255, 1);
         }
     </style>
 </head>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#000">
     <title>ZANTARA Chat - Bali Zero Intelligence</title>
 
     <!-- PWA Support -->
@@ -43,38 +43,46 @@
     </script>
 
     <style>
-        /* Bali Zero - Welcome.balizero.com Inspired Design */
+        /* Bali Zero - EXACT colors from welcome.balizero.com */
         :root {
-            /* Primary Colors - Pure Black & White */
-            --bg-primary: #000000;
-            --bg-secondary: #1a1a1a;
-            --bg-tertiary: #2a2a2a;
-            --text-primary: #FFFFFF;
-            --text-secondary: #a0a0a0;
-            --border-light: #333333;
-            --user-bubble: #0D6EFD;
-            --hover-bg: #2a2a2a;
-            --button-primary: #FFFFFF;
+            /* Primary Colors - EXACT match */
+            --bg-primary: #000;
+            --bg-secondary: #000;
+            --bg-tertiary: rgba(255,255,255,0.05);
+            --text-primary: #fff;
+            --text-secondary: rgba(255,255,255,0.7);
+            --border-light: rgba(255,255,255,0.1);
+            --user-bubble: #0066ff;
+            --hover-bg: rgba(255,255,255,0.05);
+            --button-primary: #fff;
 
-            /* Service Colors - Bali Zero Brand Palette */
-            --color-visa: #0D6EFD;
-            --color-company: #10B981;
-            --color-tax: #FDB813;
-            --color-estate: #DC2626;
+            /* Service Colors - EXACT gradients from welcome.balizero.com */
+            --color-visa-start: #0066ff;
+            --color-visa-end: #004dd1;
+            --color-company-start: #00cc66;
+            --color-company-end: #009944;
+            --color-tax-start: #ffcc00;
+            --color-tax-end: #ffaa00;
+            --color-estate-start: #ff0000;
+            --color-estate-end: #cc0000;
 
-            /* Dark Mode (same as light mode for consistency) */
-            --bg-primary-dark: #000000;
-            --bg-secondary-dark: #1a1a1a;
-            --text-primary-dark: #FFFFFF;
-            --border-dark: #333333;
+            /* Borders - EXACT from welcome.balizero.com */
+            --border-subtle: rgba(255,255,255,0.1);
+            --border-medium: rgba(255,255,255,0.3);
+
+            /* Dark Mode (same as light mode) */
+            --bg-primary-dark: #000;
+            --bg-secondary-dark: #000;
+            --text-primary-dark: #fff;
+            --border-dark: rgba(255,255,255,0.1);
 
             /* Legacy compatibility */
-            --black: #000000;
-            --red: #DC2626;
-            --cream: var(--text-secondary);
-            --gold: #FDB813;
-            --navy: var(--bg-secondary);
-            --off-white: #FFFFFF;
+            --black: #000;
+            --red: #ff0000;
+            --cream: rgba(255,255,255,0.7);
+            --gold: #ffcc00;
+            --navy: #000;
+            --off-white: #fff;
         }
 
         /* Conversation History Actions */
