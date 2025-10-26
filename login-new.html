@@ -443,14 +443,14 @@
             }
         });
         
+        // Apply translations BEFORE redirect check
+        if (window.ZANTARA_I18N) {
+            ZANTARA_I18N.applyTranslations();
+        }
+
         // Check if already logged in
         if (ZANTARA_API.isLoggedIn()) {
             window.location.href = 'chat-new.html';
-        }
-
-        // Apply translations based on user language (IT/ID)
-        if (window.ZANTARA_I18N) {
-            ZANTARA_I18N.applyTranslations();
         }
     </script>
 </body>
