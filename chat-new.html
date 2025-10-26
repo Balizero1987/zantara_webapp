@@ -38,6 +38,11 @@
     <script src="js/read-receipts.js"></script>
     <script src="js/message-search.js"></script>
     <script src="js/notifications.js"></script>
+    <script src="js/collaborative-chat.js"></script>
+    <script src="js/file-attachments.js"></script>
+    <script src="js/code-highlighting.js"></script>
+    <script src="js/markdown-support.js"></script>
+    <script src="js/emoji-picker.js"></script>
 
     <!-- Auth Guard -->
     <script>
@@ -1699,7 +1704,7 @@
             outline: none;
             border-color: var(--gold);
             background: rgba(26, 31, 58, 0.8);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
         }
 
         #chatInput::placeholder {
@@ -3932,20 +3937,102 @@
             font-weight: 700;
         }
 
-        @media (max-width: 768px) {
-            .language-dropdown {
-                right: -10px;
-                min-width: 220px;
-            }
-
-            .language-selector-btn {
-                padding: 6px 12px;
-                font-size: 0.9rem;
-            }
-
-            .current-lang-flag {
-                font-size: 1.1rem;
-            }
+        /* ============================================
+           ENHANCEMENT 19: COLLABORATIVE CHAT STYLES
+           ============================================ */
+        .collab-presence-panel {
+            display: flex;
+            gap: 12px;
+            padding: 8px 0;
+            background: rgba(255,204,0,0.07);
+            border-bottom: 1px solid rgba(255,204,0,0.15);
+        }
+        .collab-user {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.95rem;
+            color: #fff;
+            opacity: 0.7;
+        }
+        .collab-user.online {
+            opacity: 1;
+            font-weight: 600;
+        }
+        .collab-user .avatar {
+            font-size: 1.2em;
+        }
+        /* ============================================
+           ENHANCEMENT 20: FILE ATTACHMENTS STYLES
+           ============================================ */
+        .attachment-btn {
+            background: var(--gold, #ffcc00);
+            color: #222;
+            border: none;
+            border-radius: 6px;
+            padding: 7px 16px;
+            font-size: 1rem;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .attachment-btn:hover {
+            background: #ffe066;
+        }
+        /* ============================================
+           ENHANCEMENT 21: CODE HIGHLIGHTING STYLES
+           ============================================ */
+        pre code {
+            background: #222;
+            color: #fff;
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 0.98rem;
+            font-family: 'Fira Mono', 'Consolas', monospace;
+            overflow-x: auto;
+        }
+        .code-keyword {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        /* ============================================
+           ENHANCEMENT 22: MARKDOWN SUPPORT STYLES
+           ============================================ */
+        strong {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        em {
+            color: #ffd700;
+            font-style: italic;
+        }
+        a {
+            color: #4fc3f7;
+            text-decoration: underline;
+        }
+        /* ============================================
+           ENHANCEMENT 23: EMOJI PICKER STYLES
+           ============================================ */
+        .emoji-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: #222;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-top: 8px;
+            font-size: 1.3em;
+            cursor: pointer;
+            user-select: none;
+        }
+        .emoji-picker span {
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .emoji-picker span:hover {
+            background: #ffcc00;
+            color: #222;
         }
     </style>
     
