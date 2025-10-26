@@ -43,6 +43,11 @@
     <script src="js/code-highlighting.js"></script>
     <script src="js/markdown-support.js"></script>
     <script src="js/emoji-picker.js"></script>
+    <script src="js/pinned-messages.js"></script>
+    <script src="js/chat-export.js"></script>
+    <script src="js/message-scheduling.js"></script>
+    <script src="js/ai-summarization.js"></script>
+    <script src="js/custom-avatars.js"></script>
 
     <!-- Auth Guard -->
     <script>
@@ -3157,567 +3162,6 @@
             padding: 40px;
         }
 
-        .image-creator-btn {
-            position: fixed;
-            bottom: 170px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--red) 0%, var(--gold) 100%);
-            border: 2px solid var(--gold);
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
-            transition: all 0.3s;
-            z-index: 9998;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .image-creator-btn:hover {
-            transform: translateY(-5px) scale(1.1);
-            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5);
-        }
-
-        /* FREE Models UI Enhancements */
-        .model-info {
-            display: block;
-            margin-top: 5px;
-            font-size: 0.85rem;
-            color: var(--gold);
-            font-weight: 600;
-        }
-
-        .free-credits-notice {
-            background: rgba(16, 185, 129, 0.1);
-            border: 2px solid #10b981;
-            border-radius: 10px;
-            padding: 12px;
-            margin-top: 15px;
-            color: #10b981;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-
-        .model-used-badge {
-            background: rgba(212, 175, 55, 0.2);
-            border: 2px solid var(--gold);
-            border-radius: 10px;
-            padding: 8px 15px;
-            margin: 10px 0;
-            color: var(--gold);
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        /* ============================================
-           DOCUMENT UPLOAD STYLES
-           ============================================ */
-
-        .document-upload-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .document-upload-content {
-            background: linear-gradient(135deg, var(--black) 0%, rgba(34, 34, 34, 0.95) 100%);
-            border: 3px solid var(--gold);
-            border-radius: 20px;
-            max-width: 700px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 50px rgba(212, 175, 55, 0.3);
-        }
-
-        .document-upload-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 25px 30px;
-            border-bottom: 2px solid var(--gold);
-        }
-
-        .document-upload-header h2 {
-            color: var(--gold);
-            font-size: 1.8rem;
-            margin: 0;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--gold);
-            font-size: 2rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .close-btn:hover {
-            transform: rotate(90deg);
-            color: var(--red);
-        }
-
-        .document-upload-body {
-            padding: 30px;
-        }
-
-        .drop-zone {
-            border: 3px dashed var(--gold);
-            border-radius: 15px;
-            padding: 60px 40px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: rgba(212, 175, 55, 0.05);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .drop-zone:hover {
-            border-color: var(--red);
-            background: rgba(255, 0, 0, 0.05);
-            transform: scale(1.02);
-        }
-
-        .drop-zone.drag-over {
-            background: rgba(212, 175, 55, 0.15);
-            border-color: var(--gold);
-            border-style: solid;
-        }
-
-        .drop-zone-icon {
-            font-size: 4rem;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .drop-zone-text {
-            color: var(--cream);
-            font-size: 1.2rem;
-            margin: 0;
-        }
-
-        .drop-zone-text strong {
-            color: var(--gold);
-        }
-
-        .drop-zone-hint {
-            color: var(--cream);
-            opacity: 0.7;
-            font-size: 0.9rem;
-            margin: 0;
-        }
-
-        .select-file-btn {
-            background: linear-gradient(135deg, var(--red) 0%, var(--gold) 100%);
-            border: none;
-            color: white;
-            padding: 15px 40px;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .select-file-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5);
-        }
-
-        .file-preview {
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .file-preview-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 20px;
-            background: rgba(212, 175, 55, 0.1);
-            border: 2px solid var(--gold);
-            border-radius: 12px;
-            margin-bottom: 25px;
-        }
-
-        .file-icon {
-            font-size: 2.5rem;
-        }
-
-        .file-info {
-            flex: 1;
-        }
-
-        .file-name {
-            color: var(--gold);
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin: 0 0 5px 0;
-            word-break: break-word;
-        }
-
-        .file-size {
-            color: var(--cream);
-            opacity: 0.8;
-            font-size: 0.9rem;
-            margin: 0;
-        }
-
-        .remove-file-btn {
-            background: var(--red);
-            border: none;
-            color: white;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .remove-file-btn:hover {
-            transform: rotate(90deg);
-            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.5);
-        }
-
-        .metadata-section {
-            margin-bottom: 25px;
-        }
-
-        .metadata-section h3 {
-            color: var(--gold);
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            color: var(--cream);
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            background: rgba(212, 175, 55, 0.05);
-            border: 2px solid var(--gold);
-            border-radius: 8px;
-            color: var(--cream);
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--red);
-            background: rgba(255, 0, 0, 0.05);
-        }
-
-        .form-group input::placeholder {
-            color: var(--cream);
-            opacity: 0.5;
-        }
-
-        .upload-btn {
-            width: 100%;
-            background: linear-gradient(135deg, var(--red) 0%, var(--gold) 100%);
-            border: none;
-            color: white;
-            padding: 18px;
-            border-radius: 12px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s;
-        }
-
-        .upload-btn:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5);
-        }
-
-        .upload-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .upload-progress {
-            text-align: center;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        .progress-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .progress-icon {
-            font-size: 2.5rem;
-        }
-
-        .progress-icon.spinning {
-            animation: spin 2s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .progress-text {
-            color: var(--gold);
-            font-size: 1.3rem;
-            font-weight: 600;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 30px;
-            background: rgba(212, 175, 55, 0.1);
-            border: 2px solid var(--gold);
-            border-radius: 15px;
-            overflow: hidden;
-            margin-bottom: 15px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--red) 0%, var(--gold) 100%);
-            transition: width 0.5s ease;
-            width: 0%;
-        }
-
-        .progress-percentage {
-            color: var(--gold);
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-
-        .progress-detail {
-            color: var(--cream);
-            opacity: 0.8;
-            font-size: 1rem;
-            margin: 0;
-        }
-
-        .upload-result {
-            text-align: center;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        .result-icon {
-            font-size: 5rem;
-            margin-bottom: 20px;
-        }
-
-        .upload-result h3 {
-            color: var(--gold);
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-        }
-
-        .upload-result > p {
-            color: var(--cream);
-            font-size: 1.1rem;
-            margin-bottom: 25px;
-        }
-
-        .result-details {
-            background: rgba(212, 175, 55, 0.05);
-            border: 2px solid var(--gold);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: left;
-            margin-bottom: 25px;
-        }
-
-        .result-detail-item {
-            color: var(--cream);
-            margin-bottom: 12px;
-            font-size: 1rem;
-        }
-
-        .result-detail-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .result-detail-item strong {
-            color: var(--gold);
-        }
-
-        .tier-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        .tier-badge.tier-S {
-            background: linear-gradient(135deg, var(--color-estate-start), var(--color-estate-end));
-            color: white;
-        }
-
-        .tier-badge.tier-A {
-            background: linear-gradient(135deg, var(--color-tax-start), var(--color-tax-end));
-            color: white;
-        }
-
-        .tier-badge.tier-B {
-            background: linear-gradient(135deg, var(--color-visa-start), var(--color-visa-end));
-            color: white;
-        }
-
-        .tier-badge.tier-C {
-            background: linear-gradient(135deg, var(--color-company-start), var(--color-company-end));
-            color: white;
-        }
-
-        .tier-badge.tier-D {
-            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
-            color: var(--text-secondary);
-        }
-
-        .upload-another-btn {
-            background: linear-gradient(135deg, var(--red) 0%, var(--gold) 100%);
-            border: none;
-            color: white;
-            padding: 15px 40px;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .upload-another-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5);
-        }
-
-        .upload-history {
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 2px solid var(--gold);
-        }
-
-        .upload-history h3 {
-            color: var(--gold);
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-        }
-
-        .history-list {
-            max-height: 250px;
-            overflow-y: auto;
-        }
-
-        .history-empty {
-            text-align: center;
-            color: var(--cream);
-            opacity: 0.5;
-            padding: 30px;
-            font-style: italic;
-        }
-
-        .history-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: rgba(212, 175, 55, 0.05);
-            border: 2px solid var(--gold);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            transition: all 0.3s;
-        }
-
-        .history-item:hover {
-            background: rgba(212, 175, 55, 0.1);
-            transform: translateX(5px);
-        }
-
-        .history-item.failed {
-            border-color: var(--red);
-            opacity: 0.7;
-        }
-
-        .history-icon {
-            font-size: 1.8rem;
-        }
-
-        .history-info {
-            flex: 1;
-        }
-
-        .history-title {
-            color: var(--gold);
-            font-weight: 600;
-            margin: 0 0 5px 0;
-            font-size: 1rem;
-        }
-
-        .history-meta {
-            color: var(--cream);
-            opacity: 0.7;
-            font-size: 0.85rem;
-            margin: 0;
-        }
-
         .document-upload-btn {
             position: fixed;
             bottom: 230px;
@@ -4033,6 +3477,79 @@
         .emoji-picker span:hover {
             background: #ffcc00;
             color: #222;
+        }
+
+        /* ============================================
+           ENHANCEMENT 24: PINNED MESSAGES STYLES
+           ============================================ */
+        .pinned-panel {
+            background: #222;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+        }
+        .pinned-item {
+            background: #ffcc00;
+            color: #222;
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin: 2px 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        /* ============================================
+           ENHANCEMENT 25: CHAT EXPORT STYLES
+           ============================================ */
+        .export-btn {
+            background: #4fc3f7;
+            color: #222;
+            border: none;
+            border-radius: 6px;
+            padding: 7px 16px;
+            font-size: 1rem;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .export-btn:hover {
+            background: #81d4fa;
+        }
+        /* ============================================
+           ENHANCEMENT 26: MESSAGE SCHEDULING STYLES
+           ============================================ */
+        .schedule-panel {
+            background: #222;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+        }
+        /* ============================================
+           ENHANCEMENT 27: AI SUMMARIZATION STYLES
+           ============================================ */
+        .summary-btn {
+            background: #ffcc00;
+            color: #222;
+            border: none;
+            border-radius: 6px;
+            padding: 7px 16px;
+            font-size: 1rem;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .summary-btn:hover {
+            background: #ffe066;
+        }
+        /* ============================================
+           ENHANCEMENT 28: CUSTOM AVATARS STYLES
+           ============================================ */
+        .avatar {
+            font-size: 1.3em;
+            border-radius: 50%;
+            background: #222;
+            color: #ffcc00;
+            padding: 2px 6px;
+            margin-right: 6px;
         }
     </style>
     
