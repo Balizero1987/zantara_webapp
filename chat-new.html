@@ -15,6 +15,7 @@
     <script src="js/zantara-api.js"></script>
     <script src="js/sse-client.js"></script>
     <script src="js/smart-suggestions.js"></script>
+    <script src="js/citations-module.js"></script>
 
     <!-- Auth Guard -->
     <script>
@@ -236,6 +237,58 @@
             border-color: #ddd;
             color: #000;
         }
+
+        /* CITATIONS STYLING */
+        .ai-citations {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ai-citations-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: #10b981;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .citation {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid #10b981;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .citation-source {
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .citation-tier {
+            background: rgba(16, 185, 129, 0.2);
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #10b981;
+            margin-left: 8px;
+            white-space: nowrap;
+        }
+
+        .citation-similarity {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
@@ -400,6 +453,16 @@
                                 console.log('[SmartSuggestions] Sending suggestion:', suggestion);
                                 document.getElementById('chatInput').value = suggestion;
                                 sendMessage();
+                            });
+                        }
+
+                        // ✨ RENDER CITATIONS (using Citations module)
+                        if (window.Citations && window.Citations.hasCitations(response)) {
+                            const citations = window.Citations.extract(response);
+                            window.Citations.render(citations, aiMsg, {
+                                maxCitations: 3,
+                                showSimilarity: true,
+                                showTier: true
                             });
                         }
                     } else {
