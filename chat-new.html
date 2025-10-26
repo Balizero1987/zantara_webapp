@@ -408,9 +408,18 @@
                         messagesDiv.scrollTop = messagesDiv.scrollHeight;
                     });
 
-                    window.ZANTARA_SSE.on('complete', ({message: fullMessage}) => {
+                    window.ZANTARA_SSE.on('complete', ({message: fullMessage, sources}) => {
                         const content = aiMsg.querySelector('.ai-content');
                         content.textContent = fullMessage;
+
+                        // ✨ RENDER CITATIONS FROM SSE (using Citations module)
+                        if (window.Citations && sources && sources.length > 0) {
+                            window.Citations.render(sources, aiMsg, {
+                                maxCitations: 3,
+                                showSimilarity: true,
+                                showTier: true
+                            });
+                        }
 
                         // ✨ SMART SUGGESTIONS INTEGRATION
                         if (window.SmartSuggestions) {
