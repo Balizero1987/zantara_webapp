@@ -2113,8 +2113,8 @@
         <!-- Conversation History Sidebar -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-title">Chat</div>
-                <button class="new-chat-btn" id="newChatBtn">+ Nuova</button>
+                <div class="sidebar-title" data-i18n="conversations">Chat</div>
+                <button class="new-chat-btn" id="newChatBtn" data-i18n="newChat">+ Nuova</button>
             </div>
             <div class="conversation-list" id="conversationList">
                 <!-- Conversations will be added here dynamically -->
@@ -2145,18 +2145,18 @@
             <!-- Messages -->
             <div class="messages" id="messages">
                 <div class="welcome">
-                    <h2>🪷 Benvenuto su Zantara</h2>
-                    <p>L'anima intelligente di Bali Zero</p>
+                    <h2 data-i18n="welcomeTitle">🪷 Benvenuto su Zantara</h2>
+                    <p data-i18n="welcomeSubtitle">L'anima intelligente di Bali Zero</p>
                     <div class="suggested-questions">
-                        <div class="suggested-question" data-question="Come posso ottenere una E23 Freelance KITAS?">
+                        <div class="suggested-question" data-question-id="kitas" data-question="Come posso ottenere una E23 Freelance KITAS?">
                             <div class="suggested-question-title">📋 E23 Freelance KITAS</div>
                             <div class="suggested-question-subtitle">Documenti, costi e timeline</div>
                         </div>
-                        <div class="suggested-question" data-question="Quanto costa aprire una PT company in Indonesia?">
+                        <div class="suggested-question" data-question-id="company" data-question="Quanto costa aprire una PT company in Indonesia?">
                             <div class="suggested-question-title">🏢 PT Company Setup</div>
                             <div class="suggested-question-subtitle">Costi e requisiti completi</div>
                         </div>
-                        <div class="suggested-question" data-question="Quali sono le opzioni di visto per investitori?">
+                        <div class="suggested-question" data-question-id="investor" data-question="Quali sono le opzioni di visto per investitori?">
                             <div class="suggested-question-title">💼 Visti Investitori</div>
                             <div class="suggested-question-subtitle">E28A, E33A e confronto</div>
                         </div>
@@ -2167,12 +2167,12 @@
             <!-- Input Area -->
             <div class="input-area">
                 <div class="input-wrapper">
-                    <textarea id="chatInput" placeholder="Scrivi un messaggio..." rows="1"></textarea>
+                    <textarea id="chatInput" data-i18n="inputPlaceholder" placeholder="Scrivi un messaggio..." rows="1"></textarea>
                     <div class="input-actions">
-                        <button class="input-action-btn" id="voiceBtn" title="Voice input">🎤</button>
+                        <button class="input-action-btn" id="voiceBtn" data-i18n="voiceInputTitle" title="Voice input">🎤</button>
                     </div>
                 </div>
-                <button id="sendBtn" title="Send message">→</button>
+                <button id="sendBtn" data-i18n="sendButtonTitle" title="Send message">→</button>
             </div>
         </div>
     </div>
@@ -2577,24 +2577,30 @@
             currentConversationId = Date.now().toString();
             document.getElementById('messages').innerHTML = `
                 <div class="welcome">
-                    <h2>🪷 Benvenuto su Zantara</h2>
-                    <p>L'anima intelligente di Bali Zero</p>
+                    <h2 data-i18n="welcomeTitle">🪷 Benvenuto su Zantara</h2>
+                    <p data-i18n="welcomeSubtitle">L'anima intelligente di Bali Zero</p>
                     <div class="suggested-questions">
-                        <div class="suggested-question" data-question="Come posso ottenere una E23 Freelance KITAS?">
+                        <div class="suggested-question" data-question-id="kitas" data-question="Come posso ottenere una E23 Freelance KITAS?">
                             <div class="suggested-question-title">📋 E23 Freelance KITAS</div>
                             <div class="suggested-question-subtitle">Documenti, costi e timeline</div>
                         </div>
-                        <div class="suggested-question" data-question="Quanto costa aprire una PT company in Indonesia?">
+                        <div class="suggested-question" data-question-id="company" data-question="Quanto costa aprire una PT company in Indonesia?">
                             <div class="suggested-question-title">🏢 PT Company Setup</div>
                             <div class="suggested-question-subtitle">Costi e requisiti completi</div>
                         </div>
-                        <div class="suggested-question" data-question="Quali sono le opzioni di visto per investitori?">
+                        <div class="suggested-question" data-question-id="investor" data-question="Quali sono le opzioni di visto per investitori?">
                             <div class="suggested-question-title">💼 Visti Investitori</div>
                             <div class="suggested-question-subtitle">E28A, E33A e confronto</div>
                         </div>
                     </div>
                 </div>
             `;
+
+            // Apply translations to the newly created welcome section
+            if (window.ZANTARA_I18N) {
+                ZANTARA_I18N.applyTranslations();
+            }
+
             // Re-attach suggested question listeners
             document.querySelectorAll('.suggested-question').forEach(q => {
                 q.addEventListener('click', function() {
@@ -2646,6 +2652,13 @@
     <button class="memory-history-btn" onclick="MemoryPanel.toggle()" title="Storia & Profilo (Ctrl+H)">
         📚
     </button>
+
+    <!-- Apply i18n translations on page load -->
+    <script>
+        if (window.ZANTARA_I18N) {
+            ZANTARA_I18N.applyTranslations();
+        }
+    </script>
 </body>
 
 </html>
