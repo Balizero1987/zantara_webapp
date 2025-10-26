@@ -30,6 +30,7 @@
     <script src="js/conversation-history.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/language-selector.js"></script>
+    <script src="js/message-templates.js"></script>
 
     <!-- Auth Guard -->
     <script>
@@ -98,6 +99,208 @@
             flex-wrap: wrap;
             gap: 4px;
             padding: 4px 0;
+        }
+
+        /* Enhancement 10: Message Templates */
+        .templates-btn {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid var(--red);
+            color: var(--red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .templates-btn:hover {
+            background: var(--red);
+            color: white;
+        }
+
+        .templates-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .templates-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .templates-panel.active {
+            display: flex;
+        }
+
+        .templates-panel > div:first-child {
+            background: var(--navy);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .templates-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .templates-header h3 {
+            color: var(--off-white);
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .templates-close {
+            background: none;
+            border: none;
+            color: var(--off-white);
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            line-height: 1;
+        }
+
+        .templates-search {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .templates-search input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--off-white);
+            font-size: 14px;
+        }
+
+        .templates-categories {
+            display: flex;
+            gap: 8px;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-x: auto;
+        }
+
+        .template-category {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--off-white);
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .template-category:hover {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: var(--red);
+        }
+
+        .template-category.active {
+            background: var(--red);
+            border-color: var(--red);
+            color: white;
+        }
+
+        .templates-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .template-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .template-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .template-title {
+            color: var(--off-white);
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .template-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .template-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .template-use,
+        .template-preview {
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .template-use {
+            background: var(--red);
+            color: white;
+        }
+
+        .template-use:hover {
+            background: #cc0000;
+        }
+
+        .template-preview {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--off-white);
+        }
+
+        .template-preview:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .no-templates {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            padding: 40px;
+            font-size: 14px;
         }
 
         .conversation-tag {

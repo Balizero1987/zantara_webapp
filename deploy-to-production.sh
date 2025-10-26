@@ -15,7 +15,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 # Configuration
-REPO_PATH="/Users/antonellosiano/Desktop/zantara-bridge chatgpt patch/zantara_webapp"
+REPO_PATH="/Users/antonellosiano/Desktop/NUZANTARA-RAILWAY/apps/webapp"
 DOMAIN="zantara.balizero.com"
 BACKEND_PRODUCTION="https://zantara-v520-production-1064094238013.europe-west1.run.app"
 BACKEND_RAG="https://zantara-v520-chatgpt-patch-1064094238013.europe-west1.run.app"
