@@ -14,7 +14,8 @@
     <script src="js/api-contracts.js"></script>
     <script src="js/zantara-api.js"></script>
     <script src="js/sse-client.js"></script>
-    
+    <script src="js/smart-suggestions.js"></script>
+
     <!-- Auth Guard -->
     <script>
         if (!ZANTARA_API.isLoggedIn()) {
@@ -289,7 +290,7 @@
             }
         }
         
-        // Send message function
+        // Send message function - ORIGINAL VERSION
         async function sendMessage() {
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
@@ -322,109 +323,99 @@
             sendBtn.innerHTML = '<div class="loading"></div>';
             
             try {
-                // Check if SSE is available
-                const useSSE = window.ZANTARA_SSE ? true : false;
+                // Get user email
+                const userEmail = localStorage.getItem('zantara-email');
                 
-                if (useSSE) {
-                    // Use SSE streaming with premium UI/UX
+                // Use ZANTARA_SSE for streaming if available, otherwise fallback to regular API
+                if (window.ZANTARA_SSE && window.ZANTARA_SSE.stream) {
+                    console.log('🌊 Using SSE streaming...');
+                    
+                    // Create AI message for streaming
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'message ai-message';
+                    aiMsg.innerHTML = '<span class="ai-label">Zantara:</span><span class="ai-content">⏳ Thinking...</span>';
+                    messagesDiv.appendChild(aiMsg);
+                    
+                    // Start streaming
+                    await window.ZANTARA_SSE.stream(message, userEmail);
+
+                    // Clean up old listeners to prevent duplicates
+                    if (window.ZANTARA_SSE.removeAllListeners) {
+                        window.ZANTARA_SSE.removeAllListeners();
+                    }
+
+                    // Listen for streaming events
+                    window.ZANTARA_SSE.on('start', () => {
+                        aiMsg.innerHTML = '<span class="ai-label">Zantara:</span><span class="ai-content"></span>';
+                    });
+
+                    window.ZANTARA_SSE.on('delta', ({message: chunk}) => {
+                        const content = aiMsg.querySelector('.ai-content');
+                        content.textContent = chunk;
+                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                    });
+
+                    window.ZANTARA_SSE.on('complete', ({message: fullMessage}) => {
+                        const content = aiMsg.querySelector('.ai-content');
+                        content.textContent = fullMessage;
+
+                        // ✨ SMART SUGGESTIONS INTEGRATION
+                        if (window.SmartSuggestions) {
+                            const suggestions = SmartSuggestions.generate(message, fullMessage);
+                            SmartSuggestions.display(suggestions, aiMsg, (suggestion) => {
+                                console.log('[SmartSuggestions] Sending suggestion:', suggestion);
+                                document.getElementById('chatInput').value = suggestion;
+                                sendMessage();
+                            });
+                        }
+
+                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                    });
+
+                    window.ZANTARA_SSE.on('error', (error) => {
+                        console.error('❌ SSE Error:', error);
+                        const content = aiMsg.querySelector('.ai-content');
+                        content.innerHTML = '<em style="color: #ef4444;">Unable to respond. Try again in a moment.</em>';
+                    });
+                    
+                } else {
+                    // Fallback to regular API call
+                    console.log('🔄 Using regular API...');
+                    const response = await ZANTARA_API.chat(message, userEmail);
+
+                    // Create AI response message
                     const aiMsg = document.createElement('div');
                     aiMsg.className = 'message ai-message';
 
-                    // Create structure: Label (green) + Content (white)
-                    aiMsg.innerHTML = `
-                        <span class="ai-label">Zantara:</span>
-                        <span class="ai-content"><span class="thinking-dots"></span></span>
-                    `;
-                    messagesDiv.appendChild(aiMsg);
-
-                    // Get content element for updates
-                    const contentEl = aiMsg.querySelector('.ai-content');
-                    let isFirstChunk = true;
-
-                    // CRITICAL FIX: Clear all previous listeners to prevent duplicates
-                    window.ZANTARA_SSE
-                        .removeAllListeners('delta')
-                        .removeAllListeners('complete')
-                        .removeAllListeners('error');
-
-                    // Setup SSE listeners (these will now be the ONLY listeners)
-                    window.ZANTARA_SSE
-                        .on('delta', (data) => {
-                            // Remove thinking dots on first chunk
-                            if (isFirstChunk) {
-                                isFirstChunk = false;
-                            }
-
-                            // Format response with markdown-like styling
-                            let formattedMessage = data.message
-                                // Bold text
-                                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                                // Italic text
-                                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                                // Bullet points
-                                .replace(/• (.*?)(?=\n|$)/g, '• $1')
-                                // Collapse multiple newlines (max 2)
-                                .replace(/\n{3,}/g, '\n\n')
-                                // Remove leading/trailing whitespace per line
-                                .split('\n').map(line => line.trim()).join('\n')
-                                // Convert newlines to breaks
-                                .replace(/\n/g, '<br>');
-
-                            // Update ONLY content, label stays green
-                            contentEl.innerHTML = formattedMessage;
-                            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                        })
-                        .on('complete', (data) => {
-                            console.log('✅ SSE streaming complete');
-                        })
-                        .on('error', (data) => {
-                            console.error('❌ SSE error:', data.error);
-                            contentEl.innerHTML = '<em style="color: #ef4444;">Unable to respond. Try again.</em>';
-                        });
-
-                    // Start streaming (FIX: pass user email explicitly)
-                    const userEmail = localStorage.getItem('zantara-email');
-                    await window.ZANTARA_SSE.stream(message, userEmail);
-                } else {
-                    // Fallback to regular fetch (same premium UI/UX)
-                    const result = await ZANTARA_API.chat(message);
-
-                    if (result.success) {
-                        // Add AI response with formatting
-                        const aiMsg = document.createElement('div');
-                        aiMsg.className = 'message ai-message';
-
-                        // Format response with markdown-like styling
-                        let formattedResponse = result.response
-                            // Bold text
-                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                            // Italic text
-                            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                            // Bullet points
-                            .replace(/• (.*?)(?=\n|$)/g, '• $1')
-                            // Collapse multiple newlines (max 2)
-                            .replace(/\n{3,}/g, '\n\n')
-                            // Remove leading/trailing whitespace per line
-                            .split('\n').map(line => line.trim()).join('\n')
-                            // Convert newlines to breaks
-                            .replace(/\n/g, '<br>');
-
-                        // Same structure: Label (green) + Content (white)
+                    if (response.success) {
                         aiMsg.innerHTML = `
                             <span class="ai-label">Zantara:</span>
-                            <span class="ai-content">${formattedResponse}</span>
+                            <span class="ai-content">${response.response}</span>
                         `;
-                        messagesDiv.appendChild(aiMsg);
 
-                        console.log('✅ Response received from:', result.ai, result.model);
+                        // ✨ SMART SUGGESTIONS FOR FALLBACK TOO
+                        if (window.SmartSuggestions) {
+                            const suggestions = SmartSuggestions.generate(message, response.response);
+                            SmartSuggestions.display(suggestions, aiMsg, (suggestion) => {
+                                console.log('[SmartSuggestions] Sending suggestion:', suggestion);
+                                document.getElementById('chatInput').value = suggestion;
+                                sendMessage();
+                            });
+                        }
                     } else {
-                        throw new Error(result.error);
+                        aiMsg.innerHTML = `
+                            <span class="ai-label">Zantara:</span>
+                            <span class="ai-content"><em style="color: #ef4444;">Unable to respond. Try again in a moment.</em></span>
+                        `;
                     }
-                }
-            } catch (error) {
-                console.error('❌ Chat error:', error);
 
-                // Show error message (same premium UI/UX)
+                    messagesDiv.appendChild(aiMsg);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                
+                // Show error message
                 const errorMsg = document.createElement('div');
                 errorMsg.className = 'message ai-message';
                 errorMsg.innerHTML = `
