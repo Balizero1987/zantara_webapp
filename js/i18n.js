@@ -209,6 +209,72 @@ const ZANTARA_I18N = {
       // Language Selector
       languageSelector: 'Bahasa',
       changeLanguage: 'Ubah Bahasa'
+    },
+
+    uk: {
+      // Header
+      tagline: 'From Zero to Infinity ∞',
+
+      // Sidebar
+      conversations: 'Розмови',
+      newChat: '+ Нова',
+
+      // Welcome
+      welcomeTitle: 'Ласкаво просимо до Zantara',
+      welcomeSubtitle: 'Розумна душа Bali Zero',
+
+      // Suggested questions
+      suggestedQuestions: {
+        kitas: {
+          title: '📋 E23 Freelance KITAS',
+          subtitle: 'Документи, вартість та терміни',
+          question: 'Як отримати E23 Freelance KITAS?'
+        },
+        company: {
+          title: '🏢 Реєстрація PT',
+          subtitle: 'Повна вартість і вимоги',
+          question: 'Скільки коштує відкрити компанію PT в Індонезії?'
+        },
+        investor: {
+          title: '💼 Візи для інвесторів',
+          subtitle: 'E28A, E33A та порівняння',
+          question: 'Які варіанти віз для інвесторів?'
+        }
+      },
+
+      // Input area
+      inputPlaceholder: 'Напишіть повідомлення...',
+      voiceInputTitle: 'Голосовий ввід',
+      sendButtonTitle: 'Надіслати повідомлення',
+
+      // Buttons
+      exportBtn: '📥 Експорт',
+
+      // AI label
+      aiLabel: 'Zantara:',
+
+      // Messages
+      typing: 'Друкує',
+      errorMessage: 'Неможливо відповісти. Спробуйте ще раз.',
+
+      // Citations
+      citationsBadge: '📚 Джерела',
+      sources: 'джерела',
+
+      // Alerts
+      voiceNotSupported: 'Голосовий ввід не підтримується в цьому браузері',
+
+      // Login
+      loginName: "Ім'я",
+      loginEmail: 'Корпоративна електронна пошта',
+      loginPin: 'PIN (6 цифр)',
+      loginButton: 'Приєднатися до команди',
+      loginTitle: 'Ласкаво просимо до Zantara',
+      loginSubtitle: 'Розумна душа Bali Zero',
+
+      // Language Selector
+      languageSelector: 'Мова',
+      changeLanguage: 'Змінити мову'
     }
   },
 
@@ -231,6 +297,12 @@ const ZANTARA_I18N = {
       name: 'Indonesian',
       flag: '🇮🇩',
       nativeName: 'Bahasa Indonesia'
+    },
+    uk: {
+      code: 'uk',
+      name: 'Ukrainian',
+      flag: '🇺🇦',
+      nativeName: 'Українська'
     }
   },
 
@@ -252,7 +324,7 @@ const ZANTARA_I18N = {
 
   /**
    * Get user's preferred language from localStorage
-   * Priority: 1) Saved preference, 2) Browser language, 3) English (default)
+   * Priority: 1) Saved preference, 2) User object, 3) ALWAYS English (NO auto-detect)
    */
   getUserLanguage() {
     try {
@@ -272,13 +344,8 @@ const ZANTARA_I18N = {
         }
       }
 
-      // Auto-detect from browser
-      const detected = this.detectBrowserLanguage();
-      
-      // Save detected language
-      this.setUserLanguage(detected, false);
-      
-      return detected;
+      // ALWAYS default to English (NO auto-detect)
+      return 'en';
     } catch {
       return 'en'; // Fallback to English
     }
