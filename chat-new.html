@@ -35,6 +35,9 @@
     <script src="js/theme-toggle.js"></script>
     <script src="js/typing-indicators.js"></script>
     <script src="js/smart-reply.js"></script>
+    <script src="js/read-receipts.js"></script>
+    <script src="js/message-search.js"></script>
+    <script src="js/notifications.js"></script>
 
     <!-- Auth Guard -->
     <script>
@@ -753,6 +756,318 @@
                 font-size: 0.85rem;
                 padding: 8px 14px;
             }
+        }
+
+        /* ============================================
+           ENHANCEMENT 16: READ RECEIPTS STYLES
+           ============================================ */
+        .read-receipt-indicator {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 6px;
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
+        }
+
+        .read-receipt-indicator:hover {
+            opacity: 1;
+        }
+
+        .read-receipt-indicator svg {
+            fill: currentColor;
+        }
+
+        .read-receipt-indicator.read svg {
+            fill: #4CAF50; /* Green for read */
+        }
+
+        .read-receipt-indicator.unread svg {
+            fill: #9E9E9E; /* Gray for sent */
+        }
+
+        .read-receipt-settings {
+            background: var(--card-bg, #1a1a1a);
+            border: 1px solid var(--border-color, #333);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .read-receipt-settings h3 {
+            margin-bottom: 15px;
+            color: var(--gold, #ffcc00);
+        }
+
+        .read-receipt-settings label {
+            display: block;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        .read-receipt-settings input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        /* ============================================
+           ENHANCEMENT 17: MESSAGE SEARCH STYLES
+           ============================================ */
+        .message-search-panel {
+            position: sticky;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.98), rgba(30, 30, 30, 0.98));
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--gold, #ffcc00);
+            padding: 12px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .search-panel-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            border-radius: 6px;
+            padding: 8px 14px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--gold, #ffcc00);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .search-option:hover {
+            color: #fff;
+        }
+
+        .search-option input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .search-navigation {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-counter {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .search-nav-btn,
+        .search-close-btn {
+            background: rgba(255, 204, 0, 0.1);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            border-radius: 4px;
+            padding: 6px 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-nav-btn:hover,
+        .search-close-btn:hover {
+            background: rgba(255, 204, 0, 0.2);
+            border-color: var(--gold, #ffcc00);
+        }
+
+        .search-nav-btn svg,
+        .search-close-btn svg {
+            fill: var(--gold, #ffcc00);
+        }
+
+        .search-highlight {
+            background: rgba(255, 204, 0, 0.3);
+            color: #fff;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .search-highlight-active {
+            background: var(--gold, #ffcc00);
+            color: #000;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .message-search-panel {
+                padding: 10px 15px;
+            }
+
+            .search-panel-content {
+                gap: 8px;
+            }
+
+            .search-input {
+                font-size: 0.9rem;
+                padding: 6px 12px;
+            }
+
+            .search-option {
+                font-size: 0.8rem;
+            }
+
+            .search-counter {
+                font-size: 0.8rem;
+                min-width: 50px;
+            }
+        }
+
+        /* ============================================
+           ENHANCEMENT 18: NOTIFICATIONS STYLES
+           ============================================ */
+        .notification-settings {
+            background: var(--card-bg, #1a1a1a);
+            border: 1px solid var(--border-color, #333);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .notification-settings h3 {
+            margin-bottom: 15px;
+            color: var(--gold, #ffcc00);
+            font-size: 1.1rem;
+        }
+
+        .notification-settings label {
+            display: block;
+            margin: 12px 0;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .notification-settings input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .notification-settings input[type="range"] {
+            width: 100%;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+
+        .notification-settings input[type="time"] {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            border-radius: 4px;
+            padding: 6px 10px;
+            color: #fff;
+            font-size: 0.9rem;
+            margin-left: 8px;
+        }
+
+        #dndSchedule {
+            margin-left: 20px;
+            margin-top: 8px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        #volumeValue {
+            color: var(--gold, #ffcc00);
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        /* Notification toast (optional custom styling) */
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 1px solid var(--gold, #ffcc00);
+            border-radius: 8px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            max-width: 350px;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-toast.hiding {
+            animation: slideOutRight 0.3s ease-out forwards;
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .notification-toast-title {
+            color: var(--gold, #ffcc00);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .notification-toast-body {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
         }
 
         .conversation-tag {
