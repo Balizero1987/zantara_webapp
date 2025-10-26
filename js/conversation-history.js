@@ -10,9 +10,12 @@
  * - Delete conversations
  * - Auto-save current conversation
  * - Smart titles based on first message
+ * - Import/Export conversation history
+ * - Enhanced error handling
+ * - Improved search with fuzzy matching
  * 
  * @module ConversationHistory
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 const ConversationHistory = (() => {
@@ -60,6 +63,30 @@ const ConversationHistory = (() => {
             newChatBtn.addEventListener('click', createNewConversation);
         }
 
+        // Listen for export button if it exists
+        const exportBtn = document.getElementById('exportConversationsBtn');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', exportConversations);
+        }
+
+        // Listen for import button if it exists
+        const importBtn = document.getElementById('importConversationsBtn');
+        if (importBtn) {
+            importBtn.addEventListener('click', importConversations);
+        }
+
+        // Listen for clear button if it exists
+        const clearBtn = document.getElementById('clearConversationsBtn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', clearAllConversations);
+        }
+
+        // Listen for favorite button if it exists
+        const favoriteBtn = document.getElementById('favoriteConversationsBtn');
+        if (favoriteBtn) {
+            favoriteBtn.addEventListener('click', filterFavorites);
+        }
+
         console.log('✅ Conversation History ready');
     }
 
@@ -70,12 +97,39 @@ const ConversationHistory = (() => {
         try {
             const stored = localStorage.getItem(CONFIG.storageKey);
             if (stored) {
-                conversations = JSON.parse(stored);
-                console.log(`📋 Loaded ${conversations.length} conversations`);
+                const parsed = JSON.parse(stored);
+                // Validate data structure
+                if (Array.isArray(parsed)) {
+                    // Ensure backward compatibility for favorited and tags properties
+                    conversations = parsed.map(conversation => {
+                        // Ensure favorited property exists
+                        if (typeof conversation.favorited === 'undefined') {
+                            conversation.favorited = false;
+                        }
+                        
+                        // Ensure tags property exists
+                        if (!Array.isArray(conversation.tags)) {
+                            conversation.tags = [];
+                        }
+                        
+                        return conversation;
+                    });
+                    console.log(`📋 Loaded ${conversations.length} conversations`);
+                } else {
+                    console.warn('⚠️ Invalid conversation data structure, resetting');
+                    conversations = [];
+                }
             }
         } catch (error) {
             console.error('Error loading conversations:', error);
-            conversations = [];
+            // Try to recover by clearing corrupted data
+            try {
+                localStorage.removeItem(CONFIG.storageKey);
+                conversations = [];
+                console.log('🗑️ Cleared corrupted conversation data');
+            } catch (clearError) {
+                console.error('Error clearing corrupted data:', clearError);
+            }
         }
     }
 
@@ -89,6 +143,10 @@ const ConversationHistory = (() => {
             localStorage.setItem(CONFIG.storageKey, JSON.stringify(toSave));
         } catch (error) {
             console.error('Error saving conversations:', error);
+            // Notify user of storage issue
+            if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+                console.error('LocalStorage quota exceeded. Consider deleting old conversations.');
+            }
         }
     }
 
@@ -108,7 +166,9 @@ const ConversationHistory = (() => {
                 title: 'New Chat',
                 messages: [],
                 createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
+                updatedAt: new Date().toISOString(),
+                favorited: false,
+                tags: []  // Add tags array
             };
             conversations.unshift(conversation);
         }
@@ -127,6 +187,15 @@ const ConversationHistory = (() => {
 
         // Update timestamp
         conversation.updatedAt = new Date().toISOString();
+
+        // Ensure backward compatibility for favorited and tags properties
+        if (typeof conversation.favorited === 'undefined') {
+            conversation.favorited = false;
+        }
+        
+        if (!Array.isArray(conversation.tags)) {
+            conversation.tags = [];
+        }
 
         // Save and re-render
         saveConversations();
@@ -150,20 +219,39 @@ const ConversationHistory = (() => {
     }
 
     /**
+     * Perform fuzzy search on conversations
+     * @param {string} query - Search query
+     * @param {Array} conversations - Array of conversations to search
+     * @returns {Array} - Filtered array of conversations
+     */
+    function fuzzySearch(query, conversations) {
+        if (!query) return conversations;
+        
+        const searchTerm = query.toLowerCase();
+        return conversations.filter(conversation => {
+            // Check title match
+            if (conversation.title.toLowerCase().includes(searchTerm)) {
+                return true;
+            }
+            
+            // Check messages content
+            return conversation.messages.some(message => 
+                message.content.toLowerCase().includes(searchTerm)
+            );
+        });
+    }
+
+    /**
      * Render conversation list in sidebar
      */
     function renderConversationList(filterText = '') {
         const listContainer = document.getElementById('conversationList');
         if (!listContainer) return;
 
-        // Filter conversations
+        // Filter conversations with fuzzy search
         let filtered = conversations;
         if (filterText) {
-            const search = filterText.toLowerCase();
-            filtered = conversations.filter(c => 
-                c.title.toLowerCase().includes(search) ||
-                c.messages.some(m => m.content.toLowerCase().includes(search))
-            );
+            filtered = fuzzySearch(filterText, conversations);
         }
 
         // Group by date
@@ -194,18 +282,36 @@ const ConversationHistory = (() => {
                     (lastMessage.content.substring(0, 60) + (lastMessage.content.length > 60 ? '...' : '')) : 
                     'No messages';
 
+                // Create tags HTML
+                let tagsHtml = '';
+                if (conversation.tags && conversation.tags.length > 0) {
+                    tagsHtml = `<div class="conversation-tags">`;
+                    conversation.tags.forEach(tag => {
+                        tagsHtml += `<span class="conversation-tag">${escapeHtml(tag)}</span>`;
+                    });
+                    tagsHtml += `</div>`;
+                }
+
                 html += `
-                    <div class="conversation-item ${isActive ? 'active' : ''}" 
+                    <div class="conversation-item ${isActive ? 'active' : ''} ${conversation.favorited ? 'favorited' : ''}" 
                          data-conversation-id="${conversation.id}"
                          onclick="ConversationHistory.loadConversation('${conversation.id}')">
                         <div class="conversation-item-header">
                             <span class="conversation-title">${escapeHtml(conversation.title)}</span>
-                            <button class="conversation-delete" 
-                                    onclick="event.stopPropagation(); ConversationHistory.deleteConversation('${conversation.id}')"
-                                    title="Delete conversation">
-                                ×
-                            </button>
+                            <div class="conversation-actions">
+                                <button class="conversation-favorite" 
+                                        onclick="event.stopPropagation(); ConversationHistory.toggleFavorite('${conversation.id}')"
+                                        title="${conversation.favorited ? 'Unfavorite' : 'Favorite'} conversation">
+                                    ${conversation.favorited ? '★' : '☆'}
+                                </button>
+                                <button class="conversation-delete" 
+                                        onclick="event.stopPropagation(); ConversationHistory.deleteConversation('${conversation.id}')"
+                                        title="Delete conversation">
+                                    ×
+                                </button>
+                            </div>
                         </div>
+                        ${tagsHtml}
                         <div class="conversation-preview">${escapeHtml(preview)}</div>
                         <div class="conversation-meta">
                             <span class="message-count">💬 ${messageCount}</span>
@@ -339,6 +445,11 @@ const ConversationHistory = (() => {
         if (sidebar && window.innerWidth <= 768) {
             sidebar.classList.remove('open');
         }
+        
+        // Dispatch event for other modules to react
+        window.dispatchEvent(new CustomEvent('zantara:conversationLoaded', {
+            detail: { conversationId, messages: conversation.messages }
+        }));
     }
 
     /**
@@ -486,6 +597,109 @@ const ConversationHistory = (() => {
     }
 
     /**
+     * Filter conversations by favorite status
+     */
+    function filterFavorites() {
+        const listContainer = document.getElementById('conversationList');
+        if (!listContainer) return;
+
+        const favoritedConversations = conversations.filter(c => c.favorited);
+        
+        if (favoritedConversations.length === 0) {
+            listContainer.innerHTML = `
+                <div class="conversation-empty">
+                    <p>⭐ No favorited conversations</p>
+                    <p class="empty-hint">Star conversations you want to save</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Group favorited conversations by date
+        const grouped = groupConversationsByDate(favoritedConversations);
+
+        // Render grouped conversations
+        let html = '';
+
+        for (const [group, convs] of Object.entries(grouped)) {
+            html += `<div class="conversation-group">`;
+            html += `<div class="conversation-group-title">${group}</div>`;
+
+            convs.forEach(conversation => {
+                const isActive = conversation.id === currentConversationId;
+                const messageCount = conversation.messages.length;
+                const lastMessage = conversation.messages[conversation.messages.length - 1];
+                const preview = lastMessage ? 
+                    (lastMessage.content.substring(0, 60) + (lastMessage.content.length > 60 ? '...' : '')) : 
+                    'No messages';
+
+                html += `
+                    <div class="conversation-item ${isActive ? 'active' : ''} ${conversation.favorited ? 'favorited' : ''}" 
+                         data-conversation-id="${conversation.id}"
+                         onclick="ConversationHistory.loadConversation('${conversation.id}')">
+                        <div class="conversation-item-header">
+                            <span class="conversation-title">${escapeHtml(conversation.title)}</span>
+                            <div class="conversation-actions">
+                                <button class="conversation-favorite" 
+                                        onclick="event.stopPropagation(); ConversationHistory.toggleFavorite('${conversation.id}')"
+                                        title="${conversation.favorited ? 'Unfavorite' : 'Favorite'} conversation">
+                                    ${conversation.favorited ? '★' : '☆'}
+                                </button>
+                                <button class="conversation-delete" 
+                                        onclick="event.stopPropagation(); ConversationHistory.deleteConversation('${conversation.id}')"
+                                        title="Delete conversation">
+                                    ×
+                                </button>
+                            </div>
+                        </div>
+                        <div class="conversation-preview">${escapeHtml(preview)}</div>
+                        <div class="conversation-meta">
+                            <span class="message-count">💬 ${messageCount}</span>
+                            <span class="conversation-time">${formatRelativeTime(conversation.updatedAt)}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+        }
+
+        listContainer.innerHTML = html;
+    }
+
+    /**
+     * Sort conversations by different criteria
+     * @param {string} criteria - Sort criteria ('date', 'title', 'messages')
+     * @param {boolean} ascending - Sort order
+     */
+    function sortConversations(criteria = 'date', ascending = false) {
+        switch (criteria) {
+            case 'title':
+                conversations.sort((a, b) => {
+                    const comparison = a.title.localeCompare(b.title);
+                    return ascending ? comparison : -comparison;
+                });
+                break;
+            case 'messages':
+                conversations.sort((a, b) => {
+                    const comparison = a.messages.length - b.messages.length;
+                    return ascending ? comparison : -comparison;
+                });
+                break;
+            case 'date':
+            default:
+                conversations.sort((a, b) => {
+                    const dateA = new Date(a.updatedAt);
+                    const dateB = new Date(b.updatedAt);
+                    const comparison = dateA - dateB;
+                    return ascending ? comparison : -comparison;
+                });
+                break;
+        }
+        renderConversationList();
+    }
+
+    /**
      * Start auto-save timer
      */
     function startAutoSave() {
@@ -521,19 +735,310 @@ const ConversationHistory = (() => {
     }
 
     /**
+     * Get conversation statistics
+     * @returns {Object} Statistics object
+     */
+    function getStatistics() {
+        if (conversations.length === 0) {
+            return {
+                totalConversations: 0,
+                totalMessages: 0,
+                favoritedConversations: 0,
+                averageMessagesPerConversation: 0,
+                mostActiveConversation: null,
+                oldestConversation: null,
+                newestConversation: null
+            };
+        }
+
+        const totalMessages = conversations.reduce((sum, conv) => sum + conv.messages.length, 0);
+        const favoritedConversations = conversations.filter(conv => conv.favorited).length;
+        
+        const mostActiveConversation = [...conversations].sort((a, b) => 
+            b.messages.length - a.messages.length)[0];
+        
+        const sortedByDate = [...conversations].sort((a, b) => 
+            new Date(a.createdAt) - new Date(b.createdAt));
+        
+        return {
+            totalConversations: conversations.length,
+            totalMessages: totalMessages,
+            favoritedConversations: favoritedConversations,
+            averageMessagesPerConversation: Math.round(totalMessages / conversations.length * 100) / 100,
+            mostActiveConversation: {
+                id: mostActiveConversation.id,
+                title: mostActiveConversation.title,
+                messageCount: mostActiveConversation.messages.length
+            },
+            oldestConversation: {
+                id: sortedByDate[0].id,
+                title: sortedByDate[0].title,
+                date: sortedByDate[0].createdAt
+            },
+            newestConversation: {
+                id: sortedByDate[sortedByDate.length - 1].id,
+                title: sortedByDate[sortedByDate.length - 1].title,
+                date: sortedByDate[sortedByDate.length - 1].createdAt
+            }
+        };
+    }
+
+    /**
+     * Display conversation statistics
+     */
+    function displayStatistics() {
+        const stats = getStatistics();
+        
+        // Create statistics modal or display in console
+        console.log('📊 Conversation Statistics:');
+        console.log(`Total Conversations: ${stats.totalConversations}`);
+        console.log(`Total Messages: ${stats.totalMessages}`);
+        console.log(`Favorited Conversations: ${stats.favoritedConversations}`);
+        console.log(`Average Messages per Conversation: ${stats.averageMessagesPerConversation}`);
+        
+        if (stats.mostActiveConversation) {
+            console.log(`Most Active Conversation: ${stats.mostActiveConversation.title} (${stats.mostActiveConversation.messageCount} messages)`);
+        }
+        
+        if (stats.oldestConversation) {
+            console.log(`Oldest Conversation: ${stats.oldestConversation.title}`);
+        }
+        
+        if (stats.newestConversation) {
+            console.log(`Newest Conversation: ${stats.newestConversation.title}`);
+        }
+        
+        // Dispatch event with statistics
+        window.dispatchEvent(new CustomEvent('zantara:conversationStatistics', {
+            detail: { statistics: stats }
+        }));
+        
+        return stats;
+    }
+
+    /**
      * Export conversations as JSON
      */
     function exportConversations() {
-        const data = JSON.stringify(conversations, null, 2);
-        const blob = new Blob([data], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `zantara-conversations-${Date.now()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
+        try {
+            const data = JSON.stringify(conversations, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `zantara-conversations-${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            console.log('📦 Conversations exported');
+        } catch (error) {
+            console.error('Error exporting conversations:', error);
+            alert('Failed to export conversations. Check console for details.');
+        }
+    }
+
+    /**
+     * Import conversations from JSON file
+     */
+    function importConversations() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
         
-        console.log('📦 Conversations exported');
+        input.onchange = e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = event => {
+                try {
+                    const importedData = JSON.parse(event.target.result);
+                    
+                    // Validate imported data
+                    if (!Array.isArray(importedData)) {
+                        throw new Error('Invalid data format');
+                    }
+                    
+                    // Confirm import
+                    const confirmMsg = `Import ${importedData.length} conversations? This will replace your current history.`;
+                    if (!confirm(confirmMsg)) {
+                        return;
+                    }
+                    
+                    // Merge or replace conversations
+                    conversations = importedData;
+                    saveConversations();
+                    renderConversationList();
+                    createNewConversation(); // Create a fresh conversation
+                    
+                    console.log(`📥 Imported ${importedData.length} conversations`);
+                } catch (error) {
+                    console.error('Error importing conversations:', error);
+                    alert('Failed to import conversations. Check console for details.');
+                }
+            };
+            
+            reader.onerror = () => {
+                console.error('Error reading file');
+                alert('Failed to read file');
+            };
+            
+            reader.readAsText(file);
+        };
+        
+        input.click();
+    }
+
+    /**
+     * Toggle favorite status of a conversation
+     */
+    function toggleFavorite(conversationId) {
+        const conversation = conversations.find(c => c.id === conversationId);
+        if (conversation) {
+            conversation.favorited = !conversation.favorited;
+            saveConversations();
+            renderConversationList();
+            
+            // Dispatch event for other modules
+            window.dispatchEvent(new CustomEvent('zantara:conversationFavorited', {
+                detail: { conversationId, favorited: conversation.favorited }
+            }));
+        }
+    }
+
+    /**
+     * Add a tag to a conversation
+     * @param {string} conversationId - Conversation ID
+     * @param {string} tag - Tag to add
+     */
+    function addTag(conversationId, tag) {
+        const conversation = conversations.find(c => c.id === conversationId);
+        if (conversation && !conversation.tags.includes(tag)) {
+            conversation.tags.push(tag);
+            saveConversations();
+            renderConversationList();
+            
+            // Dispatch event
+            window.dispatchEvent(new CustomEvent('zantara:conversationTagged', {
+                detail: { conversationId, tag, action: 'added' }
+            }));
+        }
+    }
+
+    /**
+     * Remove a tag from a conversation
+     * @param {string} conversationId - Conversation ID
+     * @param {string} tag - Tag to remove
+     */
+    function removeTag(conversationId, tag) {
+        const conversation = conversations.find(c => c.id === conversationId);
+        if (conversation) {
+            const index = conversation.tags.indexOf(tag);
+            if (index > -1) {
+                conversation.tags.splice(index, 1);
+                saveConversations();
+                renderConversationList();
+                
+                // Dispatch event
+                window.dispatchEvent(new CustomEvent('zantara:conversationTagged', {
+                    detail: { conversationId, tag, action: 'removed' }
+                }));
+            }
+        }
+    }
+
+    /**
+     * Filter conversations by tag
+     * @param {string} tag - Tag to filter by
+     */
+    function filterByTag(tag) {
+        const listContainer = document.getElementById('conversationList');
+        if (!listContainer) return;
+
+        const taggedConversations = conversations.filter(c => c.tags.includes(tag));
+        
+        if (taggedConversations.length === 0) {
+            listContainer.innerHTML = `
+                <div class="conversation-empty">
+                    <p>🏷️ No conversations tagged with "${tag}"</p>
+                    <p class="empty-hint">Tag conversations to organize them</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Group tagged conversations by date
+        const grouped = groupConversationsByDate(taggedConversations);
+
+        // Render grouped conversations
+        let html = '';
+
+        for (const [group, convs] of Object.entries(grouped)) {
+            html += `<div class="conversation-group">`;
+            html += `<div class="conversation-group-title">${group}</div>`;
+
+            convs.forEach(conversation => {
+                const isActive = conversation.id === currentConversationId;
+                const messageCount = conversation.messages.length;
+                const lastMessage = conversation.messages[conversation.messages.length - 1];
+                const preview = lastMessage ? 
+                    (lastMessage.content.substring(0, 60) + (lastMessage.content.length > 60 ? '...' : '')) : 
+                    'No messages';
+
+                // Create tags HTML
+                let tagsHtml = '';
+                if (conversation.tags.length > 0) {
+                    tagsHtml = `<div class="conversation-tags">`;
+                    conversation.tags.forEach(tag => {
+                        tagsHtml += `<span class="conversation-tag">${escapeHtml(tag)}</span>`;
+                    });
+                    tagsHtml += `</div>`;
+                }
+
+                html += `
+                    <div class="conversation-item ${isActive ? 'active' : ''} ${conversation.favorited ? 'favorited' : ''}" 
+                         data-conversation-id="${conversation.id}"
+                         onclick="ConversationHistory.loadConversation('${conversation.id}')">
+                        <div class="conversation-item-header">
+                            <span class="conversation-title">${escapeHtml(conversation.title)}</span>
+                            <div class="conversation-actions">
+                                <button class="conversation-favorite" 
+                                        onclick="event.stopPropagation(); ConversationHistory.toggleFavorite('${conversation.id}')"
+                                        title="${conversation.favorited ? 'Unfavorite' : 'Favorite'} conversation">
+                                    ${conversation.favorited ? '★' : '☆'}
+                                </button>
+                                <button class="conversation-delete" 
+                                        onclick="event.stopPropagation(); ConversationHistory.deleteConversation('${conversation.id}')"
+                                        title="Delete conversation">
+                                    ×
+                                </button>
+                            </div>
+                        </div>
+                        ${tagsHtml}
+                        <div class="conversation-preview">${escapeHtml(preview)}</div>
+                        <div class="conversation-meta">
+                            <span class="message-count">💬 ${messageCount}</span>
+                            <span class="conversation-time">${formatRelativeTime(conversation.updatedAt)}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+        }
+
+        listContainer.innerHTML = html;
+    }
+
+    /**
+     * Get all unique tags
+     * @returns {Array} Array of unique tags
+     */
+    function getAllTags() {
+        const allTags = conversations.flatMap(conv => conv.tags);
+        return [...new Set(allTags)];
     }
 
     // Public API
@@ -544,7 +1049,17 @@ const ConversationHistory = (() => {
         searchConversations,
         clearAllConversations,
         getCurrentConversation,
-        exportConversations
+        exportConversations,
+        importConversations,
+        toggleFavorite,
+        filterFavorites,
+        sortConversations,
+        getStatistics,
+        displayStatistics,
+        addTag,
+        removeTag,
+        filterByTag,
+        getAllTags
     };
 })();
 

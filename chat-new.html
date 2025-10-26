@@ -49,6 +49,67 @@
             --off-white: #f5f5f5;      /* Off-white */
         }
 
+        /* Conversation History Actions */
+        .conversation-actions {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .conversation-action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--off-white);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+
+        .conversation-action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Conversation Item Styles */
+        .conversation-item.favorited {
+            border-left: 3px solid #FFD700;
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .conversation-favorite {
+            background: none;
+            border: none;
+            color: #FFD700;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 5px;
+        }
+
+        .conversation-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        /* Conversation Tags */
+        .conversation-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            padding: 4px 0;
+        }
+
+        .conversation-tag {
+            background: rgba(212, 175, 55, 0.2);
+            color: #D4AF37;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -2957,6 +3018,30 @@
             }
         }
     </style>
+    
+    <style>
+        .sidebar-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .conversation-action-btn {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            color: #666;
+            transition: all 0.2s ease;
+        }
+        
+        .conversation-action-btn:hover {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
     <div class="app">
@@ -2964,7 +3049,15 @@
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-title" data-i18n="conversations">Chat</div>
-                <button class="new-chat-btn" id="newChatBtn" data-i18n="newChat">+ Nuova</button>
+                <div class="sidebar-actions">
+                    <button id="exportConversationsBtn" class="conversation-action-btn" title="Export conversations">
+                        📤
+                    </button>
+                    <button id="importConversationsBtn" class="conversation-action-btn" title="Import conversations">
+                        📥
+                    </button>
+                    <button class="new-chat-btn" id="newChatBtn" data-i18n="newChat">+ Nuova</button>
+                </div>
             </div>
             <div class="conversation-list" id="conversationList">
                 <!-- Conversations will be added here dynamically -->
@@ -2990,6 +3083,35 @@
                         <span class="initials">U</span>
                         <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
                     </div>
+                </div>
+            </div>
+
+            <!-- Conversation History -->
+            <div class="sidebar-section">
+                <div class="sidebar-header">
+                    <h3>📜 Conversations</h3>
+                </div>
+                
+                <!-- Conversation Actions -->
+                <div class="conversation-actions">
+                    <button id="exportConversationsBtn" class="conversation-action-btn" title="Export conversations">
+                        📤 Export
+                    </button>
+                    <button id="importConversationsBtn" class="conversation-action-btn" title="Import conversations">
+                        📥 Import
+                    </button>
+                    <button id="clearConversationsBtn" class="conversation-action-btn" title="Clear all conversations">
+                        🗑️ Clear
+                    </button>
+                    <button id="favoriteConversationsBtn" class="conversation-action-btn" title="Show favorite conversations">
+                        ⭐ Favorites
+                    </button>
+                </div>
+                
+                <!-- Search -->
+                <div class="search-container">
+                    <input type="text" id="conversationSearch" placeholder="Search conversations..." oninput="ConversationHistory.searchConversations(this.value)">
+                    <span class="search-icon">🔍</span>
                 </div>
             </div>
 
@@ -3475,11 +3597,10 @@
             });
         });
 
-        // Price Calculator Button - Toggle existing pricing widget
+        // Price Calculator Button - Use public API
         document.getElementById('priceCalcBtn').addEventListener('click', () => {
-            const widget = document.querySelector('.pricing-calculator-widget');
-            if (widget) {
-                widget.classList.toggle('expanded');
+            if (window.PricingCalculator && typeof window.PricingCalculator.toggleWidget === 'function') {
+                window.PricingCalculator.toggleWidget();
             }
         });
 
