@@ -443,15 +443,13 @@
             }
         });
         
-        // Apply translations BEFORE redirect check
+        // Apply translations
         if (window.ZANTARA_I18N) {
             ZANTARA_I18N.applyTranslations();
         }
 
-        // Check if already logged in
-        if (ZANTARA_API.isLoggedIn()) {
-            window.location.href = 'chat-new.html';
-        }
+        // Note: Removed auto-redirect to allow manual login page access
+        // Users can navigate to chat-new.html directly if already logged in
     </script>
 </body>
 </html>
