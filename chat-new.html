@@ -31,6 +31,7 @@
     <script src="js/i18n.js"></script>
     <script src="js/language-selector.js"></script>
     <script src="js/message-templates.js"></script>
+    <script src="js/conversation-export.js"></script>
 
     <!-- Auth Guard -->
     <script>
@@ -319,6 +320,163 @@
             color: rgba(255, 255, 255, 0.5);
             padding: 40px;
             font-size: 14px;
+        }
+
+        /* Enhancement 11: Conversation Export */
+        .export-button-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+
+        .export-conversation-btn {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid var(--red);
+            color: var(--red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .export-conversation-btn:hover {
+            background: var(--red);
+            color: white;
+        }
+
+        .export-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.2s;
+        }
+
+        .export-modal-content {
+            background: var(--navy);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            overflow: hidden;
+            animation: slideUp 0.3s;
+        }
+
+        .export-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .export-modal-header h3 {
+            color: var(--off-white);
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .export-modal-close {
+            background: none;
+            border: none;
+            color: var(--off-white);
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            line-height: 1;
+        }
+
+        .export-modal-body {
+            padding: 20px;
+        }
+
+        .export-modal-body p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+        }
+
+        .export-format-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .export-format-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            color: var(--off-white);
+        }
+
+        .export-format-btn:hover {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: var(--red);
+            transform: translateY(-2px);
+        }
+
+        .export-format-btn svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .export-format-btn span {
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .export-options label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .export-options input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .conversation-tag {
