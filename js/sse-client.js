@@ -122,6 +122,7 @@ class ZantaraSSEClient {
       // Handle incoming messages
       this.eventSource.onmessage = (event) => {
         try {
+          console.log('[ZantaraSSE] RAW EVENT:', event.data.substring(0, 200)); // Debug
           const data = JSON.parse(event.data);
 
           // ← CITATIONS: Capture sources before done signal
