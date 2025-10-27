@@ -932,21 +932,44 @@
             const contentDiv = assistantMsg.querySelector('.message-content');
 
             try {
-                // Use ZANTARA_API to send message with streaming
-                const userEmail = localStorage.getItem('user_email') || 'zero@balizero.com';
+                // Use ZANTARA_API to send message
+                const userEmail = localStorage.getItem('zantara-email') || 'zero@balizero.com';
 
-                await ZANTARA_API.sendMessage(message, userEmail, (chunk) => {
-                    // Streaming callback
-                    contentDiv.innerHTML = MessageFormatter.format(chunk);
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                });
+                // Try SSE streaming first
+                if (window.ZANTARA_SSE) {
+                    let fullResponse = '';
+                    await window.ZANTARA_SSE.stream(message, userEmail, (chunk) => {
+                        fullResponse += chunk;
+                        contentDiv.innerHTML = window.MessageFormatter
+                            ? MessageFormatter.format(fullResponse)
+                            : fullResponse;
+                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                    });
 
-                // Save assistant response to history
-                conversationHistory.push({
-                    role: 'assistant',
-                    content: contentDiv.textContent,
-                    timestamp: new Date()
-                });
+                    conversationHistory.push({
+                        role: 'assistant',
+                        content: fullResponse,
+                        timestamp: new Date()
+                    });
+                } else {
+                    // Fallback to regular chat (non-streaming)
+                    const result = await ZANTARA_API.chat(message, userEmail, false);
+
+                    if (result.success) {
+                        const formattedResponse = window.MessageFormatter
+                            ? MessageFormatter.format(result.response)
+                            : result.response;
+                        contentDiv.innerHTML = formattedResponse;
+
+                        conversationHistory.push({
+                            role: 'assistant',
+                            content: result.response,
+                            timestamp: new Date()
+                        });
+                    } else {
+                        throw new Error(result.error || 'Chat failed');
+                    }
+                }
 
             } catch (error) {
                 console.error('Error sending message:', error);
