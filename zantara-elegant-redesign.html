@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000">
+    <title>ZANTARA - Bali Zero Intelligence</title>
+
+    <!-- PWA Support -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+    <!-- Google Fonts - Bali Zero Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Bali Zero - EXACT colors from balizero.com */
+        :root {
+            /* Primary Colors - EXACT match */
+            --bg-primary: #000;
+            --bg-secondary: #090920; /* Vivid black from hero section */
+            --bg-tertiary: rgba(255,255,255,0.05);
+            --text-primary: #fff;
+            --text-secondary: rgba(255,255,255,0.7);
+            --border-light: rgba(255,255,255,0.1);
+            --border-medium: rgba(255,255,255,0.3);
+            --red: #ff0000; /* EXACT Red from balizero.com */
+            --gold: #d4af37; /* Gold from balizero.com */
+            --accent: #ff0000;
+            
+            /* Zantara Brand Colors */
+            --zantara-blue: #0066ff;
+            --zantara-blue-dark: #004dd1;
+            
+            /* Service Colors */
+            --color-visa: #0066ff;
+            --color-company: #00cc66;
+            --color-tax: #ffcc00;
+            --color-estate: #ff0000;
+            
+            /* Transitions */
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Batik Pattern Background Animation */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.03) 2%, transparent 0%),
+                radial-gradient(circle at 75% 75%, rgba(232, 213, 183, 0.03) 2%, transparent 0%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.02) 1%, transparent 0%);
+            background-size: 60px 60px, 80px 80px, 40px 40px;
+            animation: batik-flow 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes batik-flow {
+            0%, 100% { opacity: 0.02; }
+            50% { opacity: 0.04; }
+        }
+
+        /* Header with Dual Logos */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0) 100%);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+            transition: var(--transition-normal);
+            /* Adding outline effect */
+            filter: drop-shadow(0 0 2px rgba(255, 0, 0, 0.8));
+            /* Adding outer glow effect */
+            text-shadow: 0 0 4px rgba(255, 0, 0, 0.6);
+        }
+
+        /* Camouflaging the white background of Bali Zero logo */
+        .bali-zero-logo {
+            background: var(--bg-primary);
+            border-radius: 6px;
+            padding: 2px;
+        }
+        
+        .logo:hover {
+            filter: brightness(1.2);
+        }
+
+        .logo-divider {
+            height: 30px;
+            width: 1px;
+            background: var(--border-medium);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition-fast);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* User Info Section - NEW */
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.25rem;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-department {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .theme-toggle:hover {
+            background: var(--border-light);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--zantara-blue), var(--zantara-blue-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-avatar-letter {
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        /* Profile Photo Upload Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-light);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            margin-bottom: 1rem;
+        }
+
+        .upload-area:hover {
+            border-color: var(--border-medium);
+            background: var(--bg-tertiary);
+        }
+
+        .upload-area input {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .btn-remove-photo {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid var(--red);
+            color: var(--red);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition-fast);
+        }
+
+        .btn-remove-photo:hover {
+            background: rgba(255, 0, 0, 0.3);
+        }
+
+        /* Main Content */
+        .main-container {
+            display: flex;
+            height: 100vh;
+            padding-top: 80px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: rgba(9, 9, 32, 0.7);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-item {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .sidebar-item:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .sidebar-item.active {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+            border-left: 3px solid var(--red);
+        }
+
+        .sidebar-item-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Chat Area */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-action-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .chat-action-btn:hover {
+            background: var(--border-light);
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .message {
+            max-width: 80%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .message-user {
+            align-self: flex-end;
+        }
+
+        .message-assistant {
+            align-self: flex-start;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        .message-avatar-user {
+            background: linear-gradient(135deg, var(--zantara-blue), var(--zantara-blue-dark));
+            overflow: hidden;
+        }
+
+        .message-avatar-user img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message-avatar-assistant {
+            /* Zantara Lotus Logo - transparent background */
+            background: transparent;
+            padding: 0;
+        }
+
+        .message-avatar-assistant img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .message-content {
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            line-height: 1.5;
+        }
+
+        .message-user .message-content {
+            background: rgba(0, 102, 255, 0.15);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            border-radius: 12px 12px 0 12px;
+        }
+
+        .message-assistant .message-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: 12px 12px 12px 0;
+        }
+
+        .input-container {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .input-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .input-box:focus-within {
+            border-color: var(--red);
+        }
+
+        .input-field {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            resize: none;
+            max-height: 200px;
+            padding: 0.5rem 0;
+        }
+
+        .input-field::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .input-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .input-action-btn:hover {
+            background: var(--border-light);
+            color: var(--text-primary);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, var(--red), #cc0000);
+            border: none;
+            color: white;
+        }
+
+        .send-btn:hover {
+            background: linear-gradient(135deg, #ff1a1a, #e60000);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar-title, 
+            .sidebar-item-text {
+                display: none;
+            }
+            
+            .sidebar-item {
+                justify-content: center;
+                padding: 1rem;
+            }
+            
+            .logo-text {
+                display: none;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+
+            .user-info {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Dual Logos -->
+    <header class="header">
+        <div class="logo-container">
+            <img src="assets/logobianco.jpeg" alt="Bali Zero" class="logo bali-zero-logo">
+            <div class="logo-divider"></div>
+            <img src="assets/zantara_logo_transparent.png" alt="ZANTARA" class="logo">
+        </div>
+        
+        <nav class="nav-links">
+            <a href="#" class="nav-link">Dashboard</a>
+            <a href="#" class="nav-link">History</a>
+            
+        </nav>
+        
+        <div class="user-actions">
+            <!-- User Info - NEW -->
+            <div class="user-info">
+                <div class="user-name" id="userName">Zero</div>
+                <div class="user-department" id="userDepartment">Management</div>
+            </div>
+
+            <div class="theme-toggle" onclick="toggleTheme()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </div>
+            <div class="user-avatar" onclick="openPhotoModal()">
+                <img id="userPhoto" src="" alt="User" style="display: none;">
+                <span class="user-avatar-letter" id="userLetter">U</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Profile Photo Upload Modal -->
+    <div id="photoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Upload Profile Photo</h3>
+                <button class="modal-close" onclick="closePhotoModal()">&times;</button>
+            </div>
+
+            <div class="upload-area" onclick="document.getElementById('photoInput').click()">
+                <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)">
+                <div class="upload-icon">📸</div>
+                <div class="upload-text">Click to upload your photo</div>
+            </div>
+
+            <button class="btn-remove-photo" onclick="removePhoto()">Remove Photo</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Conversations</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item active">
+                        <div class="sidebar-item-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <span class="sidebar-item-text">New Project Discussion</span>
+                    </li>
+                    <li class="sidebar-item">
+                        <div class="sidebar-item-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <span class="sidebar-item-text">Visa Application</span>
+                    </li>
+                    <li class="sidebar-item">
+                        <div class="sidebar-item-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <span class="sidebar-item-text">Tax Consultation</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Tools</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item">
+                        <div class="sidebar-item-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                            </svg>
+                        </div>
+                        <span class="sidebar-item-text">Knowledge Base</span>
+                    </li>
+                    
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Chat Area -->
+        <main class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">New Project Discussion</div>
+                <div class="chat-actions">
+                    <div class="chat-action-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="1"></circle>
+                            <circle cx="19" cy="12" r="1"></circle>
+                            <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="messages-container">
+                <div class="message message-assistant">
+                    <div class="message-header">
+                        <div class="message-avatar message-avatar-assistant">
+                            <img src="assets/zantara_logo_transparent.png" alt="ZANTARA">
+                        </div>
+                        <span>ZANTARA Assistant</span>
+                        <span>•</span>
+                        <span>Today, 10:30 AM</span>
+                    </div>
+                    <div class="message-content">
+                        Hello! I'm your ZANTARA assistant. How can I help you with your business needs in Indonesia today? You can ask me about visas, company setup, taxes, or any other business-related questions.
+                    </div>
+                </div>
+
+                <div class="message message-user">
+                    <div class="message-header">
+                        <div class="message-avatar message-avatar-user">
+                            <img id="messageUserPhoto" src="" alt="You" style="display: none;">
+                            <span id="messageUserLetter">U</span>
+                        </div>
+                        <span>You</span>
+                        <span>•</span>
+                        <span>Today, 10:32 AM</span>
+                    </div>
+                    <div class="message-content">
+                        I'm planning to start a tech company in Bali. What are the key requirements and steps I need to follow?
+                    </div>
+                </div>
+
+                <div class="message message-assistant">
+                    <div class="message-header">
+                        <div class="message-avatar message-avatar-assistant">
+                            <img src="assets/zantara_logo_transparent.png" alt="ZANTARA">
+                        </div>
+                        <span>ZANTARA Assistant</span>
+                        <span>•</span>
+                        <span>Today, 10:33 AM</span>
+                    </div>
+                    <div class="message-content">
+                        Starting a tech company in Bali is an excellent choice! Here are the key steps:<br><br>
+
+                        1. <strong>Choose your business structure</strong> - Most common are PT (Limited Liability Company) or Representative Office<br>
+                        2. <strong>Obtain a Business License (NIB)</strong> through the Online Single Submission (OSS) system<br>
+                        3. <strong>Register with the Ministry of Communication and Informatics</strong> for tech businesses<br>
+                        4. <strong>Open a corporate bank account</strong> in Indonesia<br><br>
+
+                        Would you like me to elaborate on any of these steps or help you with specific requirements for your tech business?
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <div class="input-box">
+                    <textarea class="input-field" placeholder="Message ZANTARA..." rows="1"></textarea>
+                    <div class="input-actions">
+                        <button class="input-action-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <path d="M21 15l-5-5L5 21"></path>
+                            </svg>
+                        </button>
+                        <button class="input-action-btn send-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Auto-resize textarea
+        const textarea = document.querySelector('.input-field');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Theme toggle
+        function toggleTheme() {
+            alert('Theme toggle would switch between light and dark modes in a full implementation.');
+        }
+
+        // Profile Photo Management
+        function loadUserProfile() {
+            // Load from localStorage
+            const savedPhoto = localStorage.getItem('zantara_user_photo');
+            const savedName = localStorage.getItem('zantara_user_name');
+            const savedDepartment = localStorage.getItem('zantara_user_department');
+
+            if (savedPhoto) {
+                document.getElementById('userPhoto').src = savedPhoto;
+                document.getElementById('userPhoto').style.display = 'block';
+                document.getElementById('userLetter').style.display = 'none';
+
+                // Update message avatar too
+                document.getElementById('messageUserPhoto').src = savedPhoto;
+                document.getElementById('messageUserPhoto').style.display = 'block';
+                document.getElementById('messageUserLetter').style.display = 'none';
+            }
+
+            if (savedName) {
+                document.getElementById('userName').textContent = savedName;
+            }
+
+            if (savedDepartment) {
+                document.getElementById('userDepartment').textContent = savedDepartment;
+            }
+        }
+
+        function openPhotoModal() {
+            document.getElementById('photoModal').classList.add('show');
+        }
+
+        function closePhotoModal() {
+            document.getElementById('photoModal').classList.remove('show');
+        }
+
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const photoData = e.target.result;
+
+                    // Save to localStorage
+                    localStorage.setItem('zantara_user_photo', photoData);
+
+                    // Update UI
+                    document.getElementById('userPhoto').src = photoData;
+                    document.getElementById('userPhoto').style.display = 'block';
+                    document.getElementById('userLetter').style.display = 'none';
+
+                    // Update message avatar
+                    document.getElementById('messageUserPhoto').src = photoData;
+                    document.getElementById('messageUserPhoto').style.display = 'block';
+                    document.getElementById('messageUserLetter').style.display = 'none';
+
+                    closePhotoModal();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removePhoto() {
+            // Remove from localStorage
+            localStorage.removeItem('zantara_user_photo');
+
+            // Reset UI
+            document.getElementById('userPhoto').style.display = 'none';
+            document.getElementById('userLetter').style.display = 'block';
+
+            // Reset message avatar
+            document.getElementById('messageUserPhoto').style.display = 'none';
+            document.getElementById('messageUserLetter').style.display = 'block';
+
+            closePhotoModal();
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('photoModal');
+            if (event.target === modal) {
+                closePhotoModal();
+            }
+        }
+
+        // Load user profile on page load
+        loadUserProfile();
+    </script>
+</body>
+</html>
