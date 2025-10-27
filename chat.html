@@ -937,22 +937,54 @@
 
                 // Try SSE streaming first
                 if (window.ZANTARA_SSE) {
+                    console.log('🌊 Using SSE streaming...');
+
                     let fullResponse = '';
-                    await window.ZANTARA_SSE.stream(message, userEmail, (chunk) => {
-                        fullResponse += chunk;
-                        contentDiv.innerHTML = window.MessageFormatter
+
+                    // Clean up old listeners
+                    if (window.ZANTARA_SSE.removeAllListeners) {
+                        window.ZANTARA_SSE.removeAllListeners();
+                    }
+
+                    // Set up event listeners BEFORE starting stream
+                    window.ZANTARA_SSE.on('start', () => {
+                        console.log('📡 Stream started');
+                        contentDiv.innerHTML = '...';
+                    });
+
+                    window.ZANTARA_SSE.on('delta', ({chunk, message: fullMsg}) => {
+                        fullResponse = fullMsg;
+                        const formattedResponse = window.MessageFormatter
                             ? MessageFormatter.format(fullResponse)
                             : fullResponse;
+                        contentDiv.innerHTML = formattedResponse;
                         messagesDiv.scrollTop = messagesDiv.scrollHeight;
                     });
 
-                    conversationHistory.push({
-                        role: 'assistant',
-                        content: fullResponse,
-                        timestamp: new Date()
+                    window.ZANTARA_SSE.on('complete', () => {
+                        console.log('✅ Stream complete');
+                        conversationHistory.push({
+                            role: 'assistant',
+                            content: fullResponse,
+                            timestamp: new Date()
+                        });
+                        sendBtn.disabled = false;
+                        input.focus();
                     });
+
+                    window.ZANTARA_SSE.on('error', (error) => {
+                        console.error('❌ Stream error:', error);
+                        contentDiv.innerHTML = '<span style="color: var(--red);">Error: Unable to respond. Try again.</span>';
+                        sendBtn.disabled = false;
+                        input.focus();
+                    });
+
+                    // Start streaming AFTER listeners are set up
+                    await window.ZANTARA_SSE.stream(message, userEmail);
+
                 } else {
                     // Fallback to regular chat (non-streaming)
+                    console.log('🔄 Using regular API...');
                     const result = await ZANTARA_API.chat(message, userEmail, false);
 
                     if (result.success) {
@@ -969,12 +1001,14 @@
                     } else {
                         throw new Error(result.error || 'Chat failed');
                     }
+
+                    sendBtn.disabled = false;
+                    input.focus();
                 }
 
             } catch (error) {
                 console.error('Error sending message:', error);
                 contentDiv.innerHTML = '<span style="color: var(--red);">Error: ' + error.message + '</span>';
-            } finally {
                 sendBtn.disabled = false;
                 input.focus();
             }
