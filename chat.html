@@ -15,6 +15,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
+    <!-- JavaScript Dependencies -->
+    <script src="js/api-contracts.js"></script>
+    <script src="js/zantara-api.js"></script>
+    <script src="js/sse-client.js"></script>
+    <script src="js/message-formatter.js"></script>
+    <script src="js/conversation-history.js"></script>
+
     <style>
         /* Bali Zero - EXACT colors from balizero.com */
         :root {
@@ -731,7 +738,7 @@
                 </div>
             </div>
 
-            <div class="messages-container">
+            <div id="messages" class="messages-container">
                 <div class="message message-assistant">
                     <div class="message-header">
                         <div class="message-avatar message-avatar-assistant">
@@ -785,7 +792,7 @@
 
             <div class="input-container">
                 <div class="input-box">
-                    <textarea class="input-field" placeholder="Message ZANTARA..." rows="1"></textarea>
+                    <textarea id="chatInput" class="input-field" placeholder="Message ZANTARA..." rows="1"></textarea>
                     <div class="input-actions">
                         <button class="input-action-btn">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -794,7 +801,7 @@
                                 <path d="M21 15l-5-5L5 21"></path>
                             </svg>
                         </button>
-                        <button class="input-action-btn send-btn">
+                        <button id="sendBtn" class="input-action-btn send-btn" onclick="sendMessage()">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="22" y1="2" x2="11" y2="13"></line>
                                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -807,6 +814,9 @@
     </div>
 
     <script>
+        // Global conversation history
+        let conversationHistory = [];
+
         // Auto-resize textarea
         const textarea = document.querySelector('.input-field');
         textarea.addEventListener('input', function() {
@@ -814,14 +824,21 @@
             this.style.height = (this.scrollHeight) + 'px';
         });
 
+        // Enter key handler
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
         // Theme toggle
         function toggleTheme() {
-            alert('Theme toggle would switch between light and dark modes in a full implementation.');
+            document.body.classList.toggle('day-mode');
         }
 
         // Profile Photo Management
         function loadUserProfile() {
-            // Load from localStorage
             const savedPhoto = localStorage.getItem('zantara_user_photo');
             const savedName = localStorage.getItem('zantara_user_name');
             const savedDepartment = localStorage.getItem('zantara_user_department');
@@ -830,8 +847,6 @@
                 document.getElementById('userPhoto').src = savedPhoto;
                 document.getElementById('userPhoto').style.display = 'block';
                 document.getElementById('userLetter').style.display = 'none';
-
-                // Update message avatar too
                 document.getElementById('messageUserPhoto').src = savedPhoto;
                 document.getElementById('messageUserPhoto').style.display = 'block';
                 document.getElementById('messageUserLetter').style.display = 'none';
@@ -860,20 +875,13 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const photoData = e.target.result;
-
-                    // Save to localStorage
                     localStorage.setItem('zantara_user_photo', photoData);
-
-                    // Update UI
                     document.getElementById('userPhoto').src = photoData;
                     document.getElementById('userPhoto').style.display = 'block';
                     document.getElementById('userLetter').style.display = 'none';
-
-                    // Update message avatar
                     document.getElementById('messageUserPhoto').src = photoData;
                     document.getElementById('messageUserPhoto').style.display = 'block';
                     document.getElementById('messageUserLetter').style.display = 'none';
-
                     closePhotoModal();
                 };
                 reader.readAsDataURL(file);
@@ -881,21 +889,14 @@
         }
 
         function removePhoto() {
-            // Remove from localStorage
             localStorage.removeItem('zantara_user_photo');
-
-            // Reset UI
             document.getElementById('userPhoto').style.display = 'none';
             document.getElementById('userLetter').style.display = 'block';
-
-            // Reset message avatar
             document.getElementById('messageUserPhoto').style.display = 'none';
             document.getElementById('messageUserLetter').style.display = 'block';
-
             closePhotoModal();
         }
 
-        // Close modal on outside click
         window.onclick = function(event) {
             const modal = document.getElementById('photoModal');
             if (event.target === modal) {
@@ -903,7 +904,111 @@
             }
         }
 
-        // Load user profile on page load
+        // Message sending logic
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            const messagesDiv = document.getElementById('messages');
+            const sendBtn = document.getElementById('sendBtn');
+
+            // Add user message
+            addUserMessage(message);
+
+            // Save to conversation history
+            conversationHistory.push({ role: 'user', content: message, timestamp: new Date() });
+
+            // Clear input
+            input.value = '';
+            input.style.height = 'auto';
+
+            // Disable send button
+            sendBtn.disabled = true;
+
+            // Create assistant message container
+            const assistantMsg = addAssistantMessage('');
+            const contentDiv = assistantMsg.querySelector('.message-content');
+
+            try {
+                // Use ZANTARA_API to send message with streaming
+                const userEmail = localStorage.getItem('user_email') || 'zero@balizero.com';
+
+                await ZANTARA_API.sendMessage(message, userEmail, (chunk) => {
+                    // Streaming callback
+                    contentDiv.innerHTML = MessageFormatter.format(chunk);
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                });
+
+                // Save assistant response to history
+                conversationHistory.push({
+                    role: 'assistant',
+                    content: contentDiv.textContent,
+                    timestamp: new Date()
+                });
+
+            } catch (error) {
+                console.error('Error sending message:', error);
+                contentDiv.innerHTML = '<span style="color: var(--red);">Error: ' + error.message + '</span>';
+            } finally {
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        }
+
+        function addUserMessage(content) {
+            const messagesDiv = document.getElementById('messages');
+            const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+            const savedPhoto = localStorage.getItem('zantara_user_photo');
+            const photoHTML = savedPhoto
+                ? `<img src="${savedPhoto}" alt="You" style="width: 100%; height: 100%; object-fit: cover;">`
+                : '<span style="font-size: 0.7rem; color: white;">U</span>';
+
+            const messageHTML = `
+                <div class="message message-user">
+                    <div class="message-header">
+                        <div class="message-avatar message-avatar-user">
+                            ${photoHTML}
+                        </div>
+                        <span>You</span>
+                        <span>•</span>
+                        <span>Today, ${time}</span>
+                    </div>
+                    <div class="message-content">${content}</div>
+                </div>
+            `;
+
+            messagesDiv.insertAdjacentHTML('beforeend', messageHTML);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function addAssistantMessage(content) {
+            const messagesDiv = document.getElementById('messages');
+            const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+            const messageHTML = `
+                <div class="message message-assistant">
+                    <div class="message-header">
+                        <div class="message-avatar message-avatar-assistant">
+                            <img src="assets/zantara_logo_transparent.png" alt="ZANTARA">
+                        </div>
+                        <span>ZANTARA Assistant</span>
+                        <span>•</span>
+                        <span>Today, ${time}</span>
+                    </div>
+                    <div class="message-content">${content || '...'}</div>
+                </div>
+            `;
+
+            messagesDiv.insertAdjacentHTML('beforeend', messageHTML);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            return messagesDiv.lastElementChild;
+        }
+
+        // Initialize
         loadUserProfile();
     </script>
 </body>
