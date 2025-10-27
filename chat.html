@@ -941,9 +941,12 @@
 
                     let fullResponse = '';
 
-                    // Clean up old listeners
+                    // Clean up specific event listeners to avoid conflicts
                     if (window.ZANTARA_SSE.removeAllListeners) {
-                        window.ZANTARA_SSE.removeAllListeners();
+                        window.ZANTARA_SSE.removeAllListeners('start');
+                        window.ZANTARA_SSE.removeAllListeners('delta');
+                        window.ZANTARA_SSE.removeAllListeners('complete');
+                        window.ZANTARA_SSE.removeAllListeners('error');
                     }
 
                     // Set up event listeners BEFORE starting stream
