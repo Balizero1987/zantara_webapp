@@ -1,2 +1,64 @@
-<!-- Deployed: 2025-10-28 08:48:34 UTC -->
-<!-- Source: https://github.com/Balizero1987/nuzantara/commit/7f092ec8e7183e9d2e05bf947f4e675605d98b44 -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="0; url=login.html">
+    <title>ZANTARA - Redirecting...</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: white;
+        }
+        .loader {
+            text-align: center;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+        }
+        p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin: 10px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="loader">
+        <div class="spinner"></div>
+        <h1>ZANTARA</h1>
+        <p>Caricamento in corso...</p>
+    </div>
+    
+    <script>
+        // Fallback redirect in case meta refresh doesn't work
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 100);
+    </script>
+</body>
+</html>
+<!-- Deployed: 2025-10-28 14:21:02 UTC -->
+<!-- Source: https://github.com/Balizero1987/nuzantara/commit/8c8e99ee9c77c4ab1d12c0b9e9aa18192e627040 -->
