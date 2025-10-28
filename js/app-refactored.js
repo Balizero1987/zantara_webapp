@@ -256,7 +256,7 @@ class ZantaraApp {
    */
   _redirectToLogin(message) {
     const params = message ? `?message=${encodeURIComponent(message)}` : '';
-    window.location.href = `/login-claude-style.html${params}`;
+    window.location.href = `/login.html${params}`;
   }
 
   /**

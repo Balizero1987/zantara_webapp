@@ -673,7 +673,7 @@ class ZantaraApp {
         whatsapp: '+62 859 5424 1699',
         website: 'https://balizero.com',
         app: 'https://zantara.balizero.com',
-        landing: 'https://welcome.balizero.com'
+        landing: 'https://balizero.com'
       };
       const contact = data.contact || {};
       const email = contact.email || CONTACT.email;
@@ -807,7 +807,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!userEmail && !isSafeBuild) {
     // Not logged in and not in safe mode, redirect to login
-    window.location.href = '/portal.html';
+    window.location.href = '/login.html';
     return;
   }
 

@@ -1072,3 +1072,339 @@ if (document.readyState === 'loading') {
 
 // Export for global access
 window.ConversationHistory = ConversationHistory;
+
+/**
+ * Conversation History Management System
+ * Enhancement #21 for NUZANTARA-RAILWAY
+ * Implements features for managing, searching, and organizing conversation history
+ */
+
+class ConversationHistory {
+  constructor() {
+    this.history = [];
+    this.starredConversations = new Set();
+    this.tags = new Map(); // conversationId -> tags[]
+    this.maxHistoryItems = 100;
+  }
+
+  /**
+   * Load conversation history from localStorage
+   */
+  loadHistory() {
+    try {
+      const savedHistory = localStorage.getItem('zantara-conversation-history');
+      const starredData = localStorage.getItem('zantara-starred-conversations');
+      const tagsData = localStorage.getItem('zantara-conversation-tags');
+      
+      if (savedHistory) {
+        this.history = JSON.parse(savedHistory);
+      }
+      
+      if (starredData) {
+        this.starredConversations = new Set(JSON.parse(starredData));
+      }
+      
+      if (tagsData) {
+        const tagsObj = JSON.parse(tagsData);
+        // Convert plain object to Map
+        this.tags = new Map(Object.entries(tagsObj).map(([k, v]) => [k, new Set(v)]));
+      }
+      
+      console.log('[ConversationHistory] Loaded conversation history');
+      return true;
+    } catch (error) {
+      console.error('[ConversationHistory] Error loading history:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Save conversation history to localStorage
+   */
+  saveHistory() {
+    try {
+      localStorage.setItem('zantara-conversation-history', JSON.stringify(this.history));
+      localStorage.setItem('zantara-starred-conversations', JSON.stringify([...this.starredConversations]));
+      
+      // Convert Map to plain object for serialization
+      const tagsObj = {};
+      for (const [key, value] of this.tags) {
+        tagsObj[key] = [...value];
+      }
+      localStorage.setItem('zantara-conversation-tags', JSON.stringify(tagsObj));
+      
+      return true;
+    } catch (error) {
+      console.error('[ConversationHistory] Error saving history:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Add a new conversation to history
+   */
+  addConversation(conversation) {
+    // Generate ID if not provided
+    if (!conversation.id) {
+      conversation.id = this.generateId();
+    }
+    
+    // Add timestamp if not provided
+    if (!conversation.timestamp) {
+      conversation.timestamp = new Date().toISOString();
+    }
+    
+    // Add to beginning of history
+    this.history.unshift(conversation);
+    
+    // Limit history size
+    if (this.history.length > this.maxHistoryItems) {
+      const removed = this.history.pop();
+      // Clean up associated data
+      this.starredConversations.delete(removed.id);
+      this.tags.delete(removed.id);
+    }
+    
+    // Save to localStorage
+    this.saveHistory();
+    
+    console.log(`[ConversationHistory] Added conversation ${conversation.id}`);
+    return conversation.id;
+  }
+
+  /**
+   * Star/Unstar a conversation
+   */
+  toggleStar(conversationId) {
+    if (this.starredConversations.has(conversationId)) {
+      this.starredConversations.delete(conversationId);
+      console.log(`[ConversationHistory] Unstarred conversation ${conversationId}`);
+    } else {
+      this.starredConversations.add(conversationId);
+      console.log(`[ConversationHistory] Starred conversation ${conversationId}`);
+    }
+    
+    this.saveHistory();
+    return this.starredConversations.has(conversationId);
+  }
+
+  /**
+   * Add tags to a conversation
+   */
+  addTags(conversationId, tags) {
+    if (!this.tags.has(conversationId)) {
+      this.tags.set(conversationId, new Set());
+    }
+    
+    const conversationTags = this.tags.get(conversationId);
+    tags.forEach(tag => conversationTags.add(tag));
+    
+    this.saveHistory();
+    console.log(`[ConversationHistory] Added tags to conversation ${conversationId}:`, tags);
+  }
+
+  /**
+   * Remove tags from a conversation
+   */
+  removeTags(conversationId, tags) {
+    if (this.tags.has(conversationId)) {
+      const conversationTags = this.tags.get(conversationId);
+      tags.forEach(tag => conversationTags.delete(tag));
+      
+      // Clean up empty tag sets
+      if (conversationTags.size === 0) {
+        this.tags.delete(conversationId);
+      }
+      
+      this.saveHistory();
+      console.log(`[ConversationHistory] Removed tags from conversation ${conversationId}:`, tags);
+    }
+  }
+
+  /**
+   * Get tags for a conversation
+   */
+  getTags(conversationId) {
+    if (this.tags.has(conversationId)) {
+      return [...this.tags.get(conversationId)];
+    }
+    return [];
+  }
+
+  /**
+   * Search conversations by keyword
+   */
+  searchConversations(keyword) {
+    const lowerKeyword = keyword.toLowerCase();
+    
+    return this.history.filter(conversation => {
+      // Search in title
+      if (conversation.title && conversation.title.toLowerCase().includes(lowerKeyword)) {
+        return true;
+      }
+      
+      // Search in messages
+      if (conversation.messages) {
+        return conversation.messages.some(message => 
+          message.content && message.content.toLowerCase().includes(lowerKeyword)
+        );
+      }
+      
+      return false;
+    });
+  }
+
+  /**
+   * Filter conversations by tags
+   */
+  filterByTags(tagList) {
+    return this.history.filter(conversation => {
+      const conversationTags = this.tags.get(conversation.id) || new Set();
+      return tagList.some(tag => conversationTags.has(tag));
+    });
+  }
+
+  /**
+   * Get starred conversations
+   */
+  getStarredConversations() {
+    return this.history.filter(conversation => 
+      this.starredConversations.has(conversation.id)
+    );
+  }
+
+  /**
+   * Sort conversations by different criteria
+   */
+  sortConversations(criteria = 'timestamp') {
+    const sorted = [...this.history];
+    
+    switch (criteria) {
+      case 'timestamp':
+        sorted.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        break;
+      case 'title':
+        sorted.sort((a, b) => {
+          const titleA = (a.title || '').toLowerCase();
+          const titleB = (b.title || '').toLowerCase();
+          return titleA.localeCompare(titleB);
+        });
+        break;
+      case 'messageCount':
+        sorted.sort((a, b) => (b.messages?.length || 0) - (a.messages?.length || 0));
+        break;
+      case 'starred':
+        sorted.sort((a, b) => {
+          const aStarred = this.starredConversations.has(a.id) ? 1 : 0;
+          const bStarred = this.starredConversations.has(b.id) ? 1 : 0;
+          return bStarred - aStarred;
+        });
+        break;
+      default:
+        // Default to timestamp sorting
+        sorted.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+    
+    return sorted;
+  }
+
+  /**
+   * Delete a conversation
+   */
+  deleteConversation(conversationId) {
+    const index = this.history.findIndex(conv => conv.id === conversationId);
+    if (index !== -1) {
+      this.history.splice(index, 1);
+      this.starredConversations.delete(conversationId);
+      this.tags.delete(conversationId);
+      this.saveHistory();
+      console.log(`[ConversationHistory] Deleted conversation ${conversationId}`);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Export conversations to JSON
+   */
+  exportConversations() {
+    const exportData = {
+      history: this.history,
+      starred: [...this.starredConversations],
+      tags: {}
+    };
+    
+    // Convert Map to plain object
+    for (const [key, value] of this.tags) {
+      exportData.tags[key] = [...value];
+    }
+    
+    return JSON.stringify(exportData, null, 2);
+  }
+
+  /**
+   * Import conversations from JSON
+   */
+  importConversations(jsonData) {
+    try {
+      const importData = JSON.parse(jsonData);
+      
+      if (importData.history) {
+        this.history = importData.history;
+      }
+      
+      if (importData.starred) {
+        this.starredConversations = new Set(importData.starred);
+      }
+      
+      if (importData.tags) {
+        // Convert plain object to Map
+        this.tags = new Map(Object.entries(importData.tags).map(([k, v]) => [k, new Set(v)]));
+      }
+      
+      this.saveHistory();
+      console.log('[ConversationHistory] Imported conversations');
+      return true;
+    } catch (error) {
+      console.error('[ConversationHistory] Error importing conversations:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Generate unique ID for conversations
+   */
+  generateId() {
+    return 'conv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  /**
+   * Get conversation statistics
+   */
+  getStatistics() {
+    return {
+      totalConversations: this.history.length,
+      starredConversations: this.starredConversations.size,
+      taggedConversations: this.tags.size,
+      totalMessages: this.history.reduce((sum, conv) => sum + (conv.messages?.length || 0), 0)
+    };
+  }
+}
+
+// Initialize conversation history system
+document.addEventListener('DOMContentLoaded', () => {
+  window.ConversationHistory = new ConversationHistory();
+  window.ConversationHistory.loadHistory();
+  
+  console.log('[ConversationHistory] System ready');
+  
+  // Mark enhancement as completed
+  if (window.enhancementTracker) {
+    window.enhancementTracker.markCompleted(21);
+  }
+});
+
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = ConversationHistory;
+}
