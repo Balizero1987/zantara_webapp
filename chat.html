@@ -15,12 +15,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- JavaScript Dependencies -->
-    <script src="js/api-contracts.js"></script>
-    <script src="js/zantara-api.js"></script>
-    <script src="js/sse-client.js"></script>
-    <script src="js/message-formatter.js"></script>
-    <script src="js/conversation-history.js"></script>
+    <!-- JavaScript Dependencies - Cache-busting enabled -->
+    <script src="js/api-contracts.js?v=2025102801"></script>
+    <script src="js/zantara-api.js?v=2025102801"></script>
+    <script src="js/sse-client.js?v=2025102801"></script>
+    <script src="js/message-formatter.js?v=2025102801"></script>
+    <script src="js/conversation-history.js?v=2025102801"></script>
 
     <style>
         /* Bali Zero - EXACT colors from balizero.com */
@@ -840,8 +840,11 @@
         // Profile Photo Management
         function loadUserProfile() {
             const savedPhoto = localStorage.getItem('zantara_user_photo');
-            const savedName = localStorage.getItem('zantara_user_name');
-            const savedDepartment = localStorage.getItem('zantara_user_department');
+
+            // Get user data from ZANTARA_API (uses correct keys)
+            const user = window.ZANTARA_API?.getUser();
+            const savedName = user?.name || localStorage.getItem('zantara-name');
+            const savedDepartment = user?.role || user?.department || localStorage.getItem('zantara-department');
 
             if (savedPhoto) {
                 document.getElementById('userPhoto').src = savedPhoto;
