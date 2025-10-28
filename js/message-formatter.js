@@ -124,12 +124,12 @@ class MessageFormatter {
         const title = headerMatch[2];
         const fontSize = level === 1 ? '1.4em' : level === 2 ? '1.2em' : '1.1em';
         const marginTop = level === 1 ? '1.5em' : '1em';
-        html += `<h${level} style="font-size: ${fontSize}; font-weight: 600; margin-top: ${marginTop}; margin-bottom: 0.5em; color: var(--text-primary);">${title}</h${level}>`;
+        html += `<h${level} style="font-size: ${fontSize}; font-weight: 600; margin-top: ${marginTop}; margin-bottom: 0.75em; color: var(--text-primary);">${title}</h${level}>`;
       } else {
-        // Regular paragraph
+        // Regular paragraph with enhanced spacing
         const formatted = this.formatParagraph(trimmed);
         if (formatted) {
-          html += `<p class="response-paragraph" style="margin-bottom: 1em; line-height: 1.6;">${formatted}</p>`;
+          html += `<p class="response-paragraph" style="margin-bottom: 1.5em; line-height: 1.7; display: block;">${formatted}</p>`;
         }
       }
     });
