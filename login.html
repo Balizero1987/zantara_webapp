@@ -1,102 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ZANTARA — Login</title>
-<link rel="stylesheet" href="tokens.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Zantara Webapp</title>
 <style>
-body{margin:0;background:radial-gradient(circle at center,var(--bg-0) 0%,var(--bg-1) 100%);color:var(--text);font-family:Inter,system-ui,sans-serif;display:grid;place-items:center}
-.card{width:min(440px,92vw);padding:28px;border:1px solid rgba(199,167,94,.15);border-radius:16px;background:#0C0C13AA;backdrop-filter:blur(6px);text-align:center}
-h1{margin:0 0 10px;color:var(--gold);font:600 14px/1.2 "Playfair Display",serif;letter-spacing:.15em;text-transform:uppercase}
-label{display:block;text-align:left;margin:14px 0 6px;color:#CFCFD4}
-input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#12121A;color:var(--text)}
-button{margin-top:16px;width:100%;padding:12px 16px;border:none;border-radius:12px;background:var(--gold);color:var(--bg-0);font-weight:700;cursor:pointer}
-button:hover{background:var(--gold-2)}
-/* Transition overlay */
-#transition{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(circle at center,var(--bg-0) 0%,var(--bg-1) 100%);opacity:0;pointer-events:none;transition:opacity .8s ease;z-index:50}
-#transition.active{opacity:1;pointer-events:auto}
-#lotus{width:120px;filter:drop-shadow(0 0 10px rgba(199,167,94,.35))}
-#infinity{width:80px;height:80px;opacity:0;margin-top:22px;color:var(--gold);display:flex;align-items:center;justify-content:center}
-#infinity svg{width:100%;height:100%;stroke:currentColor;filter:drop-shadow(0 0 12px rgba(199,167,94,.4))}
-@keyframes pulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.08);opacity:1}}
-@keyframes infinity-breath{0%,100%{transform:scale(1) rotate(0deg);filter:drop-shadow(0 0 12px rgba(199,167,94,.4))}50%{transform:scale(1.15) rotate(5deg);filter:drop-shadow(0 0 24px rgba(199,167,94,.7))}}
-#infinity.breathing svg{animation:infinity-breath 2s ease-in-out infinite}
-#caption{position:absolute;bottom:10%;text-align:center;color:var(--gold);font:16px/1.4 "Playfair Display",serif;letter-spacing:.05em;opacity:0}
-#caption .inf-icon{display:inline-block;width:18px;height:18px;vertical-align:middle;margin-left:4px}
-audio{display:none}
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0c0c13;
+  color: #d4af37;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.container {
+  background-color: #12121A;
+  padding: 20px 30px;
+  border: 1px solid #d4af37;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(212,175,55,0.4);
+  width: 300px;
+}
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #d4af37;
+  background-color: #0c0c13;
+  color: #ffffff;
+}
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #d4af37;
+  color: #0c0c13;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+button:hover {
+  background-color: #e8c95d;
+}
 </style>
 </head>
 <body>
-  <div class="card" role="form" aria-labelledby="t">
-    <h1 id="t">From Zero to Infinity <svg style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-left:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18.178 8C19.5 8 21 9.2 21 11c0 1.8-1.5 3-2.822 3-1.76 0-2.632-.883-4.178-3-1.546-2.117-2.418-3-4.178-3C8.5 8 7 9.2 7 11c0 1.8 1.5 3 2.822 3 1.76 0 2.632-.883 4.178-3 1.546-2.117 2.418-3 4.178-3Z"/></svg></h1>
-    <p style="opacity:.7;margin:0 0 12px">Benvenuto in ZANTARA</p>
-    <label for="name">Nome</label><input id="name" placeholder="zero" autocomplete="name">
-    <label for="mail">Email aziendale</label><input id="mail" type="email" placeholder="zero@balizero.com" autocomplete="email">
-    <label for="pin">PIN (6 cifre)</label><input id="pin" type="password" inputmode="numeric" pattern="\d{6}" placeholder="••••••" aria-describedby="pinHelp">
-    <small id="pinHelp" style="opacity:.6">Usa il tuo PIN interno</small>
-    <button id="login">Accedi al Team →</button>
+  <div class="container">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Enter your name" />
+    <button id="loginBtn">Enter Chat</button>
   </div>
-
-  <!-- Transition -->
-  <div id="transition" aria-live="polite">
-    <img id="lotus" src="assets/logoscon.png" alt="Lotus">
-    <div id="infinity">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18.178 8C19.5 8 21 9.2 21 11c0 1.8-1.5 3-2.822 3-1.76 0-2.632-.883-4.178-3-1.546-2.117-2.418-3-4.178-3C8.5 8 7 9.2 7 11c0 1.8 1.5 3 2.822 3 1.76 0 2.632-.883 4.178-3 1.546-2.117 2.418-3 4.178-3Z"/>
-      </svg>
-    </div>
-    <div id="caption">Initializing ZANTARA Intelligence…<br>From Zero to Infinity <svg class="inf-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18.178 8C19.5 8 21 9.2 21 11c0 1.8-1.5 3-2.822 3-1.76 0-2.632-.883-4.178-3-1.546-2.117-2.418-3-4.178-3C8.5 8 7 9.2 7 11c0 1.8 1.5 3 2.822 3 1.76 0 2.632-.883 4.178-3 1.546-2.117 2.418-3 4.178-3Z"/></svg></div>
-    <audio id="breath" src="assets/infinity_breath.mp3" preload="auto"></audio>
-  </div>
-
-<script src="js/api-contracts.js"></script>
-<script src="js/zantara-api.js"></script>
-<script>
-const tr = document.getElementById('transition');
-const lotus = document.getElementById('lotus');
-const infinity = document.getElementById('infinity');
-const cap = document.getElementById('caption');
-const breath = document.getElementById('breath');
-
-document.getElementById('login').addEventListener('click', async ()=>{
-  const name = document.getElementById('name').value;
-  const email = document.getElementById('mail').value;
-  const pin = document.getElementById('pin').value;
-
-  if (!name || !email || !pin) {
-    alert('Per favore compila tutti i campi');
-    return;
-  }
-
-  // Show transition
-  tr.classList.add('active');
-  try{ breath.volume=.22; breath.play(); }catch(e){}
-  lotus.style.animation='pulse 1.2s ease-in-out 2';
-
-  try {
-    // Call API
-    const result = await ZANTARA_API.teamLogin(email, pin, name);
-
-    if (result.success) {
-      setTimeout(()=>{ lotus.style.opacity='0'; infinity.style.opacity='1'; infinity.classList.add('breathing'); },1400);
-      setTimeout(()=>{ cap.style.opacity='1'; },1500);
-      setTimeout(()=>{ tr.style.opacity='0'; breath.pause(); window.location.href='chat.html'; },3200);
-    } else {
-      tr.classList.remove('active');
-      breath.pause();
-      alert('Login fallito: ' + result.error);
-    }
-  } catch(error) {
-    tr.classList.remove('active');
-    breath.pause();
-    alert('Errore: ' + error.message);
-  }
-});
-
-// Check if already logged in
-if (ZANTARA_API.isLoggedIn()) {
-  window.location.href = 'chat.html';
-}
-</script>
+  <script>
+    document.getElementById('loginBtn').addEventListener('click', function() {
+      const username = document.getElementById('username').value.trim();
+      if (!username) {
+        alert('Please enter your name.');
+        return;
+      }
+      localStorage.setItem('username', username);
+      window.location.href = 'chat.html';
+    });
+  </script>
 </body>
 </html>
