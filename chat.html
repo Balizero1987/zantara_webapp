@@ -46,9 +46,10 @@ footer{border-top:1px solid var(--line);padding:18px 20px;display:flex;gap:14px;
 #input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 2px rgba(199,167,94,.12)}
 #input::placeholder{color:rgba(179,179,185,.5);font-style:italic}
 
-#send{padding:14px 22px;border:none;border-radius:50%;background:var(--gold);color:var(--bg-0);font-size:20px;font-weight:700;cursor:pointer;transition:all .2s;min-width:52px;min-height:52px;display:flex;align-items:center;justify-content:center}
+#send{padding:14px 22px;border:none;border-radius:50%;background:var(--gold);color:var(--bg-0);font-size:24px;font-weight:700;cursor:pointer;transition:all .2s;min-width:52px;min-height:52px;display:flex;align-items:center;justify-content:center;font-family:"Playfair Display",serif}
 #send:hover{background:var(--gold-2);transform:scale(1.05)}
 #send:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.infinity-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center}
 
 audio{display:none}
 
@@ -84,7 +85,11 @@ audio{display:none}
 
 <footer>
 <textarea id="input" placeholder="Scrivi con calma, la mente ascolta..." rows="1"></textarea>
-<button id="send">∞</button>
+<button id="send">
+<svg class="infinity-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M18.178 8C19.5 8 21 9.2 21 11c0 1.8-1.5 3-2.822 3-1.76 0-2.632-.883-4.178-3-1.546-2.117-2.418-3-4.178-3C8.5 8 7 9.2 7 11c0 1.8 1.5 3 2.822 3 1.76 0 2.632-.883 4.178-3 1.546-2.117 2.418-3 4.178-3Z"/>
+</svg>
+</button>
 </footer>
 </div>
 
