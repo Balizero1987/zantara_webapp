@@ -67,7 +67,20 @@ audio{display:none}
 <div class="container">
 <div class="title">ZANTARA // LIVING INTERFACE</div>
 
-<div id="chat"></div>
+<div id="chat">
+<div class="msg ai-msg">
+<div class="content" id="welcomeMsg">
+<p><strong>Ciao <span id="userName">Zero</span>.</strong></p>
+<p>Benvenuto nell'interfaccia viva di ZANTARA. Qui parliamo di visti, business e investimenti in Indonesia.</p>
+<p>Chiedimi qualsiasi cosa su <strong>D12</strong>, <strong>E33G</strong>, <strong>PT PMA</strong>, o proprietà immobiliari.</p>
+<div class="suggestions">
+<span class="sug-btn" onclick="document.getElementById('input').value='Costo visa D12?';handleSend()">Costo visa D12?</span>
+<span class="sug-btn" onclick="document.getElementById('input').value='Come aprire una PT PMA?';handleSend()">Come aprire una PT PMA?</span>
+<span class="sug-btn" onclick="document.getElementById('input').value='Posso comprare casa come straniero?';handleSend()">Posso comprare casa come straniero?</span>
+</div>
+</div>
+</div>
+</div>
 
 <footer>
 <textarea id="input" placeholder="Scrivi con calma, la mente ascolta..." rows="1"></textarea>
@@ -81,6 +94,11 @@ audio{display:none}
 // Auth guard
 if(!ZANTARA_API.isLoggedIn()){window.location.href='login.html'}
 const user=ZANTARA_API.getUser();
+
+// Set welcome name
+if(user&&user.name){
+  document.getElementById('userName').textContent=user.name;
+}
 
 const chatDiv=document.getElementById('chat');
 const input=document.getElementById('input');
