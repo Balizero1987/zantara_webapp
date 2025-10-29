@@ -10,20 +10,30 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(180deg, #0A0A12 0%, #12121A 40%, #1A1A26 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            color: white;
+            color: #F9F5F0;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 50% 30%, rgba(199, 167, 94, 0.1) 0%, transparent 70%);
+            pointer-events: none;
         }
         .loader {
             text-align: center;
+            position: relative;
+            z-index: 1;
         }
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
+            border: 4px solid rgba(199, 167, 94, 0.2);
             border-radius: 50%;
-            border-top: 4px solid white;
+            border-top: 4px solid #C7A75E;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
@@ -37,11 +47,13 @@
             font-size: 24px;
             font-weight: 600;
             margin: 0;
+            color: #F9F5F0;
         }
         p {
             font-size: 14px;
             opacity: 0.9;
             margin: 10px 0 0;
+            color: #C7A75E;
         }
     </style>
 </head>
@@ -60,5 +72,5 @@
     </script>
 </body>
 </html>
-<!-- Deployed: 2025-10-29 05:37:10 UTC -->
-<!-- Source: https://github.com/Balizero1987/nuzantara/commit/4036bec7cab3da519bbd854e9c59408c33cfedd8 -->
+<!-- Deployed: 2025-10-29 07:35:31 UTC -->
+<!-- Source: https://github.com/Balizero1987/nuzantara/commit/019deeca48d778baac6af1e4e0960be4e62601d2 -->

@@ -1,51 +1,56 @@
-/* ZANTARA Syncra-Inspired Theme (Glass Morphism Purple) */
+/* ZANTARA Bali Zero Theme - Luxury Dark with Gold Accents */
 :root {
-  --primary-gradient: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
-  --purple-dark: #1E1B4B;
-  --purple-base: #8B5CF6;
-  --purple-light: #A78BFA;
-  --pink-accent: #EC4899;
-  --cyan-glow: #06B6D4;
+  /* Bali Zero Official Color Palette */
+  --background: #0A0A12;
+  --mid-charcoal: #12121A;
+  --navy: #1A1A26;
+  --primary: #E94D35;
+  --secondary: #C7A75E;
+  --off-white: #F9F5F0;
 
-  --bg-primary: #0A0A0F;
-  --bg-secondary: rgba(30, 27, 75, 0.3);
-  --bg-glass: rgba(139, 92, 246, 0.1);
-  --bg-glass-hover: rgba(139, 92, 246, 0.15);
+  /* Legacy compatibility */
+  --purple-dark: #1A1A26;
+  --purple-base: #C7A75E;
+  --purple-light: #E5D5B0;
+  --pink-accent: #E94D35;
+  --cyan-glow: #C7A75E;
 
-  --text-primary: #F3F4F6;
-  --text-secondary: #9CA3AF;
-  --text-muted: #6B7280;
+  --bg-primary: #0A0A12;
+  --bg-secondary: rgba(26, 26, 38, 0.3);
+  --bg-glass: rgba(199, 167, 94, 0.1);
+  --bg-glass-hover: rgba(199, 167, 94, 0.15);
 
-  --glow-purple: 0 0 40px rgba(139, 92, 246, 0.4);
-  --glow-cyan: 0 0 30px rgba(6, 182, 212, 0.6);
-  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-  --glass-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+  --text-primary: #F9F5F0;
+  --text-secondary: #C7A75E;
+  --text-muted: #8B8577;
+
+  --glow-gold: 0 0 40px rgba(199, 167, 94, 0.4);
+  --glow-primary: 0 0 30px rgba(233, 77, 53, 0.6);
+  --glass-border: 1px solid rgba(199, 167, 94, 0.2);
+  --glass-shadow: 0 8px 32px rgba(199, 167, 94, 0.2);
 
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-  --focus-ring: 0 0 0 3px rgba(99, 102, 241, 0.35);
+  --focus-ring: 0 0 0 3px rgba(199, 167, 94, 0.35);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg-primary);
+  background: linear-gradient(180deg, #0A0A12 0%, #12121A 40%, #1A1A26 100%);
   color: var(--text-primary);
   overflow-x: hidden;
   position: relative;
 }
 
-/* Animated Background */
+/* Bali Zero Gold Overlay */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+  background: radial-gradient(circle at 50% 30%, rgba(199, 167, 94, 0.1) 0%, transparent 70%);
   animation: backgroundPulse 20s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
