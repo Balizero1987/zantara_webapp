@@ -20,7 +20,7 @@ class ZantaraSSEClient {
     // The TypeScript backend doesn't have /bali-zero/chat-stream endpoint.
     // Always use RAG backend for SSE, regardless of api-config.js settings.
 
-    const RAG_BACKEND = 'https://scintillating-kindness-production-47e3.up.railway.app';
+    const RAG_BACKEND = 'https://nuzantara-rag.fly.dev';
 
     // Check if config explicitly overrides SSE endpoint
     if (window.ZANTARA_API?.config?.sse_backend) {
@@ -122,7 +122,6 @@ class ZantaraSSEClient {
       // Handle incoming messages
       this.eventSource.onmessage = (event) => {
         try {
-          console.log('[ZantaraSSE] RAW EVENT:', event.data.substring(0, 200)); // Debug
           const data = JSON.parse(event.data);
 
           // ← CITATIONS: Capture sources before done signal

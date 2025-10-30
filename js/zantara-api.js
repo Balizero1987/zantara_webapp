@@ -11,10 +11,10 @@
  */
 
 const ZANTARA_API = {
-  // Backend URLs (legacy - use API_CONTRACTS for new calls)
+  // Backend URLs (Fly.io deployment - Oct 29, 2025)
   backends: {
-    ts: 'https://ts-backend-production-568d.up.railway.app',
-    rag: 'https://scintillating-kindness-production-47e3.up.railway.app'
+    ts: 'https://nuzantara-backend.fly.dev',
+    rag: 'https://nuzantara-rag.fly.dev'
   },
   
   /**

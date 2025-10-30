@@ -807,7 +807,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!userEmail && !isSafeBuild) {
     // Not logged in and not in safe mode, redirect to login
-    window.location.href = '/login.html';
+    window.location.href = '/portal.html';
     return;
   }
 

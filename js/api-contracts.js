@@ -20,10 +20,10 @@ class APIContracts {
     this.maxRetries = 3;
     this.retryDelay = 1000; // 1 second
     
-    // Backend URLs with versioning
+    // Backend URLs with versioning (Fly.io deployment - Oct 29, 2025)
     this.backends = {
-      ts: 'https://ts-backend-production-568d.up.railway.app',
-      rag: 'https://scintillating-kindness-production-47e3.up.railway.app'
+      ts: 'https://nuzantara-backend.fly.dev',
+      rag: 'https://nuzantara-rag.fly.dev'
     };
     
     // Health status cache

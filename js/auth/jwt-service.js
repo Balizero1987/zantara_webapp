@@ -226,7 +226,7 @@ class JWTService {
         await this.refreshAccessToken();
       } catch (e) {
         // Refresh failed - user needs to re-login
-        window.location.href = '/login.html';
+        window.location.href = '/login-claude-style.html';
         throw new Error('Session expired');
       }
     }

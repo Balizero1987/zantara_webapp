@@ -1,76 +1,65 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BALI ZERO AI - Welcome</title>
+    <link rel="icon" type="image/png" href="assets/favicon.svg">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="assets/apple-touch-icon-152.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="assets/apple-touch-icon-167.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#9B59B6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BALI ZERO AI">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="BALI ZERO AI - Intelligent Business Assistant powered by ZANTARA. Access visa services, company setup, and tax solutions through AI-powered chat.">
+    <meta name="keywords" content="ZANTARA, Bali Zero, AI Assistant, Visa Services, Company Setup, Tax Services, Indonesia Business">
+
+    <!-- Redirect to Login -->
     <meta http-equiv="refresh" content="0; url=login.html">
-    <title>ZANTARA - Redirecting...</title>
+
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(180deg, #0A0A12 0%, #12121A 40%, #1A1A26 100%);
+            background: linear-gradient(135deg, #1a0033 0%, #2D1B69 50%, #6B46C1 100%);
+            color: white;
+            font-family: system-ui, -apple-system, sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            color: #F9F5F0;
-            position: relative;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at 50% 30%, rgba(199, 167, 94, 0.1) 0%, transparent 70%);
-            pointer-events: none;
-        }
-        .loader {
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-        .spinner {
-            border: 4px solid rgba(199, 167, 94, 0.2);
-            border-radius: 50%;
-            border-top: 4px solid #C7A75E;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
             margin: 0;
-            color: #F9F5F0;
         }
-        p {
-            font-size: 14px;
-            opacity: 0.9;
-            margin: 10px 0 0;
-            color: #C7A75E;
+        .loading {
+            text-align: center;
         }
+        /* Cache bust fallback */
     </style>
+    <script>
+      // JS fallback to ensure no cached older page is shown
+      (function(){
+        try {
+          var q = new URLSearchParams(location.search);
+          // If already has a version param, skip to prevent loops
+          if (!q.has('v')) {
+            var v = 'prod11';
+            location.replace('login.html');
+          }
+        } catch(_) {
+          location.href = 'login.html';
+        }
+      })();
+    </script>
 </head>
 <body>
-    <div class="loader">
-        <div class="spinner"></div>
-        <h1>ZANTARA</h1>
-        <p>Caricamento in corso...</p>
+    <div class="loading">
+        <h2>BALI ZERO AI</h2>
+        <p>Loading...</p>
     </div>
-    
-    <script>
-        // Fallback redirect in case meta refresh doesn't work
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 100);
-    </script>
 </body>
 </html>
-<!-- Deployed: 2025-10-30 03:33:12 UTC -->
-<!-- Source: https://github.com/Balizero1987/nuzantara/commit/019deeca48d778baac6af1e4e0960be4e62601d2 -->
+<!-- Deployed: 2025-10-30 13:45:00 UTC -->
+<!-- Source: https://github.com/Balizero1987/nuzantara/commit/75b03f25aa420b98d9e47d4c88352e6751db9655 -->

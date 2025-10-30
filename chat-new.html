@@ -15,9 +15,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Markdown Parser -->
-    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
-
     <!-- API Layer -->
     <script src="js/api-contracts.js"></script>
     <script src="js/zantara-api.js"></script>
@@ -28,7 +25,7 @@
     <!-- Auth Guard -->
     <script>
         if (!ZANTARA_API.isLoggedIn()) {
-            window.location.href = 'login.html';
+            window.location.href = 'login-new.html';
         }
     </script>
 
@@ -91,119 +88,10 @@
 
         .app {
             display: flex;
+            flex-direction: column;
             height: 100vh;
             position: relative;
             z-index: 1;
-        }
-
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-
-        /* SIDEBAR - Bali Zero Journal */
-        .sidebar {
-            width: 320px;
-            background: var(--navy);
-            border-left: 1px solid rgba(232, 213, 183, 0.2);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(232, 213, 183, 0.1);
-        }
-
-        .sidebar-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--gold);
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-        }
-
-        .sidebar-subtitle {
-            font-size: 12px;
-            color: var(--cream);
-            opacity: 0.7;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .journal-preview {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .journal-item {
-            padding: 12px;
-            margin-bottom: 8px;
-            background: rgba(9, 9, 32, 0.3);
-            border-left: 3px solid var(--gold);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .journal-item:hover {
-            background: rgba(212, 175, 55, 0.1);
-            border-left-color: var(--red);
-            transform: translateX(4px);
-        }
-
-        .journal-item-category {
-            font-size: 10px;
-            color: var(--red);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-
-        .journal-item-title {
-            font-size: 14px;
-            color: var(--off-white);
-            font-weight: 600;
-            line-height: 1.4;
-        }
-
-        .journal-footer {
-            padding: 16px 20px;
-            border-top: 1px solid rgba(232, 213, 183, 0.1);
-        }
-
-        .journal-cta {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background: var(--red);
-            color: var(--black);
-            text-align: center;
-            font-weight: 700;
-            font-size: 14px;
-            border-radius: 8px;
-            text-decoration: none;
-            transition: all 0.3s;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
-        }
-
-        .journal-cta:hover {
-            background: var(--gold);
-            transform: translateY(-2px);
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
-        }
-
-        /* Hide sidebar on mobile */
-        @media (max-width: 1024px) {
-            .sidebar {
-                display: none;
-            }
         }
 
         /* HEADER - Bali Zero Style */
@@ -326,120 +214,6 @@
         .ai-message .ai-content em {
             color: var(--cream);
             font-style: italic;
-        }
-
-        /* Markdown Formatting - ChatGPT/Claude Style */
-        .ai-content h1, .ai-content h2, .ai-content h3 {
-            color: var(--gold);
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            margin-top: 20px;
-            margin-bottom: 12px;
-            line-height: 1.3;
-        }
-
-        .ai-content h1 {
-            font-size: 24px;
-            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
-            padding-bottom: 8px;
-        }
-
-        .ai-content h2 {
-            font-size: 20px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-            padding-bottom: 6px;
-        }
-
-        .ai-content h3 {
-            font-size: 18px;
-        }
-
-        .ai-content h4 {
-            font-size: 16px;
-            color: var(--cream);
-            font-weight: 600;
-            margin-top: 16px;
-            margin-bottom: 8px;
-        }
-
-        .ai-content p {
-            margin-bottom: 16px;
-            line-height: 1.7;
-        }
-
-        .ai-content ul, .ai-content ol {
-            margin: 12px 0;
-            padding-left: 28px;
-        }
-
-        .ai-content li {
-            margin-bottom: 8px;
-            line-height: 1.6;
-        }
-
-        .ai-content li::marker {
-            color: var(--gold);
-            font-weight: 600;
-        }
-
-        .ai-content code {
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 4px;
-            padding: 2px 6px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            color: var(--cream);
-        }
-
-        .ai-content pre {
-            background: rgba(9, 9, 32, 0.6);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 8px;
-            padding: 16px;
-            margin: 16px 0;
-            overflow-x: auto;
-        }
-
-        .ai-content pre code {
-            background: none;
-            border: none;
-            padding: 0;
-            color: var(--cream);
-            font-size: 14px;
-        }
-
-        .ai-content blockquote {
-            border-left: 4px solid var(--gold);
-            padding-left: 16px;
-            margin: 16px 0;
-            color: var(--cream);
-            opacity: 0.9;
-            font-style: italic;
-        }
-
-        .ai-content hr {
-            border: none;
-            border-top: 1px solid rgba(232, 213, 183, 0.2);
-            margin: 20px 0;
-        }
-
-        .ai-content a {
-            color: var(--gold);
-            text-decoration: underline;
-            transition: color 0.2s;
-        }
-
-        .ai-content a:hover {
-            color: var(--red);
-        }
-
-        /* First paragraph after heading - no top margin */
-        .ai-content h1 + p,
-        .ai-content h2 + p,
-        .ai-content h3 + p,
-        .ai-content h4 + p {
-            margin-top: 0;
         }
 
         /* Thinking state */
@@ -629,88 +403,32 @@
 </head>
 <body>
     <div class="app">
-        <!-- Main Content Area -->
-        <div class="main-content">
-            <!-- Header - Bali Zero + ZANTARA Unified -->
-            <div class="header">
-                <div class="header-left">
-                    <img src="../website/public/logo/balizero-logo-3d.png" class="logo-balizero" alt="Bali Zero" onerror="this.style.display='none'">
-                    <span class="tagline">From Zero to <span class="infinity">Infinity ∞</span></span>
-                    <img src="../website/public/logo/zantara_logo_transparent.png" class="logo-zantara" alt="ZANTARA" onerror="this.src='assets/logoscon.png'">
-                </div>
-                <div class="user-badge" id="userBadge">Login</div>
+        <!-- Header - Bali Zero + ZANTARA Unified -->
+        <div class="header">
+            <div class="header-left">
+                <img src="../website/public/logo/balizero-logo-3d.png" class="logo-balizero" alt="Bali Zero" onerror="this.style.display='none'">
+                <span class="tagline">From Zero to <span class="infinity">Infinity ∞</span></span>
+                <img src="../website/public/logo/zantara_logo_transparent.png" class="logo-zantara" alt="ZANTARA" onerror="this.src='assets/logoscon.png'">
             </div>
-
-            <!-- Messages -->
-            <div class="messages" id="messages">
-                <div class="welcome">
-                    <h2>🪷 Benvenuto su Zantara</h2>
-                    <p>L'anima intelligente di Bali Zero</p>
-                </div>
-            </div>
-
-            <!-- Input Area -->
-            <div class="input-area">
-                <textarea id="chatInput" placeholder="Scrivi un messaggio..." rows="1"></textarea>
-                <button id="sendBtn">→</button>
+            <div class="user-badge" id="userBadge">Login</div>
+        </div>
+        
+        <!-- Messages -->
+        <div class="messages" id="messages">
+            <div class="welcome">
+                <h2>🪷 Benvenuto su Zantara</h2>
+                <p>L'anima intelligente di Bali Zero</p>
             </div>
         </div>
-
-        <!-- Sidebar - Bali Zero Journal -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-title">📰 Tools</div>
-                <div class="sidebar-subtitle">Bali Zero Journal</div>
-            </div>
-
-            <div class="journal-preview" id="journalPreview">
-                <!-- Articles loaded dynamically -->
-                <div class="journal-item" onclick="window.open('https://balizero.com/journal', '_blank')">
-                    <div class="journal-item-category">IMMIGRATION</div>
-                    <div class="journal-item-title">Latest visa updates and regulation changes</div>
-                </div>
-                <div class="journal-item" onclick="window.open('https://balizero.com/journal', '_blank')">
-                    <div class="journal-item-category">BUSINESS</div>
-                    <div class="journal-item-title">Company formation insights and trends</div>
-                </div>
-                <div class="journal-item" onclick="window.open('https://balizero.com/journal', '_blank')">
-                    <div class="journal-item-category">TAX & LEGAL</div>
-                    <div class="journal-item-title">Tax compliance and legal updates</div>
-                </div>
-                <div class="journal-item" onclick="window.open('https://balizero.com/journal', '_blank')">
-                    <div class="journal-item-category">INSIGHTS</div>
-                    <div class="journal-item-title">Market analysis and intelligence</div>
-                </div>
-            </div>
-
-            <div class="journal-footer">
-                <a href="https://balizero.com/journal" target="_blank" class="journal-cta">
-                    View Full Journal →
-                </a>
-            </div>
-        </aside>
+        
+        <!-- Input Area -->
+        <div class="input-area">
+            <textarea id="chatInput" placeholder="Scrivi un messaggio..." rows="1"></textarea>
+            <button id="sendBtn">→</button>
+        </div>
     </div>
 
     <script>
-        // Configure marked.js for safe rendering
-        marked.setOptions({
-            breaks: true,  // Convert \n to <br>
-            gfm: true,     // GitHub Flavored Markdown
-            headerIds: false,
-            mangle: false
-        });
-
-        // Markdown rendering helper
-        function renderMarkdown(text) {
-            if (!text) return '';
-            try {
-                return marked.parse(text);
-            } catch (e) {
-                console.error('Markdown parsing error:', e);
-                return text; // Fallback to plain text
-            }
-        }
-
         // Load user info
         const user = ZANTARA_API.getUser();
         if (user) {
@@ -776,13 +494,13 @@
 
                     window.ZANTARA_SSE.on('delta', ({message: chunk}) => {
                         const content = aiMsg.querySelector('.ai-content');
-                        content.innerHTML = renderMarkdown(chunk);
+                        content.textContent = chunk;
                         messagesDiv.scrollTop = messagesDiv.scrollHeight;
                     });
 
                     window.ZANTARA_SSE.on('complete', ({message: fullMessage, sources}) => {
                         const content = aiMsg.querySelector('.ai-content');
-                        content.innerHTML = renderMarkdown(fullMessage);
+                        content.textContent = fullMessage;
 
                         console.log('[SSE complete] Message length:', fullMessage.length);
                         console.log('[SSE complete] Sources from SSE:', sources);
@@ -864,7 +582,7 @@
                     if (response.success) {
                         aiMsg.innerHTML = `
                             <span class="ai-label">Zantara:</span>
-                            <span class="ai-content">${renderMarkdown(response.response)}</span>
+                            <span class="ai-content">${response.response}</span>
                         `;
 
                         // ✨ SMART SUGGESTIONS FOR FALLBACK TOO

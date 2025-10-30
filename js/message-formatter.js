@@ -6,25 +6,6 @@
 
 class MessageFormatter {
   /**
-   * Main format method - automatically detects and formats messages
-   * @param {string} text - The raw message text
-   * @param {object} options - Formatting options
-   * @returns {string} HTML formatted message
-   */
-  static format(text, options = {}) {
-    if (!text) return '';
-
-    // Auto-detect structure and format accordingly
-    const hasStructure = this.detectStructure(text);
-
-    if (hasStructure) {
-      return this.parseStructuredText(text);
-    } else {
-      return this.formatRegularMessage(text);
-    }
-  }
-
-  /**
    * Formats a message with structured sections
    * @param {string} text - The raw message text
    * @param {object} options - Formatting options
@@ -112,28 +93,14 @@ class MessageFormatter {
   static formatRegularMessage(text) {
     const paragraphs = text.split(/\n\n+/);
     let html = '<div class="regular-response">';
-
+    
     paragraphs.forEach(para => {
-      const trimmed = para.trim();
-      if (!trimmed) return;
-
-      // Check for markdown headers (# ## ###)
-      const headerMatch = trimmed.match(/^(#{1,3})\s+(.+)$/m);
-      if (headerMatch) {
-        const level = headerMatch[1].length;
-        const title = headerMatch[2];
-        const fontSize = level === 1 ? '1.4em' : level === 2 ? '1.2em' : '1.1em';
-        const marginTop = level === 1 ? '1.5em' : '1em';
-        html += `<h${level} style="font-size: ${fontSize}; font-weight: 600; margin-top: ${marginTop}; margin-bottom: 0.75em; color: var(--text-primary);">${title}</h${level}>`;
-      } else {
-        // Regular paragraph with enhanced spacing
-        const formatted = this.formatParagraph(trimmed);
-        if (formatted) {
-          html += `<p class="response-paragraph" style="margin-bottom: 1.5em; line-height: 1.7; display: block;">${formatted}</p>`;
-        }
+      const formatted = this.formatParagraph(para.trim());
+      if (formatted) {
+        html += `<p class="response-paragraph">${formatted}</p>`;
       }
     });
-
+    
     html += '</div>';
     return html;
   }

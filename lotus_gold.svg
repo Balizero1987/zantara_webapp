@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4B870;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C7A75E;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Center circle -->
+  <circle cx="50" cy="50" r="8" fill="url(#goldGradient)"/>
+
+  <!-- Petals (8 petals arranged in circle) -->
+  <!-- Top petal -->
+  <path d="M 50 10 Q 45 30, 50 40 Q 55 30, 50 10 Z" fill="url(#goldGradient)" opacity="0.9"/>
+
+  <!-- Top-right petal -->
+  <path d="M 68 18 Q 58 35, 56 42 Q 62 38, 68 18 Z" fill="url(#goldGradient)" opacity="0.85"/>
+
+  <!-- Right petal -->
+  <path d="M 82 32 Q 65 42, 60 48 Q 70 48, 82 32 Z" fill="url(#goldGradient)" opacity="0.8"/>
+
+  <!-- Bottom-right petal -->
+  <path d="M 82 68 Q 65 58, 60 52 Q 70 52, 82 68 Z" fill="url(#goldGradient)" opacity="0.85"/>
+
+  <!-- Bottom petal -->
+  <path d="M 50 90 Q 45 70, 50 60 Q 55 70, 50 90 Z" fill="url(#goldGradient)" opacity="0.9"/>
+
+  <!-- Bottom-left petal -->
+  <path d="M 32 82 Q 42 65, 44 58 Q 38 62, 32 82 Z" fill="url(#goldGradient)" opacity="0.85"/>
+
+  <!-- Left petal -->
+  <path d="M 18 68 Q 35 58, 40 52 Q 30 52, 18 68 Z" fill="url(#goldGradient)" opacity="0.8"/>
+
+  <!-- Top-left petal -->
+  <path d="M 18 32 Q 35 42, 40 48 Q 30 48, 18 32 Z" fill="url(#goldGradient)" opacity="0.85"/>
+</svg>
