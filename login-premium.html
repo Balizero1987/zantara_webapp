@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ZANTARA — Login</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:radial-gradient(circle at center,var(--bg-0) 0%,var(--bg-1) 100%);
+  font-family:Inter,system-ui,sans-serif;
+  color:var(--text);
+}
+
+/* Card base */
+.card{
+  width:min(400px,90vw);
+  padding:36px 28px;
+  border:1px solid rgba(199,167,94,.18);
+  border-radius:16px;
+  background:rgba(12,12,19,.7);
+  backdrop-filter:blur(8px);
+  text-align:center;
+  box-shadow:0 10px 40px rgba(0,0,0,.35);
+}
+#logo{
+  width:120px;
+  opacity:.88;
+  margin-bottom:18px;
+  filter:drop-shadow(0 0 8px rgba(199,167,94,.25));
+}
+h1{
+  font:600 14px/1.4 "Playfair Display",serif;
+  color:var(--gold);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  margin:0 0 10px;
+}
+p{opacity:.7;margin:0 0 16px}
+
+/* Form */
+label{display:block;text-align:left;margin:14px 0 6px;color:#ccc;font-size:14px}
+input{
+  width:100%;
+  padding:12px 14px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#12121A;
+  color:var(--text);
+}
+input:focus{
+  outline:none;
+  border-color:var(--gold);
+  box-shadow:0 0 10px rgba(199,167,94,.25);
+}
+button{
+  margin-top:20px;
+  width:100%;
+  padding:12px 16px;
+  border:none;
+  border-radius:12px;
+  background:var(--gold);
+  color:var(--bg-0);
+  font-weight:700;
+  cursor:pointer;
+  transition:background .3s ease;
+}
+button:hover{background:var(--gold-2)}
+
+/* Transition overlay */
+#transition{
+  position:fixed;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:radial-gradient(circle at center,var(--bg-0) 0%,var(--bg-1) 100%);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 1s ease;
+  z-index:100;
+}
+#transition.active{opacity:1;pointer-events:auto}
+#lotus{width:100px;filter:drop-shadow(0 0 6px rgba(199,167,94,.25))}
+#infinity{
+  font:600 28px/1 "Playfair Display",serif;
+  color:var(--gold);
+  margin-top:18px;
+  opacity:0;
+  letter-spacing:.12em;
+}
+@keyframes pulse{
+  0%,100%{transform:scale(1);opacity:.6}
+  50%{transform:scale(1.1);opacity:1}
+}
+#caption{
+  position:absolute;
+  bottom:10%;
+  text-align:center;
+  color:var(--gold);
+  font:15px/1.4 "Playfair Display",serif;
+  letter-spacing:.05em;
+  opacity:0;
+}
+audio{display:none}
+footer{
+  position:fixed;
+  bottom:12px;
+  width:100%;
+  text-align:center;
+  font-size:11px;
+  color:rgba(255,255,255,.3);
+  letter-spacing:.05em;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <!-- Logo oro/3D -->
+  <img id="logo" src="assets/balizero-logo-3d.png" alt="Bali Zero Logo">
+
+  <h1>From Zero to Infinity ∞</h1>
+  <p>Accesso riservato al sistema ZANTARA</p>
+
+  <label for="name">Nome</label>
+  <input id="name" placeholder="zero" autocomplete="name">
+
+  <label for="mail">Email aziendale</label>
+  <input id="mail" type="email" placeholder="zero@balizero.com" autocomplete="email">
+
+  <label for="pin">PIN (6 cifre)</label>
+  <input id="pin" type="password" inputmode="numeric" pattern="\\d{6}" placeholder="••••••" aria-describedby="pinHelp">
+  <small id="pinHelp" style="opacity:.6;font-size:12px;">Usa il tuo PIN interno</small>
+
+  <button id="login">Accedi →</button>
+</div>
+
+<!-- Transition overlay -->
+<div id="transition" aria-live="polite">
+  <img id="lotus" src="assets/zantara_logo_transparent.png" alt="Lotus">
+  <div id="infinity">∞</div>
+  <div id="caption">Initializing ZANTARA Intelligence…</div>
+</div>
+
+<footer>Bali Zero is powered by humans, fueled by a thinking engine.</footer>
+
+<script src="js/zantara-api.js"></script>
+<script>
+const tr = document.getElementById('transition');
+const lotus = document.getElementById('lotus');
+const infinity = document.getElementById('infinity');
+const cap = document.getElementById('caption');
+
+document.getElementById('login').addEventListener('click', async ()=>{
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('mail').value.trim();
+  const pin = document.getElementById('pin').value.trim();
+
+  if (!name || !email || !pin) {
+    alert('Compila tutti i campi');
+    return;
+  }
+
+  // Save to localStorage for auth
+  localStorage.setItem('zantara-name', name);
+  localStorage.setItem('zantara-email', email);
+  localStorage.setItem('zantara-token', 'logged-in');
+
+  // Transition animation
+  tr.classList.add('active');
+  lotus.style.animation='pulse 1.4s ease-in-out 2';
+  setTimeout(()=>{
+    lotus.style.opacity='0';
+    infinity.style.opacity='1';
+    infinity.style.animation='pulse 1.6s ease-in-out 2';
+  },1400);
+  setTimeout(()=>{ cap.style.opacity='1'; },1800);
+  setTimeout(()=>{
+    tr.style.opacity='0';
+    window.location.href='chat-premium.html';
+  },3600);
+});
+</script>
+</body>
+</html>

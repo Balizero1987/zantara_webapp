@@ -1,33 +1,18 @@
 /* ZANTARA Design Tokens */
-/* Bali Zero Color Palette */
-
 :root {
-  /* Background gradients */
-  --bg-0: #0A0A12;
-  --bg-1: #12121A;
-  --bg-2: #1A1A26;
+  /* Backgrounds */
+  --bg-0: #0b0b0b;
+  --bg-1: #121212;
 
-  /* Primary colors */
-  --gold: #C7A75E;
-  --gold-2: #D4B870;
-  --red: #E94D35;
-  --off-white: #F9F5F0;
+  /* Text Colors */
+  --text: #e8e2cf;
+  --gold: #d6b87a;
+  --gold-2: #c7a75e;
 
-  /* Text colors */
-  --text: #F9F5F0;
-  --text-secondary: #C7A75E;
-  --text-muted: rgba(249, 245, 240, 0.7);
-
-  /* UI elements */
-  --line: rgba(199, 167, 94, 0.25);
-  --border: rgba(199, 167, 94, 0.18);
-
-  /* Effects */
-  --glow-gold: 0 0 40px rgba(199, 167, 94, 0.4);
-  --glow-red: 0 0 30px rgba(233, 77, 53, 0.5);
-  --shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
-
-  /* Glass morphism */
-  --glass-bg: rgba(12, 12, 19, 0.7);
-  --glass-border: rgba(199, 167, 94, 0.18);
+  /* Lines & Borders */
+  --line: #2b2b2b;
 }
+
+/* Global font imports */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&display=swap');
