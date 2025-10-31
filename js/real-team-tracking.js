@@ -5,7 +5,7 @@
 
 class RealTeamTrackingService {
   constructor() {
-    this.apiBase = window.ZANTARA_API?.config?.backend_url || 'https://scintillating-kindness-production-47e3.up.railway.app';
+    this.apiBase = window.ZANTARA_API?.config?.backend_url || 'https://nuzantara-rag.fly.dev';
     this.userId = null;
     this.userName = null;
     this.userEmail = null;

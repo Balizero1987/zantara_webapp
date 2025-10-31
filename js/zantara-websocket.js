@@ -1,6 +1,6 @@
 /**
  * ZANTARA WebSocket Client
- * Real-time communication with TS-BACKEND Railway service
+ * Real-time communication with TS-BACKEND Fly.io service
  *
  * Features:
  * - Auto-reconnect on disconnect
@@ -19,7 +19,7 @@ class ZantaraWebSocket {
   constructor(userId = null, options = {}) {
     // Configuration
     this.userId = userId;
-    this.wsUrl = options.wsUrl || 'wss://ts-backend-production-568d.up.railway.app/ws';
+    this.wsUrl = options.wsUrl || 'wss://nuzantara-backend.fly.dev/ws';
     this.autoReconnect = options.autoReconnect !== false; // Default: true
     this.reconnectInterval = options.reconnectInterval || 3000; // 3s
     this.maxReconnectAttempts = options.maxReconnectAttempts || 10;

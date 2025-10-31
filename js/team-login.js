@@ -6,7 +6,7 @@
 class SecureTeamLogin {
   constructor() {
     // TS Backend - team.login endpoint (demo auth, no API key needed)
-    this.apiBase = 'https://ts-backend-production-568d.up.railway.app';
+    this.apiBase = 'https://nuzantara-backend.fly.dev';
     this.currentUser = null;
     this.token = null;
   }

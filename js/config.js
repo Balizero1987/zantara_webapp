@@ -8,9 +8,9 @@
 export const config = {
   // API Endpoints
   api: {
-    // Railway backends (RAG and TypeScript)
-    baseUrl: import.meta.env?.VITE_API_BASE_URL || 'https://scintillating-kindness-production-47e3.up.railway.app',
-    proxyUrl: import.meta.env?.VITE_PROXY_URL || 'https://ts-backend-production-568d.up.railway.app',
+    // Fly.io backends (RAG and TypeScript)
+    baseUrl: import.meta.env?.VITE_API_BASE_URL || 'https://nuzantara-rag.fly.dev',
+    proxyUrl: import.meta.env?.VITE_PROXY_URL || 'https://nuzantara-backend.fly.dev',
     timeout: 30000,
     retryAttempts: 3,
     retryDelay: 1000,

@@ -799,7 +799,7 @@
                         } else if (window.Citations && !sources) {
                             // SSE didn't provide sources - fetch them from API as fallback
                             console.log('[Citations] SSE missing sources, fetching from API fallback...');
-                            const RAG_BACKEND = 'https://scintillating-kindness-production-47e3.up.railway.app';
+                            const RAG_BACKEND = 'https://nuzantara-rag.fly.dev';
                             fetch(`${RAG_BACKEND}/bali-zero/chat`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },

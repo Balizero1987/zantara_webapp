@@ -206,7 +206,7 @@ class ErrorHandler {
   async reportToBackend(error) {
     try {
       // Don't use apiClient to avoid circular errors
-      const response = await fetch('https://ts-backend-production-568d.up.railway.app/call', {
+      const response = await fetch('https://nuzantara-backend.fly.dev/call', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

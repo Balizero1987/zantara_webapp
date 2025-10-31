@@ -7,7 +7,7 @@
 
 class JWTLogin {
   constructor() {
-    this.apiBase = 'https://ts-backend-production-568d.up.railway.app';
+    this.apiBase = 'https://nuzantara-backend.fly.dev';
     this.isLoggedIn = false;
   }
 

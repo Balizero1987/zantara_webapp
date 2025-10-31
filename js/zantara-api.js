@@ -1,10 +1,10 @@
 /**
  * ZANTARA API Layer - Clean & Simple
- * Allineato con backend Railway (Ottobre 2025)
+ * Allineato con backend Fly.io (Ottobre 2025)
  * 
  * Backend:
- * - TS-BACKEND: https://ts-backend-production-568d.up.railway.app
- * - RAG-BACKEND: https://scintillating-kindness-production-47e3.up.railway.app
+ * - TS-BACKEND: https://nuzantara-backend.fly.dev
+ * - RAG-BACKEND: https://nuzantara-rag.fly.dev
  * 
  * Auth: Demo auth middleware (no API key needed)
  * Contracts: API versioning and fallback system

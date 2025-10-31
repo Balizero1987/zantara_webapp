@@ -5,7 +5,7 @@
 
 class ConversationPersistence {
   constructor() {
-    this.apiBase = 'https://scintillating-kindness-production-47e3.up.railway.app';
+    this.apiBase = 'https://nuzantara-rag.fly.dev';
     this.saveDebounceTimer = null;
     this.saveDebounceDelay = 2000; // Save 2 seconds after last message
   }

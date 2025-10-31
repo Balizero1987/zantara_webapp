@@ -4,8 +4,8 @@ info:
   description: Bali Zero Business Services API
   version: 5.2.0
 servers:
-  - url: https://ts-backend-production-568d.up.railway.app
-    description: Production server (Railway)
+  - url: https://nuzantara-backend.fly.dev
+    description: Production server (Fly.io)
 
 components:
   securitySchemes:

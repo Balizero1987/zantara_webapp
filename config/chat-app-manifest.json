@@ -1,8 +1,8 @@
 {
   "name": "ZANTARA",
   "description": "AI Assistant for Bali Zero - Intelligent automation and chat support",
-  "avatarUrl": "https://ts-backend-production-568d.up.railway.app/assets/zantara-avatar.png",
-  "botUrl": "https://ts-backend-production-568d.up.railway.app/chatbot",
+  "avatarUrl": "https://nuzantara-backend.fly.dev/assets/zantara-avatar.png",
+  "botUrl": "https://nuzantara-backend.fly.dev/chatbot",
   "interactive": true,
   "canJoinSpaces": true,
   "canReceiveDirectMessages": true,
