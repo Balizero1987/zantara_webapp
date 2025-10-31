@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#FF0000">
+    <title>ZANTARA - Login</title>
+
+    <!-- PWA Support -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+    <!-- Google Fonts - Bali Zero Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- API Layer -->
+    <script src="js/api-contracts.js"></script>
+    <script src="js/zantara-api.js"></script>
+
+    <style>
+        /* Bali Zero Official Color Palette */
+        :root {
+            --black: #090920;
+            --red: #FF0000;
+            --cream: #e8d5b7;
+            --gold: #D4AF37;
+            --navy: #1a1f3a;
+            --off-white: #f5f5f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            background: var(--black);
+            color: var(--off-white);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Batik Pattern Background */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(20, 20, 50, 0.4) 0%, transparent 50%), var(--black);
+            z-index: 0;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.06) 2%, transparent 0%),
+                radial-gradient(circle at 75% 75%, rgba(232, 213, 183, 0.06) 2%, transparent 0%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.03) 1%, transparent 0%);
+            background-size: 60px 60px, 80px 80px, 40px 40px;
+            background-position: 0 0, 20px 20px, 40px 40px;
+            animation: batik-flow 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes batik-flow {
+            0%, 100% { opacity: 0.03; }
+            50% { opacity: 0.06; }
+        }
+
+        .login-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-card {
+            background: var(--navy);
+            border: 2px solid rgba(232, 213, 183, 0.2);
+            border-radius: 20px;
+            padding: 48px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .logo-center {
+            width: 80px;
+            height: 80px;
+            filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.3));
+        }
+
+        .infinity-symbol {
+            font-size: 48px;
+            color: var(--gold);
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            color: var(--off-white);
+        }
+
+        .powered-by {
+            color: var(--cream);
+            font-size: 14px;
+            margin-bottom: 32px;
+            opacity: 0.8;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+
+        .message.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--cream);
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid rgba(232, 213, 183, 0.2);
+            background: rgba(26, 31, 58, 0.5);
+            color: var(--off-white);
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: rgba(26, 31, 58, 0.8);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: rgba(232, 213, 183, 0.4);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px 24px;
+            background: var(--red);
+            color: var(--black);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            margin-top: 8px;
+        }
+
+        .btn-primary:hover {
+            background: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .brand-footer {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(232, 213, 183, 0.1);
+            font-size: 12px;
+            color: rgba(232, 213, 183, 0.6);
+        }
+
+        .brand-footer strong {
+            color: var(--gold);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="logo-container">
+                <img src="assets/logoscon.png" class="logo-center" alt="ZANTARA">
+                <span class="infinity-symbol">∞</span>
+            </div>
+
+            <h1>Welcome to Zantara</h1>
+            <p class="powered-by">🪷 The soul of Bali Zero intelligence</p>
+
+            <!-- Message Area -->
+            <div id="message" style="display: none;"></div>
+
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Nome</label>
+                    <input type="text" id="name" class="form-input"
+                           placeholder="Zero" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email aziendale</label>
+                    <input type="email" id="email" class="form-input"
+                           placeholder="zero@balizero.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">PIN (6 cifre)</label>
+                    <input type="password" id="pin" class="form-input"
+                           placeholder="••••••" maxlength="6" required>
+                </div>
+
+                <button type="submit" class="btn-primary" id="loginBtn">
+                    Accedi al Team →
+                </button>
+            </form>
+
+            <div class="brand-footer">
+                From Zero to <strong>Infinity ∞</strong>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const pin = document.getElementById('pin').value;
+
+            const messageDiv = document.getElementById('message');
+            const loginBtn = document.getElementById('loginBtn');
+
+            // Show loading
+            messageDiv.style.display = 'block';
+            messageDiv.className = 'message';
+            messageDiv.textContent = '🔄 Logging in...';
+            loginBtn.disabled = true;
+
+            try {
+                // Call API
+                const result = await ZANTARA_API.teamLogin(email, pin, name);
+
+                if (result.success) {
+                    messageDiv.className = 'message success';
+                    messageDiv.textContent = '✅ ' + result.message;
+
+                    // Redirect to chat
+                    setTimeout(() => {
+                        window.location.href = 'chat.html';
+                    }, 1000);
+                } else {
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = '❌ ' + result.error;
+                    loginBtn.disabled = false;
+                }
+            } catch (error) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = '❌ Errore: ' + error.message;
+                loginBtn.disabled = false;
+            }
+        });
+
+        // Check if already logged in
+        if (ZANTARA_API.isLoggedIn()) {
+            window.location.href = 'chat.html';
+        }
+    </script>
+</body>
+</html>
