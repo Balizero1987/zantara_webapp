@@ -310,6 +310,9 @@ const input = document.getElementById('input');
 const send = document.getElementById('send');
 const suggest = document.getElementById('suggest');
 
+// ✨ Conversation History (for context retention)
+let conversationHistory = [];
+
 const suggestions = [
   "Vuoi sapere quanto dura la procedura di visto?",
   "Serve la checklist documenti per C1, D12 o E33G?",
@@ -349,6 +352,14 @@ async function handleSend(){
   input.value='';
   setThinking(true);
 
+  // ✨ Add user message to conversation history
+  conversationHistory.push({role: 'user', content: t});
+
+  // Keep only last 20 messages (10 turns) for performance
+  if (conversationHistory.length > 20) {
+    conversationHistory = conversationHistory.slice(-20);
+  }
+
   try {
     const userEmail = localStorage.getItem('zantara-email') || 'zero@balizero.com';
 
@@ -374,6 +385,10 @@ async function handleSend(){
 
       window.ZANTARA_SSE.on('complete', () => {
         setThinking(false);
+
+        // ✨ Add assistant response to conversation history
+        conversationHistory.push({role: 'assistant', content: fullResponse});
+
         // Add smart suggestions
         const lastMsg = chat.querySelector('.message.zantara:last-child');
         if (lastMsg && fullResponse.includes('visto')) {
@@ -402,13 +417,17 @@ async function handleSend(){
         setThinking(false);
       });
 
-      await window.ZANTARA_SSE.stream(t, userEmail);
+      // ✨ Pass conversation history for context (exclude current message - already in query)
+      const historyForContext = conversationHistory.slice(0, -1);
+      await window.ZANTARA_SSE.stream(t, userEmail, historyForContext);
 
     } else {
       // Fallback to regular API
       const response = await ZANTARA_API.chat(t, userEmail);
       if (response.success) {
         append('<b>ZANTARA:</b> ' + response.response, 'zantara');
+        // ✨ Add assistant response to conversation history
+        conversationHistory.push({role: 'assistant', content: response.response});
       } else {
         append('<span style="color: #ff6b6b;">Errore. Riprova.</span>', 'zantara');
       }
